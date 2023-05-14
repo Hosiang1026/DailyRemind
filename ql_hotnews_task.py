@@ -50,7 +50,8 @@ def getNew():
 
         url = list(dict.fromkeys(url))
         for i in range(0, len(title)):
-            _content = _content + "<a href=" + url[i] + ">" + title[i] + "</a>\n"
+            # _content = _content + "<a href=" + url[i] + ">" + title[i] + "</a>\n"
+            _content = _content + title[i] + "\n"
         return _content
     except:
         return ''
