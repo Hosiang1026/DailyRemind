@@ -1,29 +1,10 @@
 /*
-东东水果:脚本更新地址 jd_fruit_task.js
-更新时间：2021-5-18
-活动入口：京东APP我的-更多工具-东东农场
-东东农场活动链接：https://h5.m.jd.com/babelDiy/Zeus/3KSjXqQabiTuD1cJ28QskrpWoBKT/index.html
-已支持IOS双京东账号,Node.js支持N个京东账号
-脚本兼容: QuantumultX, Surge, Loon, JSBox, Node.js
-互助码shareCode请先手动运行脚本查看打印可看到
-一天只能帮助3个人。多出的助力码无效
-==========================Quantumultx=========================
-[task_local]
-#jd免费水果
-5 6-18/6 * * * jd_fruit_task.js, tag=东东农场日常任务, img-url=https://raw.githubusercontent.com/58xinian/icon/master/jdnc.png, enabled=true
-=========================Loon=============================
-[Script]
-cron "5 6-18/6 * * *" script-path=jd_fruit_task.js,tag=东东农场日常任务
-
-=========================Surge============================
-东东农场日常任务 = type=cron,cronexp="5 6-18/6 * * *",wake-system=1,timeout=3600,script-path=jd_fruit_task.js
-
-=========================小火箭===========================
-东东农场日常任务 = type=cron,script-path=jd_fruit_task.js, cronexpr="5 6-18/6 * * *", timeout=3600, enable=true
-
-export DO_TEN_WATER_AGAIN="" 默认再次浇水
-
+天气预报任务:脚本更新地址 jd_fruit_task.js
 */
+
+const axios = require('axios')
+axios.defaults.timeout = 40 * 1000
+
 const $ = new Env('天气预报任务');
 let cookiesArr = [],
     cookie = '',
@@ -50,44 +31,61 @@ let randomCount = $.isNode() ? 20 : 5;
 const JD_API_HOST = 'https://api.m.jd.com/client.action';
 const urlSchema = `openjd://virtual?params=%7B%20%22category%22:%20%22jump%22,%20%22des%22:%20%22m%22,%20%22url%22:%20%22https://h5.m.jd.com/babelDiy/Zeus/3KSjXqQabiTuD1cJ28QskrpWoBKT/index.html%22%20%7D`;
 let lnrun = 0;
-!(async() => {
-	await requireConfig();
-    if (!cookiesArr[0]) {
-        $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', { "open-url": "https://bean.m.jd.com/bean/signIndex.action" });
-        return;
-    }
-    for (let i = 0; i < cookiesArr.length; i++) {
-        if (cookiesArr[i]) {
-            cookie = cookiesArr[i];
-            $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
-            $.index = i + 1;
-            $.isLogin = true;
-            $.nickName = '';
-            //await TotalBean();
-            console.log(`\n开始【京东账号${$.index}】${$.nickName || $.UserName}\n`);
-            if (!$.isLogin) {
-                $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, { "open-url": "https://bean.m.jd.com/bean/signIndex.action" });
 
-                if ($.isNode()) {
-                    await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
-                }
-                continue
-            }
-            message = '';
-            subTitle = '';
-            option = {};
-						$.UA = require('./USER_AGENTS').UARAM();
-            $.retry = 0;
-            lnrun++;
-            await jdFruit();
-						if (lnrun == 3) {
-										console.log(`\n【访问接口次数达到3次，休息一分钟.....】\n`);
-										await $.wait(60 * 1000);
-										lnrun = 0;
-						}
-						await $.wait(30 * 1000);
+//处理要发送的天气内容
+const handleWeatherContent = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let content = []
+      const { start, weather, classTable, end} = require('./input')
+
+      //根据不同的配置，增加不同的内容
+      //开头语模块
+      if (start.open) {
+        content.push(`${start.content}`)
+      }
+
+      //课表模块
+      if (classTable.open) {
+        const handleClassTable = require('./functions/classTable')
+        const classTableContent = await handleClassTable()
+        if ('' != classTableContent) {
+          content.push(`\n\n${classTableContent}`)
         }
+      }
+
+      // 天气模块
+      if (weather.open) {
+        const handleWeather = require('./functions/weather')
+        const weatherContent = await handleWeather()
+        if ('' != weatherContent) {
+          content.push(`\n\n${weatherContent}`)
+        }
+      }
+
+      //结束模块
+      if (end.open) {
+        let date = new Date()
+        let nowTime = `${date.getFullYear()}-${(date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 1):(date.getMonth() + 1)}-${(date.getDate()) < 10 ? '0' + (date.getDate()) : (date.getDate())} ${(date.getHours()) < 10 ? '0' + (date.getHours()) : (date.getHours())}:${(date.getMinutes()) < 10 ? '0' + (date.getMinutes()) : (date.getMinutes())}:${(date.getSeconds()) < 10 ? '0' + (date.getSeconds()) : (date.getSeconds())}`
+        content.push(`\n\n${end.content}`)
+        content.push(`\n${end.time} ${nowTime}`)
+      }
+
+      //如果啥都没输入的话
+      if (content.length == 0) {
+        content.push('请最少配置一个模块内容,没有内容无法推送')
+      }
+      resolve(content.join(''))//转字符串
+    } catch (error) {
+      console.log('处理内容失败', error.message || error);
+      reject(error.message || error)
     }
+  })
+}
+
+!(async() => {
+     const content = await handleWeatherContent();
+	  console.log('处理内容结果', content);
     if ($.isNode() && allMessage && $.ctrTemp) {
         await notify.sendNotify(`${$.name}`, `${allMessage}`)
     }
