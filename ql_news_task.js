@@ -1,20 +1,20 @@
 /*
-* 天气预报任务:脚本更新地址 ql_weather_task.js
-  配置参数 input.js
+* 新闻早报任务:脚本更新地址 ql_news_task.js
+* 配置参数 input.js
 */
 
 const axios = require('axios')
 axios.defaults.timeout = 40 * 1000
 
-const $ = new Env('天气预报任务');
+const $ = new Env('新闻早报任务');
 let cookiesArr = [], notify, allMessage = '';
 
-//处理要发送的天气内容
-const handleWeatherContent = () => {
+//处理要发送的新闻内容
+const handleNewsContent = () => {
   return new Promise(async (resolve, reject) => {
     try {
       let content = []
-      const { start, weather, classTable, end} = require('./input')
+      const { start, news, sentence, daily, end} = require('./input')
 
       //根据不同的配置，增加不同的内容
       //开头语模块
@@ -22,24 +22,27 @@ const handleWeatherContent = () => {
         content.push(`${start.content}`)
       }
 
-      //课表模块
-      if (classTable.open) {
-        const handleClassTable = require('./functions/classTable')
-        const classTableContent = await handleClassTable()
-        if ('' != classTableContent) {
-          content.push(`\n\n${classTableContent}`)
+      //纪念日模块
+      if (daily.open) {
+        const handleTimeList = require('./functions/daily')
+        const handleTimeContent = await handleTimeList()
+        if (handleTimeContent.length > 0) {
+          content.push(`\n\n${handleTimeContent}`)
         }
       }
-
-      // 天气模块
-      if (weather.open) {
-        const handleWeather = require('./functions/weather')
-        const weatherContent = await handleWeather()
-        if ('' != weatherContent) {
-          content.push(`\n\n${weatherContent}`)
+      // 新闻模块
+      if (news.open) {
+        const handleNews = require('./functions/news')
+        const newsContent = await handleNews()
+        if ('' != newsContent) {
+          content.push(`\n\n${newsContent}`)
         }
       }
-
+      //彩虹屁
+      if (sentence.open) {
+        const res = await axios.get('https://api.shadiao.pro/chp')
+        content.push(`\n\n💘${res.data.data.text}`)
+      }
       //结束模块
       if (end.open) {
         let date = new Date()
@@ -47,7 +50,6 @@ const handleWeatherContent = () => {
         content.push(`\n\n${end.content}`)
         content.push(`\n${end.time} ${nowTime}`)
       }
-
       //如果啥都没输入的话
       if (content.length == 0) {
         content.push('请最少配置一个模块内容,没有内容无法推送')
@@ -63,8 +65,8 @@ const handleWeatherContent = () => {
 !(async() => {
      //获取配置
      await requireConfig();
-     //获取天气内容
-     const content = await handleWeatherContent();
+     //获取新闻内容
+     const content = await handleNewsContent();
      //发送通知
      await notify.sendNotify(`${content}`)
 })()
