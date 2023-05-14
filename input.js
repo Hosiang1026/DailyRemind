@@ -446,7 +446,7 @@ let gasoline = {
 
 //结束语模块
 let end = {
-    open: true,//是否需要推送时增加结束语，需要填true，否则填false  （不需要加引号）
+    open: false,//是否需要推送时增加结束语，需要填true，否则填false  （不需要加引号）
     content: '本通知 By 狂欢马克思',//结束语内容，可以输入emoji表情，可以使用 \n 来换行
     time: '通知时间: '
 }
