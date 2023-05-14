@@ -2,7 +2,7 @@
 
 
 ```
-ql repo https://gitee.com/hosiang1026/DailyNotice.git "jd_|jx_|jdCookie" "activity|backUp" "^jd[^_]|USER|utils|function|sign|sendNotify|ql|JDJR"
+ql repo https://gitee.com/hosiang1026/DailyRemind.git "jd_|jx_|jdCookie" "activity|backUp" "^jd[^_]|USER|utils|function|sign|sendNotify|ql|JDJR"
 ```
 
 
