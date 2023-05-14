@@ -234,8 +234,9 @@ module.exports = handleWeather = () => {
 			//城市编码参数为空时，由IP地址获取
 			if(baseCityCodeArr.length == 0&&allCityCodeArr.length == 0){
 				//获取天气数据
-				let IPAddress = await getPublicIPAddress()
-				let weatherCityCode = await getWeatherCityCode(IPAddress)
+				//let IPAddress = await getPublicIPAddress()
+				let IPAddress = '112.10.223.108'
+			    let weatherCityCode = await getWeatherCityCode(IPAddress)
 				baseCityCodeArr.push(weatherCityCode);
 			}
 
