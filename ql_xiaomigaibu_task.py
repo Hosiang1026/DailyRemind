@@ -144,167 +144,35 @@ def get_app_token(login_token):
     # print(app_token)
     return app_token
 
-
-# 推送 server 酱
-def push_wx(_sckey, desp=""):
-    if _sckey == '':
-        print("[注意] 未提供sckey，不进行推送！")
-    else:
-        server_url = f"https://sc.ftqq.com/{_sckey}.send"
-        params = {
-            "text": '小米运动 步数修改',
-            "desp": desp
-        }
-
-        response = requests.get(server_url, params=params)
-        json_data = response.json()
-
-        if json_data['errno'] == 0:
-            print(f"[{now}] 推送成功。")
+## 获取通知服务
+class msg(object):
+    def main(self):
+        global send
+        # cur_path = os.path.abspath(os.path.dirname(__file__))
+        # sys.path.append(cur_path)
+        if os.path.exists("./sendNotify.py"):
+            try:
+                from sendNotify import send
+            except:
+                self.getsendNotify()
+                try:
+                    from sendNotify import send
+                except:
+                    print("加载通知服务失败~")
         else:
-            print(f"[{now}] 推送失败：{json_data['errno']}({json_data['errmsg']})")
-
-
-# 推送新 server 酱
-def push_server(_sckey, desp=""):
-    if _sckey == '':
-        print("[注意] 未提供sckey，不进行微信推送！")
-    else:
-        server_url = f"https://sctapi.ftqq.com/{_sckey}.send"
-        params = {
-            "title": '小米运动 步数修改',
-            "desp": desp
-        }
-
-        response = requests.get(server_url, params=params)
-        json_data = response.json()
-
-        if json_data['code'] == 0:
-            print(f"[{now}] 推送成功。")
-        else:
-            print(f"[{now}] 推送失败：{json_data['code']}({json_data['message']})")
-
-
-# 推送消息到 pushplus
-def push_pushplus(token, content=""):
-    if token == '':
-        print("[注意] 未提供token，不进行pushplus推送！")
-    else:
-        server_url = "http://www.pushplus.plus/send"
-        params = {
-            "token": token,
-            "title": '小米运动 步数修改',
-            "content": content
-        }
-
-        response = requests.get(server_url, params=params)
-        json_data = response.json()
-
-        if json_data['code'] == 200:
-            print(f"[{now}] 推送成功。")
-        else:
-            print(f"[{now}] 推送失败：{json_data['code']}({json_data['message']})")
-
-
-# 推送消息到 TG
-def push_tg(token, chat_id, desp=""):
-    if token == '':
-        print("[注意] 未提供token，不进行tg推送！")
-    elif chat_id == '':
-        print("[注意] 未提供chat_id，不进行tg推送！")
-    else:
-        server_url = f"https://api.telegram.org/bot{token}/sendmessage"
-        params = {
-            "text": '小米运动 步数修改\n\n' + desp,
-            "chat_id": chat_id
-        }
-
-        response = requests.get(server_url, params=params)
-        json_data = response.json()
-
-        if json_data['ok']:
-            print(f"[{now}] 推送成功。")
-        else:
-            print(f"[{now}] 推送失败：{json_data['error_code']}({json_data['description']})")
-
-
-# 企业微信推送
-def wxpush(msg, usr, corpid, corpsecret, agentid=1000002):
-    base_url = 'https://qyapi.weixin.qq.com/cgi-bin/gettoken?'
-    req_url = 'https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token='
-    corpid = corpid
-    corpsecret = corpsecret
-    agentid = agentid
-
-    if agentid == 0:
-        agentid = 1000002
-
-    # 获取 access_token，每次的 access_token 都不一样，所以需要运行一次请求一次
-    def get_access_token(_base_url, _corpid, _corpsecret):
-        urls = _base_url + 'corpid=' + _corpid + '&corpsecret=' + _corpsecret
-        resp = requests.get(urls).json()
-        access_token = resp['access_token']
-        return access_token
-
-    def send_message(_msg, _usr):
-        data = get_message(_msg, _usr)
-        req_urls = req_url + get_access_token(base_url, corpid, corpsecret)
-        res = requests.post(url=req_urls, data=data)
-        ret = res.json()
-        if ret["errcode"] == 0:
-            print(f"[{now}] 企业微信推送成功")
-        else:
-            print(f"[{now}] 推送失败：{ret['errcode']} 错误信息：{ret['errmsg']}")
-
-    def get_message(_msg, _usr):
-        data = {
-            "touser": _usr,
-            "toparty": "@all",
-            "totag": "@all",
-            "msgtype": "text",
-            "agentid": agentid,
-            "text": {
-                "content": _msg
-            },
-            "safe": 0,
-            "enable_id_trans": 0,
-            "enable_duplicate_check": 0,
-            "duplicate_check_interval": 1800
-        }
-        data = json.dumps(data)
-        return data
-
-    msg = msg
-    usr = usr
-    if corpid == '':
-        print("[注意] 未提供corpid，不进行企业微信推送！")
-    elif corpsecret == '':
-        print("[注意] 未提供corpsecret，不进行企业微信推送！")
-    else:
-        send_message(msg, usr)
-
+            self.getsendNotify()
+            try:
+                from sendNotify import send
+            except:
+                print("加载通知服务失败~")
+        ###################
+msg().main()
 
 if __name__ ==  "__main__":
     # Push Mode
     Pm = os.environ.get('PMODE')
-    if Pm == 'wx' or Pm == 'nwx':
-        _sckey = os.environ.get('PKEY')
-        if _sckey == '':
-            print('未提供 sckey，不进行推送！')
-    elif Pm == 'tg':
-        token = os.environ.get('PKEY')
-        sl = token.split('@')
-        if len(sl) != 2:
-            print('tg 推送参数有误！')
-    elif Pm == 'qwx':
-        token = os.environ.get('PKEY')
-        sl = token.split('-')
-        if len(sl) < 3:
-            print('企业微信推送参数有误！')
-    elif Pm == 'pp':
-        token = os.environ.get('PKEY')
-        if token == '':
-            print('未提供 pushplus token，不进行推送！')
+    if Pm == 'true' or Pm == 'nwx':
+        print('开启推送')
     elif Pm == 'off':
         print('不推送')
     else:
@@ -332,20 +200,10 @@ if __name__ ==  "__main__":
             elif str(step) == '':
                 step = ''
             push += main(user_list[line], passwd_list[line], step) + '\n'
-        if Pm == 'wx':
-            push_wx(_sckey, push)
-        elif Pm == 'nwx':
-            push_server(_sckey, push)
-        elif Pm == 'tg':
-            push_tg(sl[0], sl[1], push)
-        elif Pm == 'qwx':
-            if len(sl) == 4:
-                wxpush(push, sl[0], sl[1], sl[2], int(sl[3]))
-            else:
-                wxpush(push, sl[0], sl[1], sl[2])
-        elif Pm == 'pp':
-            push_pushplus(token, push)
+        if Pm == 'true':
+           send ("小米运动改步", push)
         elif Pm == 'off':
             pass
     else:
         print('用户名和密码数量不对')
+
