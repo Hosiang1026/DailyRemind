@@ -12,11 +12,6 @@ ql repo https://gitee.com/hosiang1026/DailyRemind.git "ql_|jx_|jdCookie|input" "
 ```
 https://gitee.com/hosiang1026/DailyRemindScripts.git
 ```
-#### aligo库
-
-```
-pip install aligo -i https://pypi.tuna.tsinghua.edu.cn/simple
-```
 
 #### 任务列表
 
