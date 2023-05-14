@@ -5,7 +5,7 @@
 //机器人模块
 //这里输入机器人的Webhook地址，注意不要填错了
 //let robotKey = ``
-let robotKey = `https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=07f4c380-726a-413e-b44d-2dec5015449b`
+let robotKey = `https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=07f4c380-726a-413e-b44d-2dec5015449bb`
 
 //开头语模块
 let start = {
