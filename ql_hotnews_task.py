@@ -78,7 +78,7 @@ def load_send():
 
 
 if __name__ == '__main__':
-    version = 1.1
+    version = 1.2
     checkUpdate()
     if load_send():
         content = getNew()
