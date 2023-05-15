@@ -3,8 +3,7 @@
 #### ql repo命令拉取脚本
 
 ```
-ql repo https://gitee.com/hosiang1026/DailyRemind.git "ql_|input" "activity|backUp" "^jd[^_]|USER|utils|function|sign|sendNotify|ql|JDJR|qlApi"
-
+ql repo https://gitee.com/hosiang1026/DailyRemind.git "ql_" "activity|backUp" "^jd[^_]|USER|utils|function|sign|sendNotify|ql|JDJR|qlApi"
 ```
 
 #### 依赖库
