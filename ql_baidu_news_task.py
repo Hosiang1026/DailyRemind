@@ -53,33 +53,6 @@ def getNew():
     except Exception as e:
         return e
 
-# 获取百度电影
-def getMovie():
-    try:
-        url = []
-        title = []
-        desc = []
-        _content = ""
-        bdurl = "https://top.baidu.com/board?tab=movie"
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Edg/96.0.1054.62'}
-
-        r = requests.get(bdurl)
-        r.encoding = r.apparent_encoding
-        soup = BeautifulSoup(r.text, 'html.parser')
-        tags = soup.find_all(class_="content_1YWBm");
-        for i in soup.find_all(class_="c-single-text-ellipsis"):
-            title.append(i.get_text().strip())
-        for i in soup.find_all(class_="look-more_3oNWC"):
-            url.append(str(i).split("href=\"")[1].split("\"")[0])
-
-        url = list(dict.fromkeys(url))
-        for i in range(0, 6:
-            _content = _content + "\n" +'.'+ title[i]
-        return _content
-    except Exception as e:
-        return e
-
 # 推送
 def load_send():
     global send
@@ -100,7 +73,7 @@ def load_send():
 
 
 if __name__ == '__main__':
-    version = 1.2
+    version = 1.1
     checkUpdate()
     if load_send():
         content = getNew()
@@ -109,10 +82,3 @@ if __name__ == '__main__':
             send("百度热搜", content)
         else:
             print('获取百度热搜失败！')
-
-        newcontent = getMovie()
-        if newcontent != '':
-            print('获取百度电影成功！')
-            send("百度电影", newcontent)
-        else:
-            print('获取百度电影失败！')
