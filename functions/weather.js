@@ -1,4 +1,4 @@
-const { weather } = require('../input')
+const { weather } = require('./config/input')
 const axios = require('axios')
 const publicIp = require('public-ip');
 

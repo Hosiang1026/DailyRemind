@@ -1,4 +1,4 @@
-const { classTable } = require('../input')
+const { classTable } = require('../config/input')
 
 //计算今天到下次节日时间的时间差，参数格式为 YYYY-MM-DD
 const diffTimeToDaily = (nowTime, targetTime) => {

@@ -1,6 +1,6 @@
 
 const axios = require('axios')
-const { robotKey, atAll } = require('../input')
+const { robotKey, atAll } = require('../config/input')
 //调用机器人发送消息
 const robot = async (content) => {//参数为内容
     return new Promise(async (resolve, reject) => {

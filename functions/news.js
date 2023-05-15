@@ -1,4 +1,4 @@
-const { news } = require('../input')
+const { news } = require('../config/input')
 const axios = require('axios')
 
 
