@@ -64,7 +64,6 @@ module.exports = handleTimeList = () => {
                     let solarAnniversaryDate = calendar.conversion(anniversaryDate);
                     if (nowDate == nextAnniversaryDate) {
                         if (anniversaryType == 0 ||anniversaryType == 1 ||anniversaryType == 2) {
-                            //content.push(`· 今天是${anniversaryName}<${anniversaryDate.split('-').join('.')}> ${diffYear}周年`)
                             let todayDate = '<'+anniversaryDate.split('-').join('.')+'>';
                             let todayContent = ' ' + diffYear+'周年';
                             var obj = {todayName:anniversaryName,todayDate:todayDate, todayContent:todayContent};
@@ -73,7 +72,6 @@ module.exports = handleTimeList = () => {
                         if (anniversaryType == 3) {
                             //获取生日星座
                             let anniversaryAstro = calendar.conversionAstro(solarAnniversaryDate);
-                           // content.push(`· 今天是${anniversaryName}<${anniversaryDate.split('-').join('.')}> ${anniversaryAstro}`);
                             let todayDate = '<'+anniversaryDate.split('-').join('.')+'>';
                             var obj = {todayName:anniversaryName,todayDate:todayDate, todayContent:anniversaryAstro};
                             todayArr.push(obj);
@@ -109,7 +107,6 @@ module.exports = handleTimeList = () => {
 
                 var obj = {tempName:tempName,tempTime:tempTime};
                 latelyArr.push(obj);
-                //contentArr.push(`· ${tempName}: 还有${tempTime}天`)
             }
 
             //法定节假日
@@ -133,7 +130,9 @@ module.exports = handleTimeList = () => {
                     let diffTime = diffTimeToDaily(nowDate, nextLegalDate);
 
                     if (nowDate == nextLegalDate) {
-                        content.push(`· 今天是${legalName}<${nowDate.split('-').join('.')}>`)
+                        let todayDate = '<'+nowDate.split('-').join('.')+'>';
+                        var obj = {todayName:legalName,todayDate:todayDate, todayContent:''};
+                        todayArr.push(obj);
                     } else {
                         if (tempTime == 0) {
                             tempName = legalName;
@@ -148,7 +147,6 @@ module.exports = handleTimeList = () => {
                     let endYearLegalDate = nowDate;
                     let startLegalHoliday = legalHoliday[0];
                     let endLegalHoliday = legalHoliday[legalHoliday.length - 1];
-                    let startDiffTime = diffTimeToDaily(nowDate, startYearLegalDate);
                     if (diffTime < 15) {
                         let legalHolidayNum = legalHoliday.length;
                         if (legalHolidayNum == 1) {
@@ -156,8 +154,6 @@ module.exports = handleTimeList = () => {
                             if (new Date(nowDate) > new Date(startYearLegalDate)) {
                                 startYearLegalDate = currentYear + 1 + '-' + startLegalHoliday;
                             }
-
-                            tipsArr.push(`⏳距离${legalName}放假还有${startDiffTime}天\n`)
                             if (legalRepair != 0) {
                                 let legalRepairNum = legalRepair.length;
                                 tipsArr.push(`👩‍💻补班${legalRepairNum}天: ${legalRepair.join('、')}`)
@@ -178,7 +174,7 @@ module.exports = handleTimeList = () => {
                                 endYearLegalDate = currentYear + 1 + '-' + endLegalHoliday;
                             }
                             let startDiffTime = diffTimeToDaily(nowDate, startYearLegalDate);
-                            tipsArr.push(`⏳距离${legalName}放假还有${startDiffTime}天\n`)
+                            tipsArr.push(`⏳距离${legalName}开始放假还有${startDiffTime}天\n`)
                             if (legalRepair != 0) {
                                 let legalRepairNum = legalRepair.length;
                                 tipsArr.push(`👩‍💻补班${legalRepairNum}天: ${legalRepair.join('、')}`)
@@ -196,7 +192,6 @@ module.exports = handleTimeList = () => {
 
                 var obj = {tempName:tempName,tempTime:tempTime};
                 latelyArr.push(obj);
-                //contentArr.push(`· ${tempName}: 还有${tempTime}天`)
             }
 
             //阳历节日
@@ -216,7 +211,9 @@ module.exports = handleTimeList = () => {
                     //计算差值
                     let diffTime = diffTimeToDaily(nowDate, nextSFtvDate);
                     if (nowDate == nextSFtvDate) {
-                        content.push(`· 今天是${sFtvName}<${nowDate.split('-').join('.')}>`)
+                        let todayDate = '<'+nowDate.split('-').join('.')+'>';
+                        var obj = {todayName:sFtvName,todayDate:todayDate, todayContent:''};
+                        todayArr.push(obj);
                     }else{
                         if (tempTime == 0){
                             tempName = sFtvName;
@@ -230,7 +227,6 @@ module.exports = handleTimeList = () => {
 
                 var obj = {tempName:tempName,tempTime:tempTime};
                 latelyArr.push(obj);
-                //contentArr.push(`· ${tempName}: 还有${tempTime}天`)
             }
 
             //阴历节日
@@ -252,7 +248,9 @@ module.exports = handleTimeList = () => {
                     //计算差值
                     let diffTime = diffTimeToDaily(nowDate, nextlFtvSolarDate);
                     if (nowDate == nextlFtvSolarDate) {
-                        content.push(`· 今天是${lFtvName}<${nowDate.split('-').join('.')}>`)
+                        let todayDate = '<'+nowDate.split('-').join('.')+'>';
+                        var obj = {todayName:lFtvName,todayDate:todayDate, todayContent:''};
+                        todayArr.push(obj);
                     }else{
                         if (tempTime == 0){
                             tempName = lFtvName;
@@ -265,7 +263,6 @@ module.exports = handleTimeList = () => {
                 }
                 var obj = {tempName:tempName,tempTime:tempTime};
                 latelyArr.push(obj);
-                //contentArr.push(`· ${tempName}: 还有${tempTime}天`)
             }
 
             //二十四节气
@@ -287,7 +284,9 @@ module.exports = handleTimeList = () => {
                     //计算差值
                     let diffTime = diffTimeToDaily(nowDate, nextTermSolarDate)+1;
                     if (nowDate == nextTermSolarDate) {
-                        content.push(`· 今天是${termName}<${nowDate.split('-').join('.')}>`)
+                        let todayDate = '<'+nowDate.split('-').join('.')+'>';
+                        var obj = {todayName:termName,todayDate:todayDate, todayContent:''};
+                        todayArr.push(obj);
                     }else{
                         if (tempTime == 0){
                             tempSort = termSort;
@@ -303,7 +302,6 @@ module.exports = handleTimeList = () => {
                 tempName = '第'+tempSort+'个节气'+tempName;
                 var obj = {tempName:tempName,tempTime:tempTime};
                 latelyArr.push(obj);
-                //contentArr.push(`· 第${tempSort}个节气${tempName}: 还有${tempTime}天`)
             }
             //特殊节日
             let specialArr = daily.special;
@@ -326,7 +324,9 @@ module.exports = handleTimeList = () => {
                     //计算差值
                     let diffTime = diffTimeToDaily(nowDate, nextSpecialSolarDate);
                     if (nowDate == nextSpecialSolarDate) {
-                        content.push(`· 今天是${specialName}<${nowDate.split('-').join('.')}>`)
+                        let todayDate = '<'+nowDate.split('-').join('.')+'>';
+                        var obj = {todayName:specialName,todayDate:todayDate, todayContent:''};
+                        todayArr.push(obj);
                     }else{
                         if (tempTime == 0){
                             tempName = specialName;
@@ -339,7 +339,6 @@ module.exports = handleTimeList = () => {
                 }
                 var obj = {tempName:tempName,tempTime:tempTime};
                 latelyArr.push(obj);
-                //contentArr.push(`· ${tempName}: 还有${tempTime}天`)
             }
 
             //最近的节日或今日的节日
@@ -356,7 +355,7 @@ module.exports = handleTimeList = () => {
                     let tempName = latelyArr[j].tempName;
                     let tempTime = latelyArr[j].tempTime;
                     if (minTempTime == latelyArr[j].tempTime){
-                        content.push(`距离下一个节日${tempName}: \n还有${tempTime}天\n`);
+                        content.push(`⏳距离下一个节日${tempName}: \n还有${tempTime}天\n`);
                     }else{
                         contentArr.push(`· ${tempName}: 还有${tempTime}天`);
                     }
