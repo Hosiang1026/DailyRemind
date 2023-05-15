@@ -52,7 +52,7 @@ def getNew():
         num = 1;
         for i in range(0, len(title)):
             # _content = _content + "<a href=" + url[i] + ">" + title[i] + "</a>\n"
-            _content = _content + num + "." + title[i] + "\n"
+            _content = "\n" + _content + num + "." + title[i]
             num = num + 1
         return _content
     except:
