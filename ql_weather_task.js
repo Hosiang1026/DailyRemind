@@ -14,7 +14,7 @@ const handleWeatherContent = () => {
   return new Promise(async (resolve, reject) => {
     try {
       let content = []
-      const { start, weather, classTable, end} = require('./config/input')
+      const { start, weather, classTable, end} = require('./functions/input')
 
       //根据不同的配置，增加不同的内容
       //开头语模块

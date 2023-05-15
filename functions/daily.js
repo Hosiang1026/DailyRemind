@@ -1,4 +1,4 @@
-const { daily } = require('../config/input')
+const { daily } = require('./input')
 var calendar = require("./calendar");
 var calendarplus = require("./calendarplus");
 //计算节日时间到今天的时间差，参数格式为 YYYY-MM-DD
