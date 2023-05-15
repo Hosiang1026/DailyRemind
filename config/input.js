@@ -3,9 +3,11 @@
  */
 
 //机器人模块
-//这里输入机器人的Webhook地址，注意不要填错了
-//let robotKey = ``
-let robotKey = `https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=07f4c380-726a-413e-b44d-2dec5015449bb`
+    //开头语模块
+let robotPush = {
+        open: false, //是否需要推送时增加开头语，需要填true，否则填false （不需要加引号）
+        key: `07f4c380-726a-413e-b44d-2dec5015449bb`//这里输入机器人的Webhook地址，注意不要填错了
+    }
 
 //开头语模块
 let start = {
@@ -588,4 +590,4 @@ let sentence = {
 }
 
 //下面的内容请勿改动
-module.exports = { robotKey, start, news, weather, daily, gasoline, end, atAll, classTable, sentence }
+module.exports = { robotPush, start, news, weather, daily, gasoline, end, atAll, classTable, sentence }

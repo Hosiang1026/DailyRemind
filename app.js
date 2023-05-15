@@ -167,8 +167,8 @@ const scheduleCronstyle = ()=>{
 module.exports = weatherPush = async (ctx) => {
   try {
     const content = await handleWeatherContent()
-    const robot = require('./functions/robotPush')
-    const res = await robot(content)
+    const handleRobotPush = require('./functions/robotPush')
+    const res = await handleRobotPush(content)
     return JSON.stringify({ success: true, data: res });
   } catch (error) {
     return JSON.stringify({ success: false, errMsg: error.message || error });
@@ -185,8 +185,8 @@ schedule.scheduleJob('0 10 7 ? * MON-FRI',  async () => {
 module.exports = newsPush = async (ctx) => {
   try {
     const content = await handleNewsContent()
-    const robot = require('./functions/robotPush')
-    const res = await robot(content)
+    const handleRobotPush = require('./functions/robotPush')
+    const res = await handleRobotPush(content)
     return JSON.stringify({ success: true, data: res });
   } catch (error) {
     return JSON.stringify({ success: false, errMsg: error.message || error });
