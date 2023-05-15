@@ -49,9 +49,11 @@ def getNew():
             url.append(str(i).split("href=\"")[1].split("\"")[0])
 
         url = list(dict.fromkeys(url))
+        num = 1;
         for i in range(0, len(title)):
             # _content = _content + "<a href=" + url[i] + ">" + title[i] + "</a>\n"
-            _content = _content + title[i] + "\n"
+            _content = _content + num + "." + title[i] + "\n"
+            num = num + 1
         return _content
     except:
         return ''
