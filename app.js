@@ -74,6 +74,13 @@ const handleNewsContent = () => {
           content.push(`\n\n${handleTimeContent}`)
         }
       }
+
+      //彩虹屁
+      if (sentence.open) {
+        const res = await axios.get('https://api.shadiao.pro/chp')
+        content.push(`\n\n💘${res.data.data.text}`)
+      }
+
       // 新闻模块
       if (news.open) {
         const handleNews = require('./functions/news')
@@ -82,11 +89,7 @@ const handleNewsContent = () => {
           content.push(`\n\n${newsContent}`)
         }
       }
-      //彩虹屁
-      if (sentence.open) {
-        const res = await axios.get('https://api.shadiao.pro/chp')
-        content.push(`\n\n💘${res.data.data.text}`)
-      }
+
       //结束模块
       if (end.open) {
         let date = new Date()

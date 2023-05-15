@@ -24,7 +24,10 @@ module.exports = handleTimeList = () => {
             //内容数组
             let content = []
             let contentArr = []
+            let todayArr = []
+            let latelyArr = []
             let tipsArr = []
+            let loveContent;
 
             //把今日日期转为YYYY-MM-DD的格式
             let date = new Date();
@@ -61,12 +64,19 @@ module.exports = handleTimeList = () => {
                     let solarAnniversaryDate = calendar.conversion(anniversaryDate);
                     if (nowDate == nextAnniversaryDate) {
                         if (anniversaryType == 0 ||anniversaryType == 1 ||anniversaryType == 2) {
-                            content.push(`· 今天是${anniversaryName}<${anniversaryDate.split('-').join('.')}> ${diffYear}周年`)
+                            //content.push(`· 今天是${anniversaryName}<${anniversaryDate.split('-').join('.')}> ${diffYear}周年`)
+                            let todayDate = '<'+anniversaryDate.split('-').join('.')+'>';
+                            let todayContent = ' ' + diffYear+'周年';
+                            var obj = {todayName:anniversaryName,todayDate:todayDate, todayContent:todayContent};
+                            todayArr.push(obj);
                         }
                         if (anniversaryType == 3) {
                             //获取生日星座
                             let anniversaryAstro = calendar.conversionAstro(solarAnniversaryDate);
-                            content.push(`· 今天是${anniversaryName}<${anniversaryDate.split('-').join('.')}> ${anniversaryAstro}`);
+                           // content.push(`· 今天是${anniversaryName}<${anniversaryDate.split('-').join('.')}> ${anniversaryAstro}`);
+                            let todayDate = '<'+anniversaryDate.split('-').join('.')+'>';
+                            var obj = {todayName:anniversaryName,todayDate:todayDate, todayContent:anniversaryAstro};
+                            todayArr.push(obj);
                         }
                     }
                     let diffTime = diffTimeToDaily(nowDate, nextAnniversaryDate);
@@ -77,7 +87,7 @@ module.exports = handleTimeList = () => {
                     if (anniversaryType == 0) {
                         //计算累计值
                         let sumTime = sumTimeToNow(anniversaryDate, nowDate);
-                        contentArr.push(`· 恋爱天数: 已经${sumTime}天`)
+                        loveContent = `\n我们在一起恋爱: 已经${sumTime}天`;
                     }
 
                     if (anniversaryType == 1) {
@@ -96,7 +106,10 @@ module.exports = handleTimeList = () => {
                         }
                     }
                 }
-                contentArr.push(`· ${tempName}: 还有${tempTime}天`)
+
+                var obj = {tempName:tempName,tempTime:tempTime};
+                latelyArr.push(obj);
+                //contentArr.push(`· ${tempName}: 还有${tempTime}天`)
             }
 
             //法定节假日
@@ -180,7 +193,10 @@ module.exports = handleTimeList = () => {
                     }
 
                 }
-                    contentArr.push(`· ${tempName}: 还有${tempTime}天`)
+
+                var obj = {tempName:tempName,tempTime:tempTime};
+                latelyArr.push(obj);
+                //contentArr.push(`· ${tempName}: 还有${tempTime}天`)
             }
 
             //阳历节日
@@ -211,7 +227,10 @@ module.exports = handleTimeList = () => {
                         }
                     }
                 }
-                contentArr.push(`· ${tempName}: 还有${tempTime}天`)
+
+                var obj = {tempName:tempName,tempTime:tempTime};
+                latelyArr.push(obj);
+                //contentArr.push(`· ${tempName}: 还有${tempTime}天`)
             }
 
             //阴历节日
@@ -244,7 +263,9 @@ module.exports = handleTimeList = () => {
                         }
                     }
                 }
-                contentArr.push(`· ${tempName}: 还有${tempTime}天`)
+                var obj = {tempName:tempName,tempTime:tempTime};
+                latelyArr.push(obj);
+                //contentArr.push(`· ${tempName}: 还有${tempTime}天`)
             }
 
             //二十四节气
@@ -279,7 +300,10 @@ module.exports = handleTimeList = () => {
                         }
                     }
                 }
-                contentArr.push(`· 第${tempSort}个节气${tempName}: 还有${tempTime}天`)
+                tempName = '第'+tempSort+'个节气'+tempName;
+                var obj = {tempName:tempName,tempTime:tempTime};
+                latelyArr.push(obj);
+                //contentArr.push(`· 第${tempSort}个节气${tempName}: 还有${tempTime}天`)
             }
             //特殊节日
             let specialArr = daily.special;
@@ -313,9 +337,31 @@ module.exports = handleTimeList = () => {
                         }
                     }
                 }
-                contentArr.push(`· ${tempName}: 还有${tempTime}天`)
+                var obj = {tempName:tempName,tempTime:tempTime};
+                latelyArr.push(obj);
+                //contentArr.push(`· ${tempName}: 还有${tempTime}天`)
             }
 
+            //最近的节日或今日的节日
+            if(todayArr.length > 0){
+                for (var i = 0; i < todayArr.length; i++) {
+                    let todayName = todayArr[i].todayName;
+                    let todayDate = todayArr[i].todayDate;
+                    let todayContent = todayArr[i].todayContent;
+                    content.push(`· 今天是${todayName}${todayDate} ${todayContent}`);
+                }
+            }else{
+                let minTempTime = Math.min.apply(Math, latelyArr.map(item => { return item['tempTime'] }))
+                for (var j = 0; j < latelyArr.length; j++) {
+                    let tempName = latelyArr[j].tempName;
+                    let tempTime = latelyArr[j].tempTime;
+                    if (minTempTime == latelyArr[j].tempTime){
+                        content.push(`距离下一个节日${tempName}: \n还有${tempTime}天\n`);
+                    }else{
+                        contentArr.push(`· ${tempName}: 还有${tempTime}天`);
+                    }
+                }
+            }
             //输出补班/放假温馨提示
             if(tipsArr.length > 0){
                 for (var i = 0; i < tipsArr.length; i++) {
@@ -341,6 +387,8 @@ module.exports = handleTimeList = () => {
                     content.push(contentArr[i]);
                 }
             }
+            //恋爱天数
+            content.push(loveContent);
 
             console.log('获取重要节日成功', content.join('\n'));
             resolve(content.join('\n'))
