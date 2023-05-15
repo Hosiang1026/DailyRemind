@@ -6,8 +6,8 @@
 const axios = require('axios')
 axios.defaults.timeout = 40 * 1000
 
-const $ = new Env('新闻早报任务');
-let cookiesArr = [], notify, allMessage = '';
+const $ = new Env('新闻早报');
+let notify, allMessage = '';
 
 //处理要发送的新闻内容
 const handleNewsContent = () => {
@@ -68,7 +68,7 @@ const handleNewsContent = () => {
      //获取新闻内容
      const content = await handleNewsContent();
      //发送通知
-     await notify.sendNotify(`${content}`)
+     await notify.sendNotify(`${$.name}`, `${content}`)
 })()
 .catch((e) => {
         $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')

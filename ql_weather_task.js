@@ -6,8 +6,8 @@
 const axios = require('axios')
 axios.defaults.timeout = 40 * 1000
 
-const $ = new Env('天气预报任务');
-let cookiesArr = [], notify, allMessage = '';
+const $ = new Env('天气预报');
+let notify, allMessage = '';
 
 //处理要发送的天气内容
 const handleWeatherContent = () => {
@@ -66,7 +66,7 @@ const handleWeatherContent = () => {
      //获取天气内容
      const content = await handleWeatherContent();
      //发送通知
-     await notify.sendNotify(`${content}`)
+     await notify.sendNotify(`${$.name}`, `${content}`)
 })()
 .catch((e) => {
         $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
