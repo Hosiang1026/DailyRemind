@@ -264,7 +264,7 @@ module.exports = handleTimeList = () => {
                         nextTermSolarDate = calendar.conversionTerm(currentYear+1, termMonth, termSort);
                     }
                     //计算差值
-                    let diffTime = diffTimeToDaily(nowDate, nextTermSolarDate);
+                    let diffTime = diffTimeToDaily(nowDate, nextTermSolarDate)+1;
                     if (nowDate == nextTermSolarDate) {
                         content.push(`· 今天是${termName}<${nowDate.split('-').join('.')}>`)
                     }else{
