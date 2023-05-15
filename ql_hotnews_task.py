@@ -84,6 +84,6 @@ if __name__ == '__main__':
         content = getNew()
         if content != '':
             print('获取今日热点成功！')
-            send(datetime.datetime.now().strftime("%Y.%m.%d") + " 今日热点", content)
+            send(" 今日热点" + datetime.datetime.now().strftime("%Y.%m.%d"), content)
         else:
             print('获取今日热点失败！')
