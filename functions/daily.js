@@ -355,7 +355,7 @@ module.exports = handleTimeList = () => {
                     let tempName = latelyArr[j].tempName;
                     let tempTime = latelyArr[j].tempTime;
                     if (minTempTime == latelyArr[j].tempTime){
-                        content.push(`⏳距离下一个节日${tempName}: \n还有${tempTime}天\n`);
+                        content.push(`⏳距离下一个节日: \n· ${tempName}: 还有${tempTime}天\n`);
                     }else{
                         contentArr.push(`· ${tempName}: 还有${tempTime}天`);
                     }
