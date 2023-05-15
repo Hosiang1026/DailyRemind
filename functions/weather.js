@@ -64,6 +64,14 @@ const getBaseWeather = (weatherKey, weatherCityCode, baseAppend) => {
 						weatherIcon = "⛈";
 						umbrellaFlag = true;
 						break;
+					default:
+						if (weathers.indexOf('晴') != -1){
+							weatherIcon = "🌤";
+						}
+						if (weathers.indexOf('雨') != -1){
+							weatherIcon = "🌨";
+							umbrellaFlag = true;
+						}
 				}
 				console.log('获取今日实况天气成功', weatherData);
 				weatherContent.push(`\n🎈${weatherData.province}${weatherData.city}`);
@@ -153,6 +161,14 @@ const getAllWeather = (weatherKey, weatherCityCode, allAppend) => {
 							weatherIcon = "⛈";
 							rainDayNum = rainDayNum+1;
 							break;
+						default:
+							if (weathers.indexOf('晴') != -1){
+								weatherIcon = "🌤";
+							}
+							if (weathers.indexOf('雨') != -1){
+								weatherIcon = "🌨";
+								rainDayNum = rainDayNum+1;
+							}
 					}
 					weatherContent.push(`\n${weatherData.date} ${weatherWeekName}`);
 					weatherContent.push(`· 天气: ${weathers}${weatherIcon}`);
