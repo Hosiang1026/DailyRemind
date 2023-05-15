@@ -49,7 +49,7 @@ def getMovie():
             url.append(str(i).split("href=\"")[1].split("\"")[0])
 
         url = list(dict.fromkeys(url))
-        for i in range(0, 6:
+        for i in range(0, 6):
             _content = _content + "\n" +'.'+ title[i]
         return _content
     except Exception as e:
