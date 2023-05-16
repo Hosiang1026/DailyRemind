@@ -220,7 +220,7 @@ const classFunction = {
                 }
 
                 if (computerHomeworkContent.length > 0||hrHomeworkContent.length > 0) {
-                    content.push(`📝作业提醒`)
+                    content.push(`\n📝作业提醒`)
                     if (computerHomeworkContent.length > 0) {
                         content.push(`\n📔‍22春计算机本 \n${computerHomeworkContent.join('\n')}`)
                     }
@@ -238,7 +238,7 @@ const classFunction = {
                         content.push(`\n📙22春行政专 \n${hrExamContent.join('\n')}`)
                     }
                 }else if (computerExamArr.length > 0 || hrExamArr.length > 0) {
-                    content.push(`💯考试提醒`)
+                    content.push(`\n💯考试提醒`)
                     if (computerExamArr.length > 0) {
                         content.push(`\n📒‍22春计算机本 \n${computerExamArr.join('\n')}`)
                     }
