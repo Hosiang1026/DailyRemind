@@ -22,21 +22,21 @@ const handleWeatherContent = () => {
         content.push(`${start.content}`)
       }
 
-      //课表模块
-      if (classTable.open) {
-        const handleClassTable = require('./functions/classTable')
-        const classTableContent = await handleClassTable()
-        if ('' != classTableContent) {
-          content.push(`\n\n${classTableContent}`)
-        }
-      }
-
       // 天气模块
       if (weather.open) {
         const handleWeather = require('./functions/weather')
         const weatherContent = await handleWeather()
         if ('' != weatherContent) {
           content.push(`\n\n${weatherContent}`)
+        }
+      }
+
+      //课表模块
+      if (classTable.open) {
+        const handleClassTable = require('./functions/classTable')
+        const classTableContent = await handleClassTable()
+        if ('' != classTableContent) {
+          content.push(`\n\n${classTableContent}`)
         }
       }
 
