@@ -76,6 +76,7 @@ def load_send():
 
 if __name__ == '__main__':
     version = 1.1
+    title = '百度电影'
     checkUpdate()
     if load_send():
         newcontent = getMovie()

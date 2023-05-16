@@ -164,6 +164,7 @@ msg().main()
 
 if __name__ ==  "__main__":
     # Push Mode
+    title = '小米运动改步'
     Pm = os.environ.get('PMODE')
     if Pm == 'true' or Pm == 'nwx':
         print('开启推送')

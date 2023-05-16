@@ -74,6 +74,7 @@ def load_send():
 
 if __name__ == '__main__':
     version = 1.1
+    title = '百度热搜'
     checkUpdate()
     if load_send():
         content = getNew()

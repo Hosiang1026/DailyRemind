@@ -202,7 +202,7 @@ const classFunction = {
 
                 //‍结果组装
                 if (computerClassContent.length > 0||hrClassContent.length > 0) {
-                    content.push(`📚今日网课`)
+                    content.push(`🗣今日网课`)
                     if (computerClassContent.length > 0) {
                         content.push(`\n📕‍22春计算机本 \n${computerClassContent.join('\n')}`)
                     }
