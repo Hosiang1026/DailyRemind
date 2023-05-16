@@ -459,15 +459,16 @@ let classTable = {
         {
             name: '软件工程',//课程名称04.11-04.25
             teacher: '郑炜',//辅导老师
-            homework: 0, // homework: '2023-06-30',
-            exam: 0,
-            /*exam:
+            //homework: 0, // homework: '2023-06-30',
+            //exam: 0,
+            homework: '2023-06-15',
+            exam:
                 {
                     type: 1, //考试方式 1:纸质闭卷 2:上机闭卷
-                    date: '2023-06-11',
-                    time: '18:30 - 20:00',//考试时间
+                    date: '2023-07-08',
+                    time: '08:30 - 10:30',//考试时间
                     place: '浙江开放学院'//考试地点
-                },*/
+                },
             classList: [
                 {
                     type: 1, //教学方式 1:钉钉直播 2:线下教室
@@ -484,8 +485,16 @@ let classTable = {
         {
             name: '离散数学',//课程名称05.10-06.07
             teacher: '韩玉娟',//辅导老师
-            homework: 0,
-            exam: 0,
+            //homework: 0,
+            //exam: 0,
+            homework: '2023-06-15',
+            exam:
+                {
+                    type: 1, //考试方式 1:纸质闭卷 2:上机闭卷
+                    date: '2023-07-08',
+                    time: '08:30 - 10:30',//考试时间
+                    place: '浙江开放学院'//考试地点
+                },
             classList: [
                 {
                     type: 1, //教学方式 1:钉钉直播 2:线下教室
@@ -517,8 +526,16 @@ let classTable = {
         {
             name: '数据结构',//课程名称04.20-05.18
             teacher: '徐斌立',//辅导老师
-            homework: 0,
-            exam: 0,
+            //homework: 0,
+            //exam: 0,
+            homework: '2023-06-15',
+            exam:
+                {
+                    type: 1, //考试方式 1:纸质闭卷 2:上机闭卷
+                    date: '2023-07-09',
+                    time: '08:30 - 10:30',//考试时间
+                    place: '浙江开放学院'//考试地点
+                },
             classList: [
                 {
                     type: 1, //教学方式 1:钉钉直播 2:线下教室
