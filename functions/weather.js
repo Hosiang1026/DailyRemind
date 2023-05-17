@@ -2,6 +2,7 @@ const { weather } = require('./input')
 const axios = require('axios')
 const publicIp = require('public-ip');
 
+let allBrellaFlag = true;
 let umbrellaFlag = false;
 let rainDayNum = 0;
 
@@ -81,6 +82,7 @@ const getBaseWeather = (weatherKey, weatherCityCode, baseAppend) => {
 				if (umbrellaFlag&&baseAppend){
 					weatherContent.push(`\n🌂外面正在下雨, 记得带伞！`);
 					umbrellaFlag = false;
+					allBrellaFlag = false;
 				}
 				resolve(weatherContent.join('\n'), umbrellaFlag)
 		   } else {
@@ -179,6 +181,7 @@ const getAllWeather = (weatherKey, weatherCityCode, allAppend) => {
 				if (rainDayNum > 0&&allAppend){
 					weatherContent.push(`\n🌂未来${rainDayNum}天有雨, 记得带伞！`);
 					rainDayNum = 0;
+					allBrellaFlag = false;
 				}
 				resolve(weatherContent.join('\n'))
 			} else {
@@ -287,13 +290,15 @@ module.exports = handleWeather = () => {
 			}
 
 			if(baseCityCodeArr.length > 0||allCityCodeArr.length > 0) {
-				if (nowDay != 6 && nowDay != 0) {
-					if (nowTime == "AM") {
-						weatherCityContent.push(`\n🕘9点上班，记得打卡!`)
-					}
+				if (allBrellaFlag){
+					if (nowDay != 6 && nowDay != 0) {
+						if (nowTime == "AM") {
+							weatherCityContent.push(`\n🕘9点上班，记得打卡!`)
+						}
 
-					if (nowTime == "PM") {
-						weatherCityContent.push(`\n🕡18点30分下班，记得打卡!`)
+						if (nowTime == "PM") {
+							weatherCityContent.push(`\n🕡18点30分下班，记得打卡!`)
+						}
 					}
 				}
 			}

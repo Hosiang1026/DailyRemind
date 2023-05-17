@@ -220,10 +220,10 @@ const classFunction = {
                             content.push(`\n${computerClassArr.join('\n')}`)
                         }
                         if (computerHomeworkContent.length > 0) {
-                            content.push(`\n📝作业提醒: ${computerHomeworkContent.join('\n')}`)
+                            content.push(`\n📝形考任务: ${computerHomeworkContent.join('\n')}`)
                         }
                         if (computerExamArr.length > 0) {
-                            content.push(`💯考试提醒: ${computerExamArr.join('\n')}`)
+                            content.push(`💯期末终考: ${computerExamArr.join('\n')}`)
                         }
                     }
 
@@ -233,10 +233,10 @@ const classFunction = {
                             content.push(`\n${hrClassArr.join('\n')}`)
                         }
                         if (hrHomeworkContent.length > 0) {
-                            content.push(`\n📝作业提醒: ${hrHomeworkContent.join('\n')}`)
+                            content.push(`\n📝形考任务: ${hrHomeworkContent.join('\n')}`)
                         }
                         if (hrExamArr.length > 0) {
-                            content.push(`💯考试提醒: ${hrExamArr.join('\n')}`)
+                            content.push(`💯期末终考: ${hrExamArr.join('\n')}`)
                         }
                     }
                 }
