@@ -569,8 +569,16 @@ let classTable = {
         {
             name: '社会调查研究与方法',//课程名称05.14、05.21
             teacher: '吴乐珍',//辅导老师
-            homework: 0, // homework: '2023-06-30',
-            exam: 0,
+            //homework: 0, // homework: '2023-06-30',
+            //exam: 0,
+            homework: '2023-06-15',
+            exam:
+                {
+                    type: 1, //考试方式 1:纸质闭卷 2:上机闭卷
+                    date: '2023-07-09',
+                    time: '08:30 - 10:30',//考试时间
+                    place: '浙江开放学院'//考试地点
+                },
             classList: [
                 {
                     type: 1, //教学方式 1:钉钉直播 2:线下教室
