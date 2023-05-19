@@ -19,14 +19,14 @@ const handleGasolineContent = () => {
       //根据不同的配置，增加不同的内容
       //开头语模块
       if (start.open) {
-        content.push(`${start.content}`)
+        content.push(`${start.content}\n\n`)
       }
       //汽油价格模块
       if (gasoline.open) {
         const handleGasoline = require('./functions/gasoline')
         const gasolineContent = await handleGasoline()
         if (gasolineContent.length > 0) {
-          content.push(`\n\n${gasolineContent}`)
+          content.push(`${gasolineContent}`)
         }
       }
       //结束模块

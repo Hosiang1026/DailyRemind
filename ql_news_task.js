@@ -19,7 +19,7 @@ const handleNewsContent = () => {
       //根据不同的配置，增加不同的内容
       //开头语模块
       if (start.open) {
-        content.push(`${start.content}`)
+        content.push(`${start.content}\n\n`)
       }
 
       //纪念日模块
@@ -27,7 +27,7 @@ const handleNewsContent = () => {
         const handleTimeList = require('./functions/daily')
         const handleTimeContent = await handleTimeList()
         if (handleTimeContent.length > 0) {
-          content.push(`\n\n${handleTimeContent}`)
+          content.push(`${handleTimeContent}`)
         }
       }
 

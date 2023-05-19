@@ -19,7 +19,7 @@ const handleWeatherContent = () => {
       //根据不同的配置，增加不同的内容
       //开头语模块
       if (start.open) {
-        content.push(`${start.content}`)
+        content.push(`${start.content}\n\n`)
       }
 
       // 天气模块
@@ -27,7 +27,7 @@ const handleWeatherContent = () => {
         const handleWeather = require('./functions/weather')
         const weatherContent = await handleWeather()
         if ('' != weatherContent) {
-          content.push(`\n\n${weatherContent}`)
+          content.push(`${weatherContent}`)
         }
       }
 
