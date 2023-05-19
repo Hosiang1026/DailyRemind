@@ -33,6 +33,7 @@ def getMovie():
     try:
         url = []
         title = []
+        actor = []
         desc = []
         _content = ""
         bdurl = "https://top.baidu.com/board?tab=movie"
@@ -44,18 +45,16 @@ def getMovie():
         soup = BeautifulSoup(r.text, 'html.parser')
         for i in soup.find_all(class_="c-single-text-ellipsis"):
             title.append(i.get_text().strip())
+        for i in soup.find_all(class_="intro_1l0wp"):
+            actor.append(i.get_text().strip())
+
         # for i in soup.find_all(class_="look-more_3oNWC"):
             # url.append(str(i).split("href=\"")[1].split("\"")[0])
 
         # url = list(dict.fromkeys(url))
         num = 1
-        for k in range(0, 12, 2):
-            _contentRan = ""
-            if title[k+1].find(title[k]) >= 0:
-                _contentRan = "\n" + str(num) + '.' + title[k+1][: -5]
-            else:
-                _contentRan = "\n" + str(num) + '.《' + title[k] +'》'+ title[k+1][: -5]
-            _content = _content + _contentRan
+        for k in range(0, 20, 2):
+            _content = _content + "\n" + str(num) + '.《' + title[k] +'》 - '+ actor[k+1][3:]
             num = num+1
         return _content
 
