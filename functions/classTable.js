@@ -202,14 +202,14 @@ const classFunction = {
                     if (computerClassArr.length > 0) {
                         content.push(`\n📗‍22春计算机本`)
                         if (computerClassArr.length > 0) {
-                            content.push(`\n${computerClassArr.join('\n')}`)
+                            content.push(`${computerClassArr.join('\n')}`)
                         }
                     }
 
                     if (hrClassArr.length > 0) {
                         content.push(`\n📗22春行政专`)
                         if (hrClassArr.length > 0) {
-                            content.push(`\n${hrClassArr.join('\n')}`)
+                            content.push(`${hrClassArr.join('\n')}`)
                         }
                     }
 
