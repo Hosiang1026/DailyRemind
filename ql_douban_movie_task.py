@@ -19,46 +19,39 @@ v1.1更新记录：
 def checkUpdate():
     print("当前运行的脚本版本：" + str(version))
     try:
-        r1 = requests.get("https://gitee.com/hosiang1026/DailyRemind/raw/master/ql_baidu_movie_task.py").text
+        r1 = requests.get("https://gitee.com/hosiang1026/DailyRemind/raw/master/ql_douban_movie_task.py").text
         r2 = re.findall(re.compile("version = \d.\d"), r1)[0].split("=")[1].strip()
         if float(r2) > version:
             print("发现新版本：" + r2)
             print("正在自动更新脚本...")
-            os.system("ql raw https://gitee.com/hosiang1026/DailyRemind/raw/master/ql_baidu_movie_task.py &")
+            os.system("ql raw https://gitee.com/hosiang1026/DailyRemind/raw/master/ql_douban_movie_task.py &")
     except:
         pass
 
-# 获取百度电影
+# 获取豆瓣电影
 def getMovie():
     try:
         url = []
         title = []
         desc = []
         _content = ""
-        bdurl = "https://top.baidu.com/board?tab=movie"
+        bdurl = "https://movie.douban.com/cinema/nowplaying/hangzhou"
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Edg/96.0.1054.62'}
 
         r = requests.get(bdurl)
         r.encoding = r.apparent_encoding
         soup = BeautifulSoup(r.text, 'html.parser')
-        for i in soup.find_all(class_="c-single-text-ellipsis"):
+        tags = soup.find_all(attrs={"class": "list-item"})
+        for i in soup.find_all(class_="list-item"):
             title.append(i.get_text().strip())
-        # for i in soup.find_all(class_="look-more_3oNWC"):
-            # url.append(str(i).split("href=\"")[1].split("\"")[0])
+        for i in soup.find_all(class_="look-more_3oNWC"):
+            url.append(str(i).split("href=\"")[1].split("\"")[0])
 
-        # url = list(dict.fromkeys(url))
-        num = 1
-        for k in range(0, 12, 2):
-            _contentRan = ""
-            if title[k+1].find(title[k]) >= 0:
-                _contentRan = "\n" + str(num) + '.' + title[k+1][: -5]
-            else:
-                _contentRan = "\n" + str(num) + '.《' + title[k] +'》'+ title[k+1][: -5]
-            _content = _content + _contentRan
-            num = num+1
+        url = list(dict.fromkeys(url))
+        for i in range(0, 6):
+            _content = _content + "\n" +'.'+ title[i]
         return _content
-
     except Exception as e:
         return e
 
