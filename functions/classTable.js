@@ -214,24 +214,21 @@ const classFunction = {
                     }
                 }else if (computerClassArr.length > 0 || hrClassArr.length > 0) {
                     content.push(`📚网课提醒`)
-                    if (computerClassArr.length > 0||computerHomeworkContent.length > 0||computerExamArr.length > 0) {
+                    if (computerClassArr.length > 0) {
                         content.push(`\n📗‍22春计算机本`)
                         if (computerClassArr.length > 0) {
                             content.push(`\n${computerClassArr.join('\n')}`)
                         }
-                        if (computerHomeworkContent.length > 0) {
-                            content.push(`\n📝形考任务: ${computerHomeworkContent.join('\n')}`)
-                        }
-                        if (computerExamArr.length > 0) {
-                            content.push(`💯期末终考: ${computerExamArr.join('\n')}`)
-                        }
                     }
 
-                    if (hrClassArr.length > 0||hrHomeworkContent.length > 0||hrExamArr.length > 0) {
+                    if (hrClassArr.length > 0) {
                         content.push(`\n📗22春行政专`)
                         if (hrClassArr.length > 0) {
                             content.push(`\n${hrClassArr.join('\n')}`)
                         }
+                    }
+
+                    if (hrHomeworkContent.length > 0||hrExamArr.length > 0) {
                         if (hrHomeworkContent.length > 0) {
                             content.push(`\n📝形考任务: ${hrHomeworkContent.join('\n')}`)
                         }

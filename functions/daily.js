@@ -85,7 +85,7 @@ module.exports = handleTimeList = () => {
                     if (anniversaryType == 0) {
                         //计算累计值
                         let sumTime = sumTimeToNow(anniversaryDate, nowDate);
-                        loveContent = `\n我们在一起恋爱: 已经${sumTime}天`;
+                        loveContent = `\n😍我们在一起恋爱: 已经${sumTime}天`;
                     }
 
                     if (anniversaryType == 1) {
@@ -347,7 +347,7 @@ module.exports = handleTimeList = () => {
                     let todayName = todayArr[i].todayName;
                     let todayDate = todayArr[i].todayDate;
                     let todayContent = todayArr[i].todayContent;
-                    content.push(`· 今天是${todayName}${todayDate} ${todayContent}`);
+                    content.push(`· 今天是${todayName}${todayDate} ${todayContent}⛱`);
                 }
             }else{
                 let minTempTime = Math.min.apply(Math, latelyArr.map(item => { return item['tempTime'] }))
