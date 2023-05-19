@@ -66,7 +66,7 @@ const handleWeatherContent = () => {
      //获取天气内容
      const content = await handleWeatherContent();
      //发送通知
-     await notify.sendNotify(`${$.name}`, `${content}`)
+     await notify.sendNotify(``, `${content}`)
 })()
 .catch((e) => {
         $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
