@@ -455,13 +455,12 @@ let end = {
 //课表推送模块
 let classTable = {
     open: true,//是否需要推送时增加课表，需要填true，否则填false  （不需要加引号）
+    homework: '2023-06-15', // homework: 0,
+    examdate: '2023-07-08', // examdate: 0,
     computer: [//22春计算机本-课程列表
         {
             name: '软件工程',//课程名称04.11-04.25
             teacher: '郑炜',//辅导老师
-            //homework: 0, // homework: '2023-06-30',
-            //exam: 0,
-            homework: '2023-06-15',
             exam:
                 {
                     type: 1, //考试方式 1:纸质闭卷 2:上机闭卷
@@ -485,9 +484,6 @@ let classTable = {
         {
             name: '离散数学',//课程名称05.10-06.07
             teacher: '韩玉娟',//辅导老师
-            //homework: 0,
-            //exam: 0,
-            homework: '2023-06-15',
             exam:
                 {
                     type: 1, //考试方式 1:纸质闭卷 2:上机闭卷
@@ -526,9 +522,6 @@ let classTable = {
         {
             name: '数据结构',//课程名称04.20-05.18
             teacher: '徐斌立',//辅导老师
-            //homework: 0,
-            //exam: 0,
-            homework: '2023-06-15',
             exam:
                 {
                     type: 1, //考试方式 1:纸质闭卷 2:上机闭卷
@@ -569,9 +562,6 @@ let classTable = {
         {
             name: '社会调查研究与方法',//课程名称05.14、05.21
             teacher: '吴乐珍',//辅导老师
-            //homework: 0, // homework: '2023-06-30',
-            //exam: 0,
-            homework: '2023-06-15',
             exam:
                 {
                     type: 1, //考试方式 1:纸质闭卷 2:上机闭卷
