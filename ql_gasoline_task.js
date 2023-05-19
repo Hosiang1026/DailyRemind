@@ -54,7 +54,7 @@ const handleGasolineContent = () => {
      //获取汽油价格
      const content = await handleGasolineContent();
      //发送通知
-     await notify.sendNotify(`${$.name}`, `${content}`)
+     await notify.sendNotify(`大家好😻`, `${content}`)
 })()
 .catch((e) => {
         $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
