@@ -17,10 +17,6 @@ const handleGasolineContent = () => {
       const { start, gasoline, end } = require('./functions/input')
 
       //根据不同的配置，增加不同的内容
-      //开头语模块
-      if (start.open) {
-        content.push(`${start.content}\n\n`)
-      }
       //汽油价格模块
       if (gasoline.open) {
         const handleGasoline = require('./functions/gasoline')
@@ -29,13 +25,7 @@ const handleGasolineContent = () => {
           content.push(`${gasolineContent}`)
         }
       }
-      //结束模块
-      if (end.open) {
-        let date = new Date()
-        let nowTime = `${date.getFullYear()}-${(date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 1):(date.getMonth() + 1)}-${(date.getDate()) < 10 ? '0' + (date.getDate()) : (date.getDate())} ${(date.getHours()) < 10 ? '0' + (date.getHours()) : (date.getHours())}:${(date.getMinutes()) < 10 ? '0' + (date.getMinutes()) : (date.getMinutes())}:${(date.getSeconds()) < 10 ? '0' + (date.getSeconds()) : (date.getSeconds())}`
-        content.push(`\n\n${end.content}`)
-        content.push(`\n${end.time} ${nowTime}`)
-      }
+
       //如果啥都没输入的话
       if (content.length == 0) {
         content.push('请最少配置一个模块内容,没有内容无法推送')
