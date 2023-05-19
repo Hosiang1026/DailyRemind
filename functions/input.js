@@ -10,7 +10,7 @@ let robotPush = {
 
 //开头语模块
 let start = {
-    open: true, //是否需要推送时增加开头语，需要填true，否则填false （不需要加引号）
+    open: false, //是否需要推送时增加开头语，需要填true，否则填false （不需要加引号）
     content: '大家好🐷', //开头语内容，可以输入emoji表情，可以使用 \n 来换行
 }
 

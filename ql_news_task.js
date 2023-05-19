@@ -71,7 +71,7 @@ const handleNewsContent = () => {
      //获取新闻内容
      const content = await handleNewsContent();
      //发送通知
-     await notify.sendNotify(`${$.name}`, `${content}`)
+     await notify.sendNotify(`早上好🦔`, `${content}`)
 })()
 .catch((e) => {
         $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
