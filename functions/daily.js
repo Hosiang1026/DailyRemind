@@ -347,7 +347,7 @@ module.exports = handleTimeList = () => {
                     let todayName = todayArr[i].todayName;
                     let todayDate = todayArr[i].todayDate;
                     let todayContent = todayArr[i].todayContent;
-                    content.push(`· 今天是${todayName}🎉  \n${todayDate} ${todayContent}`);
+                    content.push(`· 今天是${todayName}🎉     \n${todayDate} ${todayContent}`);
                 }
             }else{
                 let minTempTime = Math.min.apply(Math, latelyArr.map(item => { return item['tempTime'] }))
