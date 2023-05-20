@@ -347,7 +347,7 @@ module.exports = handleTimeList = () => {
                     let todayName = todayArr[i].todayName;
                     //let todayDate = todayArr[i].todayDate;
                     let todayContent = todayArr[i].todayContent;
-                    content.push(`· 今天是${todayName} ${todayContent}🎉\n`);
+                    content.push(`· 今天是${todayName} ${todayContent}🎉`);
                     //content.push(`· ${todayDate} ${todayContent}`);
                 }
             }else{
