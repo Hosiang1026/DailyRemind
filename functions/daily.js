@@ -283,7 +283,7 @@ module.exports = handleTimeList = () => {
                     }
                     //计算差值
                     let diffTime = diffTimeToDaily(nowDate, nextTermSolarDate)+1;
-                    if (nowDate == nextTermSolarDate) {
+                    if (diffTime == 0) {
                         let todayDate = '<'+nowDate.split('-').join('.')+'>';
                         var obj = {todayName:termName,todayDate:todayDate, todayContent:''};
                         todayArr.push(obj);
