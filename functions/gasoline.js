@@ -1,4 +1,4 @@
-const { gasoline } = require('./config/input')
+const { gasoline } = require('./input')
 const axios = require('axios')
 
 //汽油价格API: https://api.help.bj.cn/apis/youjia/
