@@ -19,36 +19,36 @@ v1.1更新记录：
 def checkUpdate():
     print("当前运行的脚本版本：" + str(version))
     try:
-        r1 = requests.get("https://gitee.com/hosiang1026/DailyRemind/raw/master/ql_baidu_news_task.py").text
+        r1 = requests.get("https://gitee.com/hosiang1026/DailyRemind/raw/master/ql_cctv_news_task.py").text
         r2 = re.findall(re.compile("version = \d.\d"), r1)[0].split("=")[1].strip()
         if float(r2) > version:
             print("发现新版本：" + r2)
             print("正在自动更新脚本...")
-            os.system("ql raw https://gitee.com/hosiang1026/DailyRemind/raw/master/ql_baidu_news_task.py &")
+            os.system("ql raw https://gitee.com/hosiang1026/DailyRemind/raw/master/ql_cctv_news_task.py &")
     except:
         pass
 
-# 获取百度新闻
+# 获取新闻联播
 def getNew():
     try:
         url = []
-        title = []
+        title = ""
+        desc = []
         _content = ""
-        bdurl = "https://top.baidu.com/board?tab=realtime"
+        bdurl = "http://mrxwlb.com"
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Edg/96.0.1054.62'}
 
         r = requests.get(bdurl)
         r.encoding = r.apparent_encoding
         soup = BeautifulSoup(r.text, 'html.parser')
-        for i in soup.find_all(class_="c-single-text-ellipsis"):
-            title.append(i.get_text().strip())
-        for i in soup.find_all(class_="look-more_3oNWC"):
-            url.append(str(i).split("href=\"")[1].split("\"")[0])
-
-        url = list(dict.fromkeys(url))
-        for i in range(0, 8):
-            _content = _content + "\n" +str(i+1)+'.'+ title[i]
+        _content = soup.find_all(class_="entry-content")[1].p.get_text().strip();
+        for i in soup.find_all(class_="entry-content")[1].ul:
+            desc.append(i.get_text().strip())
+        num = 1
+        for i in range(1, len(desc), 2):
+            _content = _content + "\n" +str(num)+'.'+ desc[i]
+            num = num+1
         return _content
     except Exception as e:
         return e
@@ -74,12 +74,12 @@ def load_send():
 
 if __name__ == '__main__':
     version = 1.1
-    title = '百度热搜'
+    title = '新闻联播'
     checkUpdate()
     if load_send():
         content = getNew()
         if content != '':
-            print('获取百度热搜成功！')
-            send("百度热搜", content)
+            print('获取新闻联播成功！')
+            send("新闻联播", content)
         else:
-            print('获取百度热搜失败！')
+            print('获取新闻联播失败！')
