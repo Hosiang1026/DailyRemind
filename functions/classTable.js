@@ -212,13 +212,13 @@ const classFunction = {
                             content.push(`${hrClassArr.join('\n')}`)
                         }
                     }
+                }
 
-                    if (homeworkArr.length > 0) {
-                        content.push(`\n📝形考任务: ${homeworkArr.join('\n')}`)
-                    }
-                    if (examArr.length > 0) {
-                        content.push(`💯期末终考: ${examArr.join('\n')}`)
-                    }
+                if (homeworkArr.length > 0) {
+                    content.push(`\n📝形考任务: ${homeworkArr.join('\n')}`)
+                }
+                if (examArr.length > 0) {
+                    content.push(`💯期末终考: ${examArr.join('\n')}`)
                 }
 
                 if (computerExamContent.length > 0||hrExamContent.length > 0) {
