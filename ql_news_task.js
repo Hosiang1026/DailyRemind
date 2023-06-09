@@ -30,7 +30,7 @@ const handleNewsContent = () => {
       //彩虹屁
       if (sentence.open) {
         const res = await axios.get('https://api.shadiao.pro/chp')
-        content.push(`\n\n💘${res.data.data.text}`)
+        content.push(`\n💘${res.data.data.text}`)
       }
 
       // 新闻模块
