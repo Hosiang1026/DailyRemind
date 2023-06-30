@@ -39,7 +39,7 @@ module.exports = handleNews = () => {
     return new Promise(async (resolve, reject) => {
         try {
             let newsContent = [] //内容数组
-            const { picture, content } = await getNews()
+            const { content } = await getNews()
 
             let newsSize = news.size;
             if(newsSize > content.length){

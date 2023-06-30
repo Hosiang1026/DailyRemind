@@ -1,30 +1,36 @@
 /*
-* 新闻早报任务:脚本更新地址 ql_news_task.js
+* 节日提醒任务:脚本更新地址 ql_daily_task.js
 * 配置参数 input.js
 */
 
 const axios = require('axios')
 axios.defaults.timeout = 40 * 1000
 
-const $ = new Env('新闻早报');
+const $ = new Env('节日提醒');
 let notify;
 
-//处理要发送的新闻内容
-const handleNewsContent = () => {
+//处理要发送的节日内容
+const handleDailyContent = () => {
   return new Promise(async (resolve, reject) => {
     try {
       let content = []
-      const { news} = require('./functions/input')
+      const {sentence, daily} = require('./functions/input')
 
       //根据不同的配置，增加不同的内容
 
-      // 新闻模块
-      if (news.open) {
-        const handleNews = require('./functions/news')
-        const newsContent = await handleNews()
-        if ('' != newsContent) {
-          content.push(`\n\n${newsContent}`)
+      //纪念日模块
+      if (daily.open) {
+        const handleTimeList = require('./functions/daily')
+        const handleTimeContent = await handleTimeList()
+        if (handleTimeContent.length > 0) {
+          content.push(`${handleTimeContent}`)
         }
+      }
+
+      //彩虹屁
+      if (sentence.open) {
+        const res = await axios.get('https://api.shadiao.pro/chp')
+        content.push(`\n💘${res.data.data.text}`)
       }
 
       //如果啥都没输入的话
@@ -42,8 +48,8 @@ const handleNewsContent = () => {
 !(async() => {
      //获取配置
      await requireConfig();
-     //获取新闻内容
-     const content = await handleNewsContent();
+     //获取节日内容
+     const content = await handleDailyContent();
      //发送通知
      await notify.sendNotify(`早上好🦔`, `${content}`)
 })()
