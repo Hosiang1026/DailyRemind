@@ -1,12 +1,12 @@
 /*
-* 实况天气任务:脚本更新地址 ql_weather_task.js
+* 天气预报任务:脚本更新地址 ql_next_weather_task.js
   配置参数 input.js
 */
 
 const axios = require('axios')
 axios.defaults.timeout = 40 * 1000
 
-const $ = new Env('实况天气');
+const $ = new Env('天气预报');
 let notify, allMessage = '';
 
 //处理要发送的天气内容
@@ -19,8 +19,8 @@ const handleWeatherContent = () => {
       //根据不同的配置，增加不同的内容
       // 天气模块
       if (weather.open) {
-        const handleWeather = require('./functions/weather')
-        const weatherContent = await handleWeather()
+        const handleNextWeather = require('./functions/weather')
+        const weatherContent = await handleNextWeather()
         if ('' != weatherContent) {
           content.push(`${weatherContent}`)
         }

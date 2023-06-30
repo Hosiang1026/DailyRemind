@@ -194,7 +194,7 @@ const getAllWeather = (weatherKey, weatherCityCode, allAppend) => {
 	})
 }
 
-//处理天气数据
+//处理实况天气数据
 module.exports = handleWeather = () => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -212,10 +212,8 @@ module.exports = handleWeather = () => {
                 nowTime = "PM"; //大于就是PM
             }
 			const baseCityCodeArr = [];
-			const allCityCodeArr = [];
             let weatherKey = weather.key;
 			let weatherBaseDataArr = weather.base_data;
-			let weatherAllDataArr = weather.all_data;
 			//组装实况天气城市编码参数
 		    for (let i = 0; i < weatherBaseDataArr.length; i++) {
 				const weatherTimeArr = weatherBaseDataArr[i].time;
@@ -233,25 +231,8 @@ module.exports = handleWeather = () => {
 				}
 		    }
 
-			//组装未来天气城市编码参数
-			for (let i = 0; i < weatherAllDataArr.length; i++) {
-				const weatherTimeArr = weatherAllDataArr[i].time;
-				for (let j = 0; j < weatherTimeArr.length; j++) {
-					const weatherTime = weatherTimeArr[j];
-					if(nowTime == weatherTime) {
-						const weatherAllDayArr = weatherAllDataArr[i].day;
-						for (let k = 0; k < weatherAllDayArr.length; k++) {
-							if (nowDay == weatherAllDayArr[k]) {
-								let weatherCityCode = weatherAllDataArr[i].city_code;
-								allCityCodeArr.push(weatherCityCode);
-							}
-						}
-					}
-				}
-			}
-
 			//城市编码参数为空时，由IP地址获取
-			if(baseCityCodeArr.length == 0&&allCityCodeArr.length == 0){
+			if(baseCityCodeArr.length == 0){
 				//获取天气数据
 				let IPAddress = await getPublicIPAddress()
 				//let IPAddress = '112.10.223.108'
@@ -274,22 +255,7 @@ module.exports = handleWeather = () => {
 				}
 			}
 
-			//获取未来天气数据
-			let allAppend = false;
-			if(allCityCodeArr.length > 0){
-				weatherCityContent.push(`🌍天气预报`);
-				for (let i = 0; i < allCityCodeArr.length; i++) {
-					//获取天气数据
-					let weatherCityCode = allCityCodeArr[i]
-					if(i+1 == allCityCodeArr.length){
-						allAppend = true;
-					}
-					let cityContent = await getAllWeather(weatherKey, weatherCityCode, allAppend)
-					weatherCityContent.push(cityContent);
-				}
-			}
-
-			if(baseCityCodeArr.length > 0||allCityCodeArr.length > 0) {
+			if(baseCityCodeArr.length > 0) {
 				if (allBrellaFlag){
 					if (nowDay != 6 && nowDay != 0) {
 						if (nowTime == "AM") {
@@ -311,6 +277,67 @@ module.exports = handleWeather = () => {
     })
 }
 
+//处理未来天气数据
+module.exports = handleNextWeather = () => {
+	return new Promise(async (resolve, reject) => {
+		try {
+			let weatherCityContent = []
+			//获取当天是周几、此刻是上午OR下午
+			let nowDate = new Date();
+			let nowDay = nowDate.getDay();
+			let nowHour = nowDate.getHours();
+			let nowTime;
+			if(nowHour < 11) {
+				nowTime = "AM"; //小于就是AM
+			} else if(nowHour <= 13) {
+				nowTime = "MM"; //大于就是PM
+			} else {
+				nowTime = "PM"; //大于就是PM
+			}
+
+			const allCityCodeArr = [];
+			let weatherKey = weather.key;
+			let weatherAllDataArr = weather.all_data;
+
+			//组装未来天气城市编码参数
+			for (let i = 0; i < weatherAllDataArr.length; i++) {
+				const weatherTimeArr = weatherAllDataArr[i].time;
+				for (let j = 0; j < weatherTimeArr.length; j++) {
+					const weatherTime = weatherTimeArr[j];
+					if(nowTime == weatherTime) {
+						const weatherAllDayArr = weatherAllDataArr[i].day;
+						for (let k = 0; k < weatherAllDayArr.length; k++) {
+							if (nowDay == weatherAllDayArr[k]) {
+								let weatherCityCode = weatherAllDataArr[i].city_code;
+								allCityCodeArr.push(weatherCityCode);
+							}
+						}
+					}
+				}
+			}
+
+			//获取未来天气数据
+			let allAppend = false;
+			if(allCityCodeArr.length > 0){
+				weatherCityContent.push(`🌍天气预报`);
+				for (let i = 0; i < allCityCodeArr.length; i++) {
+					//获取天气数据
+					let weatherCityCode = allCityCodeArr[i]
+					if(i+1 == allCityCodeArr.length){
+						allAppend = true;
+					}
+					let cityContent = await getAllWeather(weatherKey, weatherCityCode, allAppend)
+					weatherCityContent.push(cityContent);
+				}
+			}
+
+			resolve(weatherCityContent.join('\n'))
+		} catch (error) {
+			console.log('处理天气数据失败', error.message || error);
+			reject(error.message || error)
+		}
+	})
+}
 
 //根据城市名获得城市代码
 const getCityCode = (cityName) => {
