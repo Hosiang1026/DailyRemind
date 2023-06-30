@@ -214,13 +214,6 @@ const classFunction = {
                     }
                 }
 
-                if (homeworkArr.length > 0) {
-                    content.push(`\n📝形考任务: ${homeworkArr.join('\n')}`)
-                }
-                if (examArr.length > 0) {
-                    content.push(`💯期末终考: ${examArr.join('\n')}`)
-                }
-
                 if (computerExamContent.length > 0||hrExamContent.length > 0) {
                     content.push(`💯今日考试`)
                     if (computerExamContent.length > 0) {
@@ -229,6 +222,13 @@ const classFunction = {
                     if (hrExamContent.length > 0) {
                         content.push(`\n📙22春行政专 \n${hrExamContent.join('\n')}`)
                     }
+                }
+
+                if (homeworkArr.length > 0) {
+                    content.push(`\n📝形考任务: ${homeworkArr.join('\n')}`)
+                }
+                if (examArr.length > 0) {
+                    content.push(`💯期末终考: ${examArr.join('\n')}`)
                 }
 
                 console.log('获取课表成功', content.join('\n'));
