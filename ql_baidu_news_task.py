@@ -74,12 +74,12 @@ def load_send():
 
 if __name__ == '__main__':
     version = 1.1
-    title = '百度热搜'
+    title = '今日新闻'
     checkUpdate()
     if load_send():
         content = getNew()
         if content != '':
-            print('获取百度热搜成功！')
-            send("百度热搜", content)
+            print('获取今日新闻成功！')
+            send("今日新闻", content)
         else:
-            print('获取百度热搜失败！')
+            print('获取今日新闻失败！')

@@ -82,12 +82,12 @@ def load_send():
 
 if __name__ == '__main__':
     version = 1.1
-    title = '百度电影'
+    title = '热映电影'
     checkUpdate()
     if load_send():
         newcontent = getMovie()
         if newcontent != '':
-            print('获取百度电影成功！')
-            send("百度电影", newcontent)
+            print('获取热映电影成功！')
+            send("热映电影", newcontent)
         else:
-            print('获取百度电影失败！')
+            print('获取热映电影失败！')
