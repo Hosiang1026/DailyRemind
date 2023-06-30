@@ -26,15 +26,6 @@ const handleWeatherContent = () => {
         }
       }
 
-      //课表模块
-      if (classTable.open) {
-        const handleClassTable = require('./functions/classTable')
-        const classTableContent = await handleClassTable()
-        if ('' != classTableContent) {
-          content.push(`\n\n${classTableContent}`)
-        }
-      }
-
       //如果啥都没输入的话
       if (content.length == 0) {
         content.push('请最少配置一个模块内容,没有内容无法推送')
