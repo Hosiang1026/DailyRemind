@@ -26,10 +26,6 @@ const handleWeatherContent = () => {
         }
       }
 
-      //如果啥都没输入的话
-      if (content.length == 0) {
-        content.push('请最少配置一个模块内容,没有内容无法推送')
-      }
       resolve(content.join(''))//转字符串
     } catch (error) {
       console.log('处理内容失败', error.message || error);
@@ -44,7 +40,9 @@ const handleWeatherContent = () => {
      //获取天气内容
      const content = await handleWeatherContent();
      //发送通知
-     await notify.sendNotify(`大家好🐇`, `${content}`)
+    if (content.length > 0) {
+        await notify.sendNotify(`大家好🐇`, `${content}`)
+    }
 })()
 .catch((e) => {
         $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')

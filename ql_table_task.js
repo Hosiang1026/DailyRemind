@@ -25,10 +25,6 @@ const handleWeatherContent = () => {
         }
       }
 
-      //如果啥都没输入的话
-      if (content.length == 0) {
-        content.push('本学期课程已结束，等待下学期开学安排!')
-      }
       resolve(content.join(''))//转字符串
     } catch (error) {
       console.log('处理内容失败', error.message || error);
@@ -43,7 +39,9 @@ const handleWeatherContent = () => {
      //获取天气内容
      const content = await handleWeatherContent();
      //发送通知
-     await notify.sendNotify(`大家好🐇`, `${content}`)
+    if (content.length > 0) {
+        await notify.sendNotify(`大家好🐇`, `${content}`)
+    }
 })()
 .catch((e) => {
         $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
