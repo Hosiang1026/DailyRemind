@@ -23,7 +23,7 @@ const handleNewsContent = () => {
         const handleNews = require('./functions/news')
         const newsContent = await handleNews()
         if ('' != newsContent) {
-          content.push(`\n\n${newsContent}`)
+          content.push(`${newsContent}`)
         }
       }
 
