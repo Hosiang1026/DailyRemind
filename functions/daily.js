@@ -388,13 +388,13 @@ module.exports = handleTimeList = () => {
                 for (var i = 0; i < contentArr.length; i++) {
                     content.push(contentArr[i]);
                 }
-
-
             }
 
             if(todayArr.length == 0){
                 //恋爱天数
                 content.push(loveContent);
+                const res = await axios.get('https://api.shadiao.pro/chp')
+                content.push(`\n💘${res.data.data.text}`)
             }
             console.log('获取重要节日成功', content.join('\n'));
             resolve(content.join('\n'))

@@ -27,12 +27,6 @@ const handleDailyContent = () => {
         }
       }
 
-      //彩虹屁
-      if (sentence.open) {
-        const res = await axios.get('https://api.shadiao.pro/chp')
-        content.push(`\n💘${res.data.data.text}`)
-      }
-
       //如果啥都没输入的话
       if (content.length == 0) {
         content.push('请最少配置一个模块内容,没有内容无法推送')
