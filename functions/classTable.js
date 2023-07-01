@@ -226,10 +226,10 @@ const classFunction = {
                     if (homeworkArr.length > 0||examArr.length > 0) {
                         content.push(`⏰倒计时`)
                         if (homeworkArr.length > 0) {
-                            content.push(`\n\n📝形考任务: ${homeworkArr.join('\n')}`)
+                            content.push(`\n📝形考任务: ${homeworkArr.join('\n')}`)
                         }
                         if (examArr.length > 0) {
-                            content.push(`💯期末终考: ${examArr.join('\n')}`)
+                            content.push(`\n💯期末终考: ${examArr.join('\n')}`)
                         }
                     }
                 }
