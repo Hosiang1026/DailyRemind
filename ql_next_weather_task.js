@@ -7,14 +7,14 @@ const axios = require('axios')
 axios.defaults.timeout = 40 * 1000
 
 const $ = new Env('天气预报');
-let notify, allMessage = '';
+let notify;
 
 //处理要发送的天气内容
 const handleWeatherContent = () => {
   return new Promise(async (resolve, reject) => {
     try {
       let content = []
-      const { start, weather, classTable, end} = require('./functions/input')
+      const { weather} = require('./functions/input')
 
       //根据不同的配置，增加不同的内容
       // 天气模块
