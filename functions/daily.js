@@ -389,8 +389,11 @@ module.exports = handleTimeList = () => {
                     content.push(contentArr[i]);
                 }
             }
-            //恋爱天数
-            content.push(loveContent);
+
+            if(todayArr.length == 0) {
+                //恋爱天数
+                content.push(loveContent);
+            }
 
             console.log('获取重要节日成功', content.join('\n'));
             resolve(content.join('\n'))
