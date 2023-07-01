@@ -222,13 +222,16 @@ const classFunction = {
                     if (hrExamContent.length > 0) {
                         content.push(`\n📙22春行政专 \n${hrExamContent.join('\n')}`)
                     }
-                }
-
-                if (homeworkArr.length > 0) {
-                    content.push(`\n📝形考任务: ${homeworkArr.join('\n')}`)
-                }
-                if (examArr.length > 0) {
-                    content.push(`💯期末终考: ${examArr.join('\n')}`)
+                }else{
+                    if (homeworkArr.length > 0||examArr.length > 0) {
+                        content.push(`⏰期末倒计时`)
+                        if (homeworkArr.length > 0) {
+                            content.push(`\n📝形考任务: ${homeworkArr.join('\n')}`)
+                        }
+                        if (examArr.length > 0) {
+                            content.push(`💯期末终考: ${examArr.join('\n')}`)
+                        }
+                    }
                 }
 
                 console.log('获取课表成功', content.join('\n'));
