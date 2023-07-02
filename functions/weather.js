@@ -179,7 +179,7 @@ const getAllWeather = (weatherKey, weatherCityCode, allAppend) => {
 				}
 
 				if (rainDayNum > 0&&allAppend){
-					weatherContent.push(`\n🌂未来${rainDayNum}天有雨, 记得带伞！`);
+					weatherContent.push(`\n🌂最近${rainDayNum}天有雨, 记得带伞！`);
 					rainDayNum = 0;
 					allBrellaFlag = false;
 				}
