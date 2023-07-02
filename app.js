@@ -18,7 +18,7 @@ const handleWeatherContent = () => {
       // 天气模块
       if (weather.open) {
         const handleNextWeather = require('./functions/weather')
-        const weatherContent = await handleNextWeather()
+        const weatherContent = await handleWeather()
         if ('' != weatherContent) {
           content.push(`\n\n${weatherContent}`)
         }
