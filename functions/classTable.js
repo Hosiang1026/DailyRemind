@@ -234,7 +234,7 @@ const classFunction = {
                 }else{
                     if (homeworkArr.length > 0||examArr.length > 0) {
                         if (examArr.length > 0) {
-                            content.push(`⏰终考倒计时`)
+                            content.push(`⏰期末考试倒计时`)
                             content.push(`${examArr.join('\n')}`)
                         }
                         if (homeworkArr.length > 0) {
