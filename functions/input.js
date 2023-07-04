@@ -451,7 +451,6 @@ let end = {
 let classTable = {
     open: true,//是否需要推送时增加课表，需要填true，否则填false  （不需要加引号）
     homework: '2023-06-15', // homework: 0,
-    examdate: '2023-07-08', // examdate: 0,
     computer: [//22春计算机本-课程列表
         {
             name: '软件工程',//课程名称04.11-04.25

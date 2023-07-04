@@ -24,9 +24,10 @@ const classFunction = {
                 let examArr = []
                 let tempExamTime = 0;
                 let hrTempExamTime = 0;
+                let tempExamName = "";
+                let hrTempExamName = "";
 
                 const homeworkDate = classTable.homework;
-                const examdateDate = classTable.examdate;
 
                 //22春计算机本-课程列表
                 const computerList = classTable.computer;
@@ -69,23 +70,22 @@ const classFunction = {
                         }
 
                         //考试处理
-                        if (examdateDate != 0) {
-                            let eleExam = element.exam;
-                            if (eleExam != 0) {
-                                let examType = (eleExam.type) == 1 ? '纸质闭卷' : '上机闭卷';
-                                let examDate = eleExam.date;
-                                let examTime = eleExam.time;
-                                let examPlace = eleExam.place;
-                                if (nowDate == examDate) {
-                                    computerExamContent.push(`· 考试课程: ${eleName}`)
-                                    computerExamContent.push(`· 考试方式: ${examType}`)
-                                    computerExamContent.push(`· 考试时间: ${examTime}`)
-                                    computerExamContent.push(`· 考试地点: ${examPlace}\n`)
-                                } else if (new Date(examDate) > new Date(nowDate)) {
-                                    let diffTime = diffTimeToDaily(nowDate, examDate);
-                                    if (tempExamTime == 0 || diffTime < tempExamTime) {
-                                        tempExamTime = diffTime;
-                                    }
+                        let eleExam = element.exam;
+                        if (eleExam != 0) {
+                            let examType = (eleExam.type) == 1 ? '纸质闭卷' : '上机闭卷';
+                            let examDate = eleExam.date;
+                            let examTime = eleExam.time;
+                            let examPlace = eleExam.place;
+                            if (nowDate == examDate) {
+                                computerExamContent.push(`· 考试课程: ${eleName}`)
+                                computerExamContent.push(`· 考试方式: ${examType}`)
+                                computerExamContent.push(`· 考试时间: ${examTime}`)
+                                computerExamContent.push(`· 考试地点: ${examPlace}\n`)
+                            } else if (new Date(examDate) > new Date(nowDate)) {
+                                let diffTime = diffTimeToDaily(nowDate, examDate);
+                                if (tempExamTime == 0 || diffTime < tempExamTime) {
+                                    tempExamTime = diffTime;
+                                    tempExamName = eleName;
                                 }
                             }
                         }
@@ -155,6 +155,7 @@ const classFunction = {
                                 let diffTime = diffTimeToDaily(nowDate, examDate);
                                 if (hrTempExamTime == 0 || diffTime < hrTempExamTime){
                                     hrTempExamTime = diffTime;
+                                    hrTempExamName = eleName;
                                 }
                             }
                         }
@@ -175,13 +176,21 @@ const classFunction = {
                 }
 
                 //期末考试倒计时
-                if (examdateDate != 0) {
-                    if (new Date(examdateDate) > new Date(nowDate)) {
-                        let diffTime = diffTimeToDaily(nowDate, examdateDate);
-                        if (diffTime == 1) {
-                            examArr.push(`明日进行期末考试`)
-                        } else if (diffTime > 1) {
-                            examArr.push(`还有${diffTime}天`)
+                if (tempExamTime != 0 || hrTempExamTime) {
+                    if (tempExamTime > 0) {
+                        examArr.push(`\n📗‍22春计算机本`)
+                        if (tempExamTime == 1) {
+                            examArr.push(`· ${tempExamName}: 明日考试`)
+                        } else if (tempExamTime > 1) {
+                            examArr.push(`· ${tempExamName}: 还有${tempExamTime}天`)
+                        }
+                    }
+                    if (hrTempExamTime > 0) {
+                        examArr.push(`\n📗22春行政专`)
+                        if (hrTempExamTime == 1) {
+                            examArr.push(`· ${hrTempExamName}: 明日考试`)
+                        } else if (hrTempExamTime > 1) {
+                            examArr.push(`· ${hrTempExamName}: 还有${hrTempExamTime}天`)
                         }
                     }
                 }
@@ -224,13 +233,14 @@ const classFunction = {
                     }
                 }else{
                     if (homeworkArr.length > 0||examArr.length > 0) {
-                        content.push(`⏰倒计时`)
-                        if (homeworkArr.length > 0) {
-                            content.push(`\n📝形考任务: ${homeworkArr.join('\n')}`)
-                        }
                         if (examArr.length > 0) {
-                            content.push(`\n💯期末终考: ${examArr.join('\n')}`)
+                            content.push(`⏰终考倒计时`)
+                            content.push(`\n${examArr.join('\n')}`)
                         }
+                        if (homeworkArr.length > 0) {
+                            content.push(`\n📝形考任务截止: ${homeworkArr.join('\n')}`)
+                        }
+
                     }
                 }
 
