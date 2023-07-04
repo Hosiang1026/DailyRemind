@@ -177,22 +177,22 @@ const classFunction = {
                 if (computerClassContent.length > 0||hrClassContent.length > 0) {
                     content.push(`🗣今日网课`)
                     if (computerClassContent.length > 0) {
-                        content.push(`\n📕‍22春计算机本 \n${computerClassContent.join('\n')}`)
+                        content.push(`\n📘‍22春计算机本 \n${computerClassContent.join('\n')}`)
                     }
                     if (hrClassContent.length > 0) {
-                        content.push(`\n📕22春行政专 \n${hrClassContent.join('\n')}`)
+                        content.push(`\n📘22春行政专 \n${hrClassContent.join('\n')}`)
                     }
                 }else if (computerClassArr.length > 0 || hrClassArr.length > 0) {
                     content.push(`📚网课提醒`)
                     if (computerClassArr.length > 0) {
-                        content.push(`\n📗‍22春计算机本`)
+                        content.push(`\n📒‍22春计算机本`)
                         if (computerClassArr.length > 0) {
                             content.push(`${computerClassArr.join('\n')}`)
                         }
                     }
 
                     if (hrClassArr.length > 0) {
-                        content.push(`\n📗22春行政专`)
+                        content.push(`\n📒22春行政专`)
                         if (hrClassArr.length > 0) {
                             content.push(`${hrClassArr.join('\n')}`)
                         }
@@ -202,10 +202,10 @@ const classFunction = {
                 if (computerExamContent.length > 0||hrExamContent.length > 0) {
                     content.push(`💯今日考试`)
                     if (computerExamContent.length > 0) {
-                        content.push(`\n📙‍22春计算机本 \n${computerExamContent.join('\n')}`)
+                        content.push(`\n📕‍22春计算机本 \n${computerExamContent.join('\n')}`)
                     }
                     if (hrExamContent.length > 0) {
-                        content.push(`\n📙22春行政专 \n${hrExamContent.join('\n')}`)
+                        content.push(`\n📕22春行政专 \n${hrExamContent.join('\n')}`)
                     }
                 }else{
                     if (tempExamContent.length > 0||hrTempExamContent.length > 0) {
@@ -218,7 +218,7 @@ const classFunction = {
                         }
                      }
                     if (homeworkArr.length > 0) {
-                        content.push(`\n📝形考任务截止: ${homeworkArr.join('\n')}`)
+                        content.push(`\n📝形考任务倒计时: ${homeworkArr.join('\n')}`)
                     }
                 }
 
