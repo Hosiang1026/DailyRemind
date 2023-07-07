@@ -47,8 +47,11 @@ def getNew():
             url.append(str(i).split("href=\"")[1].split("\"")[0])
 
         url = list(dict.fromkeys(url))
-        for i in range(0, 8):
-            _content = _content + "\n" +str(i+1)+'.'+ title[i]
+        for i in range(1, 9):
+            if i == 1:
+                _content = "\n" +str(i)+'.'+ title[i]
+            else:
+                _content = _content + "\n" +str(i)+'.'+ title[i]
         return _content
     except Exception as e:
         return e
@@ -74,12 +77,12 @@ def load_send():
 
 if __name__ == '__main__':
     version = 1.1
-    title = '今日新闻'
+    title = '今日热搜'
     checkUpdate()
     if load_send():
         content = getNew()
         if content != '':
-            print('获取今日新闻成功！')
-            send("今日新闻", content)
+            print('获取今日热搜成功！')
+            send("今日热搜", content)
         else:
-            print('获取今日新闻失败！')
+            print('获取今日热搜失败！')
