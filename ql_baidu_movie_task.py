@@ -54,7 +54,10 @@ def getMovie():
         # url = list(dict.fromkeys(url))
         num = 1
         for k in range(0, 20, 2):
-            _content = _content + "\n" + str(num) + '.《' + title[k] +'》 - '+ actor[k+1][3:]
+            if k == 0:
+             _content = str(num) + '.《' + title[k] +'》 - '+ actor[k+1][3:]
+            else:
+                _content = _content + "\n" + str(num) + '.《' + title[k] +'》 - '+ actor[k+1][3:]
             num = num+1
         return _content
 

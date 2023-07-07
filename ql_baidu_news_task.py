@@ -7,7 +7,6 @@ import os
 import re
 import sys
 import requests
-import datetime
 from bs4 import BeautifulSoup
 
 '''
@@ -49,7 +48,7 @@ def getNew():
         url = list(dict.fromkeys(url))
         for i in range(1, 9):
             if i == 1:
-                _content = "\n" +str(i)+'.'+ title[i]
+                _content = str(i)+'.'+ title[i]
             else:
                 _content = _content + "\n" +str(i)+'.'+ title[i]
         return _content
