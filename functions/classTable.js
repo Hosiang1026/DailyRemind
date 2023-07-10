@@ -207,19 +207,19 @@ const classFunction = {
                     if (hrExamContent.length > 0) {
                         content.push(`\n📕22春行政专 \n${hrExamContent.join('\n')}`)
                     }
-                }else{
-                    if (tempExamContent.length > 0||hrTempExamContent.length > 0) {
-                        content.push(`⏰期末考试倒计时`)
-                        if (tempExamContent.length > 0) {
-                            content.push(`\n📙‍22春计算机本 \n${tempExamContent.join('\n')}`)
-                        }
-                        if (hrTempExamContent.length > 0) {
-                            content.push(`\n📙22春行政专 \n${hrTempExamContent.join('\n')}`)
-                        }
-                     }
-                    if (homeworkArr.length > 0) {
-                        content.push(`\n📝形考任务倒计时: ${homeworkArr.join('\n')}`)
+                }
+
+                if (tempExamContent.length > 0||hrTempExamContent.length > 0) {
+                    content.push(`⏰期末考试倒计时`)
+                    if (tempExamContent.length > 0) {
+                        content.push(`\n📙‍22春计算机本 \n${tempExamContent.join('\n')}`)
                     }
+                    if (hrTempExamContent.length > 0) {
+                        content.push(`\n📙22春行政专 \n${hrTempExamContent.join('\n')}`)
+                    }
+                }
+                if (homeworkArr.length > 0) {
+                    content.push(`\n📝形考任务倒计时: ${homeworkArr.join('\n')}`)
                 }
 
                 console.log('获取课表成功', content.join('\n'));
