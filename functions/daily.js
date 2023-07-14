@@ -354,10 +354,14 @@ module.exports = handleTimeList = () => {
                     let todayContent = todayArr[i].todayContent;
                     content.push(`· 今天是${todayName} ${todayContent}🎉`);
                 }
-                //一言
-                const res = await axios.get('https://api.vvhan.com/api/ian?cl=wx&&type=json')
-                content.push(`\n ${res.data.data.vhan}`)
-
+                //随机笑话
+                if (Math.floor(Math.random() * 10) % 2 == 0) {
+                    const res = await axios.get('https://api.vvhan.com/api/joke?type=json')
+                    content.push(`\n ${res.data.joke}  -- 「${res.data.title}」`)
+                }else{
+                    const res = await axios.get('https://api.uomg.com/api/comments.163?format=json')
+                    content.push(`\n${res.data.data.content} -- 来自@${res.data.data.nickname}「${res.data.data.name}」${res.data.data.artistsname}`)
+                }
             }else{
                 let minTempTime = Math.min.apply(Math, latelyArr.map(item => { return item['tempTime'] }))
                 for (var j = 0; j < latelyArr.length; j++) {
@@ -402,9 +406,9 @@ module.exports = handleTimeList = () => {
                 if (Math.floor(Math.random() * 10) % 2 == 0) {
                     const res = await axios.get('https://api.shadiao.pro/chp')
                     content.push(`\n💘${res.data.data.text}`)
-                }else {
-                    const res = await axios.get('https://api.uomg.com/api/comments.163?format=json')
-                    content.push(`\n${res.data.data.content} -- 来自@${res.data.data.nickname}「${res.data.data.name}」${res.data.data.artistsname}`)
+                }else{
+                    const res = await axios.get('https://api.vvhan.com/api/sao?type=json')
+                    content.push(`\n💘${res.data.ishan}`)
                 }
             }
             console.log('获取重要节日成功', content.join('\n'));
