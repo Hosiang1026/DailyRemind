@@ -30,19 +30,18 @@ module.exports = handleTimeList = () => {
             let tipsArr = []
             let loveContent;
 
-            //把今日日期转为YYYY-MM-DD的格式
+            //把今日日期转为YYYY-MM-DD的格式 第一天
             let date = new Date();
             let currentYear = date.getFullYear();
             let currentMonth = date.getMonth();
             let currentDate = date.getDate();
+            let firstDate = `${currentYear}` +'-01-01';
             let nowDate = `${currentYear}-${(currentMonth + 1) < 10 ? '0' + (currentMonth + 1) : (currentMonth + 1)}-${(currentDate) < 10 ? '0' + (currentDate) : (currentDate)}`
 
+            let yearDiffTime = sumTimeToNow(firstDate, nowDate)+1;
             let lunarDate = calendar.solar2lunar();
-            let lunarDateStr = lunarDate.Animal +'年' +'•'+ lunarDate.gzYear +'年'+ lunarDate.IMonthCn + lunarDate.IDayCn;
-            content.push(`${nowDate} ${lunarDate.ncWeek} \n${lunarDateStr}\n`);
-
-            //今日星座
-            //https://api.vvhan.com/api/horoscope?type=scorpio&time=today
+            let lunarDateStr = lunarDate.Animal +'年' +'•'+ lunarDate.gzYear +'年'+ lunarDate.IMonthCn + lunarDate.IDayCn + ' ' + lunarDate.astro;
+            content.push(`${nowDate} ${lunarDate.ncWeek} 第${yearDiffTime}天 \n${lunarDateStr}\n`);
 
             content.push(`📆重要节日: \n`);
 
@@ -356,8 +355,8 @@ module.exports = handleTimeList = () => {
                     content.push(`· 今天是${todayName} ${todayContent}🎉`);
                 }
                 //一言
-                //https://api.vvhan.com/api/ian?type=json
-
+                const res = await axios.get('https://api.vvhan.com/api/ian?cl=wx&&type=json')
+                content.push(`\n ${res.data.data.vhan}`)
 
             }else{
                 let minTempTime = Math.min.apply(Math, latelyArr.map(item => { return item['tempTime'] }))
