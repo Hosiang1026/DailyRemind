@@ -40,6 +40,10 @@ module.exports = handleTimeList = () => {
             let lunarDate = calendar.solar2lunar();
             let lunarDateStr = lunarDate.Animal +'年' +'•'+ lunarDate.gzYear +'年'+ lunarDate.IMonthCn + lunarDate.IDayCn;
             content.push(`${nowDate} ${lunarDate.ncWeek} \n${lunarDateStr}\n`);
+
+            //今日星座
+            //https://api.vvhan.com/api/horoscope?type=scorpio&time=today
+
             content.push(`📆重要节日: \n`);
 
             //纪念日/生日
@@ -348,11 +352,13 @@ module.exports = handleTimeList = () => {
             if(todayArr.length > 0){
                 for (var i = 0; i < todayArr.length; i++) {
                     let todayName = todayArr[i].todayName;
-                    //let todayDate = todayArr[i].todayDate;
                     let todayContent = todayArr[i].todayContent;
                     content.push(`· 今天是${todayName} ${todayContent}🎉`);
-                    //content.push(`· ${todayDate} ${todayContent}`);
                 }
+                //一言
+                //https://api.vvhan.com/api/ian?type=json
+
+
             }else{
                 let minTempTime = Math.min.apply(Math, latelyArr.map(item => { return item['tempTime'] }))
                 for (var j = 0; j < latelyArr.length; j++) {
@@ -391,11 +397,16 @@ module.exports = handleTimeList = () => {
                 }
             }
 
-            if(todayArr.length == 0){
+            if(todayArr.length == 0) {
                 //恋爱天数
                 content.push(loveContent);
-                const res = await axios.get('https://api.shadiao.pro/chp')
-                content.push(`\n💘${res.data.data.text}`)
+                if (Math.floor(Math.random() * 10) % 2 == 0) {
+                    const res = await axios.get('https://api.shadiao.pro/chp')
+                    content.push(`\n💘${res.data.data.text}`)
+                }else {
+                    const res = await axios.get('https://api.uomg.com/api/comments.163?format=json')
+                    content.push(`\n${res.data.data.content} -- 来自@${res.data.data.nickname}「${res.data.data.name}」${res.data.data.artistsname}`)
+                }
             }
             console.log('获取重要节日成功', content.join('\n'));
             resolve(content.join('\n'))

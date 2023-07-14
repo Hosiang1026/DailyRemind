@@ -235,7 +235,7 @@ app.listen(port, hostname, function (err) {
 
 app.get('/', async (req, res) => {
   const pushRes = 'push推送服务 - 启动成功： http://192.168.1.2:8090 ';
-  const appRes = await weatherPush()
+  const appRes = await newsPush()
   console.log(appRes);
   res.send(pushRes + appRes + " " + new Date())
 })
