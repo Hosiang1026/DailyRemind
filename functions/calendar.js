@@ -781,7 +781,7 @@ calendar.conversion = function(str) {
 <!-- 24节气转换公历 -->
 calendar.conversionTerm = function(year, mouth, num) {
 
-    var day = calendar.getTerm(parseInt(year) - 2, parseInt(num) + 2);
+    var day = calendar.getTerm(parseInt(year) - 1, parseInt(num) + 2);
     var termDay = (day) < 10 ? '0' + (day) : (day)
     var termStr = year + "-" + mouth + "-" + termDay;
 
