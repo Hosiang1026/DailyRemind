@@ -155,7 +155,7 @@ module.exports = handleWeather = () => {
 				}
 			}
 
-			if(baseCityCodeArr.length > 0) {
+			/*if(baseCityCodeArr.length > 0) {
 				if (allBrellaFlag){
 					if (nowDay != 6 && nowDay != 0) {
 						if (nowTime == "AM") {
@@ -167,7 +167,7 @@ module.exports = handleWeather = () => {
 						}
 					}
 				}
-			}
+			}*/
 
 			resolve(weatherCityContent.join('\n'))
         } catch (error) {
