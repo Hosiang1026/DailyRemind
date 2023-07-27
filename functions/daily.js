@@ -43,7 +43,7 @@ module.exports = handleTimeList = () => {
             let lunarDateStr = lunarDate.Animal +'年' +'•'+ lunarDate.gzYear +'年'+ lunarDate.IMonthCn + lunarDate.IDayCn + ' ' + lunarDate.astro;
             content.push(`${nowDate} ${lunarDate.ncWeek} 第${yearDiffTime}天 \n${lunarDateStr}\n`);
 
-            content.push(`📆重要节日: \n`);
+            content.push(`📆重要节日 \n`);
 
             //纪念日/生日
             let anniversaryArr = daily.anniversary;
@@ -368,7 +368,7 @@ module.exports = handleTimeList = () => {
                     let tempName = latelyArr[j].tempName;
                     let tempTime = latelyArr[j].tempTime;
                     if (minTempTime == latelyArr[j].tempTime){
-                        content.push(`⏳距离下一个节日: \n📌${tempName}: 还有${tempTime}天\n`);
+                        content.push(`⏳距离下一个节日 \n📌${tempName}: 还有${tempTime}天\n`);
                     }else{
                         contentArr.push(`· ${tempName}: 还有${tempTime}天`);
                     }
