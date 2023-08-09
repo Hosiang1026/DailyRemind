@@ -411,7 +411,7 @@ module.exports = handleTimeList = () => {
                     content.push(`\n💘${res.data.ishan}`)
                 }
             }
-            console.log('获取重要节日成功', content.join('\n'));
+            console.log('获取重要节日成功 \n', content.join('\n'));
             resolve(content.join('\n'))
         } catch (error) {
             reject(error.message || error)
