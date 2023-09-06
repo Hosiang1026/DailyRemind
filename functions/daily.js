@@ -1,5 +1,6 @@
 const { daily } = require('./input')
 var calendar = require("./calendar");
+const axios = require('axios')
 var calendarplus = require("./calendarplus");
 //计算节日时间到今天的时间差，参数格式为 YYYY-MM-DD
 const sumTimeToNow = (targetTime, nowTime) => {
@@ -29,17 +30,20 @@ module.exports = handleTimeList = () => {
             let tipsArr = []
             let loveContent;
 
-            //把今日日期转为YYYY-MM-DD的格式
+            //把今日日期转为YYYY-MM-DD的格式 第一天
             let date = new Date();
             let currentYear = date.getFullYear();
             let currentMonth = date.getMonth();
             let currentDate = date.getDate();
+            let firstDate = `${currentYear}` +'-01-01';
             let nowDate = `${currentYear}-${(currentMonth + 1) < 10 ? '0' + (currentMonth + 1) : (currentMonth + 1)}-${(currentDate) < 10 ? '0' + (currentDate) : (currentDate)}`
 
+            let yearDiffTime = sumTimeToNow(firstDate, nowDate)+1;
             let lunarDate = calendar.solar2lunar();
-            let lunarDateStr = lunarDate.Animal +'年' +'•'+ lunarDate.gzYear +'年'+ lunarDate.IMonthCn + lunarDate.IDayCn;
-            content.push(`${nowDate} ${lunarDate.ncWeek} \n${lunarDateStr}\n`);
-            content.push(`📆重要节日: \n`);
+            let lunarDateStr = lunarDate.Animal +'年' +'•'+ lunarDate.gzYear +'年'+ lunarDate.IMonthCn + lunarDate.IDayCn + ' ' + lunarDate.astro;
+            content.push(`${nowDate} ${lunarDate.ncWeek} 第${yearDiffTime}天 \n${lunarDateStr}\n`);
+
+            content.push(`📆重要节日 \n`);
 
             //纪念日/生日
             let anniversaryArr = daily.anniversary;
@@ -174,16 +178,18 @@ module.exports = handleTimeList = () => {
                                 endYearLegalDate = currentYear + 1 + '-' + endLegalHoliday;
                             }
                             let startDiffTime = diffTimeToDaily(nowDate, startYearLegalDate);
-                            tipsArr.push(`⏳距离${legalName}开始放假还有${startDiffTime}天\n`)
-                            if (legalRepair != 0) {
-                                let legalRepairNum = legalRepair.length;
-                                tipsArr.push(`👩‍💻补班${legalRepairNum}天: ${legalRepair.join('、')}`)
-                            }
-                            let legalHolidayNum = legalHoliday.length;
-                            if (legalHolidayNum > 2){
-                                tipsArr.push(`⛱放假${legalHolidayNum}天: ${startLegalHoliday} ~ ${endLegalHoliday}\n`)
-                            }else{
-                                tipsArr.push(`⛱放假${legalHolidayNum}天: ${legalHoliday.join('、')}\n`)
+                            if (startDiffTime > 0){
+                                tipsArr.push(`⏳距离${legalName}开始放假还有${startDiffTime}天\n`)
+                                if (legalRepair != 0) {
+                                    let legalRepairNum = legalRepair.length;
+                                    tipsArr.push(`👩‍💻补班${legalRepairNum}天: ${legalRepair.join('、')}`)
+                                }
+                                let legalHolidayNum = legalHoliday.length;
+                                if (legalHolidayNum > 2){
+                                    tipsArr.push(`⛱放假${legalHolidayNum}天: ${startLegalHoliday} ~ ${endLegalHoliday}\n`)
+                                }else{
+                                    tipsArr.push(`⛱放假${legalHolidayNum}天: ${legalHoliday.join('、')}\n`)
+                                }
                             }
                         }
                     }
@@ -282,8 +288,8 @@ module.exports = handleTimeList = () => {
                         nextTermSolarDate = calendar.conversionTerm(currentYear+1, termMonth, termSort);
                     }
                     //计算差值
-                    let diffTime = diffTimeToDaily(nowDate, nextTermSolarDate)+1;
-                    if (nowDate == nextTermSolarDate) {
+                    let diffTime = diffTimeToDaily(nowDate, nextTermSolarDate);
+                    if (diffTime == 0) {
                         let todayDate = '<'+nowDate.split('-').join('.')+'>';
                         var obj = {todayName:termName,todayDate:todayDate, todayContent:''};
                         todayArr.push(obj);
@@ -345,9 +351,16 @@ module.exports = handleTimeList = () => {
             if(todayArr.length > 0){
                 for (var i = 0; i < todayArr.length; i++) {
                     let todayName = todayArr[i].todayName;
-                    let todayDate = todayArr[i].todayDate;
                     let todayContent = todayArr[i].todayContent;
-                    content.push(`· 今天是${todayName}${todayDate} ${todayContent}⛱`);
+                    content.push(`· 今天是${todayName} ${todayContent}🎉`);
+                }
+                //随机笑话
+                if (Math.floor(Math.random() * 10) % 2 == 0) {
+                    const res = await axios.get('https://api.vvhan.com/api/joke?type=json')
+                    content.push(`\n ${res.data.joke}  \n-- 「${res.data.title}」`)
+                }else{
+                    const res = await axios.get('https://api.uomg.com/api/comments.163?format=json')
+                    content.push(`\n${res.data.data.content} \n-- 来自@${res.data.data.nickname}「${res.data.data.name}」${res.data.data.artistsname}`)
                 }
             }else{
                 let minTempTime = Math.min.apply(Math, latelyArr.map(item => { return item['tempTime'] }))
@@ -355,7 +368,7 @@ module.exports = handleTimeList = () => {
                     let tempName = latelyArr[j].tempName;
                     let tempTime = latelyArr[j].tempTime;
                     if (minTempTime == latelyArr[j].tempTime){
-                        content.push(`⏳距离下一个节日: \n📌${tempName}: 还有${tempTime}天\n`);
+                        content.push(`⏳距离下一个节日 \n📌${tempName}: 还有${tempTime}天\n`);
                     }else{
                         contentArr.push(`· ${tempName}: 还有${tempTime}天`);
                     }
@@ -386,10 +399,19 @@ module.exports = handleTimeList = () => {
                     content.push(contentArr[i]);
                 }
             }
-            //恋爱天数
-            content.push(loveContent);
 
-            console.log('获取重要节日成功', content.join('\n'));
+            if(todayArr.length == 0) {
+                //恋爱天数
+                content.push(loveContent);
+                if (Math.floor(Math.random() * 10) % 2 == 0) {
+                    const res = await axios.get('https://api.shadiao.pro/chp')
+                    content.push(`\n💘${res.data.data.text}`)
+                }else{
+                    const res = await axios.get('https://api.vvhan.com/api/sao?type=json')
+                    content.push(`\n💘${res.data.ishan}`)
+                }
+            }
+            console.log('获取重要节日成功\n', content.join('\n'));
             resolve(content.join('\n'))
         } catch (error) {
             reject(error.message || error)

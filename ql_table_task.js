@@ -1,36 +1,30 @@
 /*
-* 新闻早报任务:脚本更新地址 ql_news_task.js
-* 配置参数 input.js
+* 网课提醒任务:脚本更新地址 ql_table_task.js
+  配置参数 input.js
 */
 
 const axios = require('axios')
 axios.defaults.timeout = 40 * 1000
 
-const $ = new Env('新闻早报');
-let notify;
+const $ = new Env('网课提醒');
+let notify, allMessage = '';
 
-//处理要发送的新闻内容
-const handleNewsContent = () => {
+//处理要发送的天气内容
+const handleWeatherContent = () => {
   return new Promise(async (resolve, reject) => {
     try {
       let content = []
-      const { news} = require('./functions/input')
+      const { classTable} = require('./functions/input')
 
-      //根据不同的配置，增加不同的内容
-
-      // 新闻模块
-      if (news.open) {
-        const handleNews = require('./functions/news')
-        const newsContent = await handleNews()
-        if ('' != newsContent) {
-          content.push(`${newsContent}`)
+      //课表模块
+      if (classTable.open) {
+        const handleClassTable = require('./functions/classTable')
+        const classTableContent = await handleClassTable()
+        if ('' != classTableContent) {
+          content.push(`${classTableContent}`)
         }
       }
 
-      //如果啥都没输入的话
-      if (content.length == 0) {
-        content.push('请最少配置一个模块内容,没有内容无法推送')
-      }
       resolve(content.join(''))//转字符串
     } catch (error) {
       console.log('处理内容失败', error.message || error);
@@ -42,10 +36,12 @@ const handleNewsContent = () => {
 !(async() => {
      //获取配置
      await requireConfig();
-     //获取新闻内容
-     const content = await handleNewsContent();
+     //获取天气内容
+     const content = await handleWeatherContent();
      //发送通知
-     await notify.sendNotify(`早上好🦔`, `${content}`)
+    if (content.length > 0) {
+        await notify.sendNotify(`大家好🐇`, `${content}`)
+    }
 })()
 .catch((e) => {
         $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
@@ -53,6 +49,7 @@ const handleNewsContent = () => {
     .finally(() => {
         $.done();
     })
+
 
 function requireConfig() {
   return new Promise(resolve => {

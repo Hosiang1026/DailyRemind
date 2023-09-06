@@ -771,7 +771,7 @@ calendar.conversion = function(str) {
     var solar = calendar.lunar2solar(y, m, d);
     //var solarBirthday = solar.cYear + "-" + solar.cMonth + "-" + solar.cDay;
 
-    var solarCMonth = (solar.cMonth) < 10 ? '0' + (solar.cMonth) : (solar.cMonth);
+    var solarCMonth = (solar.cMonth-1) < 10 ? '0' + (solar.cMonth-1) : (solar.cMonth-1);
     var solarCDay = (solar.cDay) < 10 ? '0' + (solar.cDay) : (solar.cDay)
     var solarBirthday = solar.cYear + "-" + solarCMonth  + "-" + solarCDay;
 
@@ -781,7 +781,7 @@ calendar.conversion = function(str) {
 <!-- 24节气转换公历 -->
 calendar.conversionTerm = function(year, mouth, num) {
 
-    var day = calendar.getTerm(parseInt(year), parseInt(num));
+    var day = calendar.getTerm(parseInt(year), parseInt(num) + 2);
     var termDay = (day) < 10 ? '0' + (day) : (day)
     var termStr = year + "-" + mouth + "-" + termDay;
 

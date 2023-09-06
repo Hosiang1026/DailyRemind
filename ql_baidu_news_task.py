@@ -7,7 +7,6 @@ import os
 import re
 import sys
 import requests
-import datetime
 from bs4 import BeautifulSoup
 
 '''
@@ -19,12 +18,12 @@ v1.1更新记录：
 def checkUpdate():
     print("当前运行的脚本版本：" + str(version))
     try:
-        r1 = requests.get("https://gitee.com/hosiang1026/DailyRemind/raw/master/ql_hotnews_task.py").text
+        r1 = requests.get("https://gitee.com/hosiang1026/DailyRemind/raw/master/ql_baidu_news_task.py").text
         r2 = re.findall(re.compile("version = \d.\d"), r1)[0].split("=")[1].strip()
         if float(r2) > version:
             print("发现新版本：" + r2)
             print("正在自动更新脚本...")
-            os.system("ql raw https://gitee.com/hosiang1026/DailyRemind/raw/master/ql_hotnews_task.py &")
+            os.system("ql raw https://gitee.com/hosiang1026/DailyRemind/raw/master/ql_baidu_news_task.py &")
     except:
         pass
 
@@ -47,8 +46,11 @@ def getNew():
             url.append(str(i).split("href=\"")[1].split("\"")[0])
 
         url = list(dict.fromkeys(url))
-        for i in range(0, 8):
-            _content = _content + "\n" +str(i+1)+'.'+ title[i]
+        for i in range(1, 9):
+            if i == 1:
+                _content = "\n" + str(i)+'.'+ title[i]
+            else:
+                _content = _content + "\n" +str(i)+'.'+ title[i]
         return _content
     except Exception as e:
         return e
@@ -74,12 +76,12 @@ def load_send():
 
 if __name__ == '__main__':
     version = 1.1
-    title = '百度热搜'
+    title = '今日热搜'
     checkUpdate()
     if load_send():
         content = getNew()
         if content != '':
-            print('获取百度热搜成功！')
-            send("百度热搜", content)
+            print('获取今日热搜成功！')
+            send("今日热搜", content)
         else:
-            print('获取百度热搜失败！')
+            print('获取今日热搜失败！')
