@@ -230,7 +230,7 @@ const app = express();
 
 // 启动 web 服务器
 const hostname = getIPAddress()
-const port = 9000
+const port = 8090
 
 app.listen(port, hostname, function (err) {
   if (err) {
