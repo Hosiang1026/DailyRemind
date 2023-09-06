@@ -22,7 +22,7 @@ const handleLotteryContent = () => {
         const handleLottery = require('./functions/lottery')
         const lotteryContent = await handleLottery()
         if ('' != lotteryContent) {
-          content.push(`\n\n${lotteryContent}`)
+          content.push(`${lotteryContent}`)
         }
       }
 

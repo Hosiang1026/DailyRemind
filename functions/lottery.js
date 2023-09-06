@@ -54,7 +54,6 @@ module.exports = handleLottery = () => {
 
 		const [SSQ, SD, KL8, QLC] = await Promise.all(lotteryURLs.map(getLotteryData));
 
-
 		lotteryContent.push(`📈福利彩票`);
 
 		lotteryContent.push(`\n🎈3D\n`);
