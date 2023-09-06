@@ -7,12 +7,21 @@ const handleWeatherContent = () => {
   return new Promise(async (resolve, reject) => {
     try {
       let content = []
-      const { start, weather, classTable, end} = require('./functions/input')
+      const { start, weather, classTable, lottery, end} = require('./functions/input')
 
       //根据不同的配置，增加不同的内容
       //开头语模块
       if (start.open) {
         content.push(`${start.content}`)
+      }
+
+      //福利彩票模块
+      if (lottery.open) {
+        const handleLottery = require('./functions/lottery')
+        const lotteryContent = await handleLottery()
+        if ('' != lotteryContent) {
+          content.push(`\n\n${lotteryContent}`)
+        }
       }
 
       // 天气模块
@@ -221,7 +230,7 @@ const app = express();
 
 // 启动 web 服务器
 const hostname = getIPAddress()
-const port = 8090
+const port = 9000
 
 app.listen(port, hostname, function (err) {
   if (err) {

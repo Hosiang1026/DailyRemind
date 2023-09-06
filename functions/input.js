@@ -14,6 +14,11 @@ let start = {
     content: '大家好🐷', //开头语内容，可以输入emoji表情，可以使用 \n 来换行
 }
 
+//福利彩票模块
+let lottery = {
+    open: true, //是否需要推送福利彩票，需要填true，否则填false （不需要加引号，填了false的话下面新闻有关的配置项就不用填了）
+}
+
 //新闻模块
 let news = {
     open: true, //是否需要推送新闻，需要填true，否则填false （不需要加引号，填了false的话下面新闻有关的配置项就不用填了）
@@ -22,7 +27,7 @@ let news = {
 
 //天气模块
 let weather = {
-    open: true, //是否需要推送天气，需要填true，否则填false （不需要加引号，填了false的话下面天气有关的配置项就不用填了）
+    open: false, //是否需要推送天气，需要填true，否则填false （不需要加引号，填了false的话下面天气有关的配置项就不用填了）
 	key: 'd8045d9dd3eb0db5dc3f2a807a6a64e0', //这里输入天气申请到的key
     //工作日推送实况天气
     base_data: [ //气象类型，base:返回实况天气
@@ -600,8 +605,8 @@ let atAll = false //是否需要艾特所有人，需要填true，否则填false
 
 //彩虹屁模块
 let sentence = {
-    open: true,//是否需要彩虹屁文案，需要填true，否则填false （不需要加引号） 
+    open: true,//是否需要彩虹屁文案，需要填true，否则填false （不需要加引号）
 }
 
 //下面的内容请勿改动
-module.exports = { robotPush, start, news, weather, daily, gasoline, end, atAll, classTable, sentence }
+module.exports = { robotPush, start, news, lottery, weather, daily, gasoline, end, atAll, classTable, sentence }
