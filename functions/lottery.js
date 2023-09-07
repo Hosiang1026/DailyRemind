@@ -66,7 +66,16 @@ module.exports = handleLottery = () => {
 			if (SDArr[i] == nowDay){
 				lotteryContent.push(`\n🎈福彩3D\n`);
 				lotteryContent.push(`· 开奖期号: ` + SD.code);
-				lotteryContent.push(`· 开奖时间: ` + SD.date);
+				lotteryContent.push(`· 开奖日期: ` + SD.date);
+				if (SD.sales != ''){
+					lotteryContent.push(`· 销售金额: ` + SD.sales + '元');
+				}
+				if (SD.poolmoney != ''){
+					lotteryContent.push(`· 奖池金额: ` + SD.poolmoney + '元');
+				}
+				if (SD.content != ''){
+					lotteryContent.push(`· 中奖情况: ` + SD.content);
+				}
 				lotteryContent.push(`· 中奖号码: ` + SD.red);
 			}
 		}
@@ -76,7 +85,16 @@ module.exports = handleLottery = () => {
 			if (KL8Arr[i] == nowDay){
 				lotteryContent.push(`\n🎈快乐8\n`);
 				lotteryContent.push(`· 开奖期号: ` + KL8.code);
-				lotteryContent.push(`· 开奖时间: ` + KL8.date);
+				lotteryContent.push(`· 开奖日期: ` + KL8.date);
+				if (KL8.sales != ''){
+					lotteryContent.push(`· 销售金额: ` + KL8.sales + '元');
+				}
+				if (KL8.poolmoney != ''){
+					lotteryContent.push(`· 奖池金额: ` + KL8.poolmoney + '元');
+				}
+				if (KL8.content != ''){
+					lotteryContent.push(`· 中奖情况: ` + KL8.content);
+				}
 				lotteryContent.push(`· 中奖号码: ` + KL8.red);
 			}
 		}
@@ -86,7 +104,16 @@ module.exports = handleLottery = () => {
 			if (QLCArr[i] == nowDay){
 				lotteryContent.push(`\n🎈七乐彩\n`);
 				lotteryContent.push(`· 开奖期号: ` + QLC.code);
-				lotteryContent.push(`· 开奖时间: ` + QLC.date);
+				lotteryContent.push(`· 开奖日期: ` + QLC.date);
+				if (QLC.sales != ''){
+					lotteryContent.push(`· 销售金额: ` + QLC.sales + '元');
+				}
+				if (QLC.poolmoney != ''){
+					lotteryContent.push(`· 奖池金额: ` + QLC.poolmoney + '元');
+				}
+				if (QLC.content != ''){
+					lotteryContent.push(`· 中奖情况: ` + QLC.content);
+				}
 				lotteryContent.push(`· 红球号码: ` + QLC.red);
 				lotteryContent.push(`· 蓝球号码: ` + QLC.blue);
 			}
@@ -97,7 +124,16 @@ module.exports = handleLottery = () => {
 			if (SSQArr[i] == nowDay){
 				lotteryContent.push(`\n🎈双色球\n`);
 				lotteryContent.push(`· 开奖期号: ` + SSQ.code);
-				lotteryContent.push(`· 开奖时间: ` + SSQ.date);
+				lotteryContent.push(`· 开奖日期: ` + SSQ.date);
+				if (SSQ.sales != ''){
+					lotteryContent.push(`· 销售金额: ` + SSQ.sales + '元');
+				}
+				if (SSQ.poolmoney != ''){
+					lotteryContent.push(`· 奖池金额: ` + SSQ.poolmoney + '元');
+				}
+				if (SSQ.content != ''){
+					lotteryContent.push(`· 中奖情况: ` + SSQ.content);
+				}
 				lotteryContent.push(`· 红球号码: ` + SSQ.red);
 				lotteryContent.push(`· 蓝球号码: ` + SSQ.blue);
 			}
