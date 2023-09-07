@@ -67,13 +67,13 @@ module.exports = handleLottery = () => {
 				lotteryContent.push(`\n🎱福彩3D\n`);
 				lotteryContent.push(`· 开奖期号: ` + SD.code);
 				lotteryContent.push(`· 开奖日期: ` + SD.date);
-				if (SD.sales != ''){
+				if (SD.sales != ''&&SD.sales != '_'&&SD.sales != '0'){
 					lotteryContent.push(`· 销售金额: ` + SD.sales + '元');
 				}
-				if (SD.poolmoney != ''){
+				if (SD.poolmoney != ''&&SD.poolmoney != '_'&&SD.poolmoney != '0'){
 					lotteryContent.push(`· 奖池金额: ` + SD.poolmoney + '元');
 				}
-				if (SD.content != ''){
+				if (SD.content != ''&&SD.content != '_'){
 					lotteryContent.push(`· 中奖情况: ` + SD.content);
 				}
 				lotteryContent.push(`· 中奖号码: ` + SD.red);
@@ -86,13 +86,13 @@ module.exports = handleLottery = () => {
 				lotteryContent.push(`\n🎱快乐8\n`);
 				lotteryContent.push(`· 开奖期号: ` + KL8.code);
 				lotteryContent.push(`· 开奖日期: ` + KL8.date);
-				if (KL8.sales != ''){
+				if (KL8.sales != ''&&KL8.sales != '_'&&KL8.sales != '0'){
 					lotteryContent.push(`· 销售金额: ` + KL8.sales + '元');
 				}
-				if (KL8.poolmoney != ''){
+				if (KL8.poolmoney != ''&&KL8.poolmoney != '_'&&KL8.poolmoney != '0'){
 					lotteryContent.push(`· 奖池金额: ` + KL8.poolmoney + '元');
 				}
-				if (KL8.content != ''){
+				if (KL8.content != ''&&KL8.content != '_'){
 					lotteryContent.push(`· 中奖情况: ` + KL8.content);
 				}
 				lotteryContent.push(`· 中奖号码: ` + KL8.red);
@@ -105,13 +105,13 @@ module.exports = handleLottery = () => {
 				lotteryContent.push(`\n🎱七乐彩\n`);
 				lotteryContent.push(`· 开奖期号: ` + QLC.code);
 				lotteryContent.push(`· 开奖日期: ` + QLC.date);
-				if (QLC.sales != ''){
+				if (QLC.sales != ''&&QLC.sales != '_'&&QLC.sales != '0'){
 					lotteryContent.push(`· 销售金额: ` + QLC.sales + '元');
 				}
-				if (QLC.poolmoney != ''){
+				if (QLC.poolmoney != ''&&QLC.poolmoney != '_'&&QLC.poolmoney != '0'){
 					lotteryContent.push(`· 奖池金额: ` + QLC.poolmoney + '元');
 				}
-				if (QLC.content != ''){
+				if (QLC.content != ''&&QLC.content != '_'){
 					lotteryContent.push(`· 中奖情况: ` + QLC.content);
 				}
 				lotteryContent.push(`· 红球号码: ` + QLC.red);
@@ -125,13 +125,13 @@ module.exports = handleLottery = () => {
 				lotteryContent.push(`\n🎱双色球\n`);
 				lotteryContent.push(`· 开奖期号: ` + SSQ.code);
 				lotteryContent.push(`· 开奖日期: ` + SSQ.date);
-				if (SSQ.sales != ''){
+				if (SSQ.sales != ''&&SSQ.sales != '_'&&SSQ.sales != '0'){
 					lotteryContent.push(`· 销售金额: ` + SSQ.sales + '元');
 				}
-				if (SSQ.poolmoney != ''){
+				if (SSQ.poolmoney != ''&&SSQ.poolmoney != '_'&&SSQ.poolmoney != '0'){
 					lotteryContent.push(`· 奖池金额: ` + SSQ.poolmoney + '元');
 				}
-				if (SSQ.content != ''){
+				if (SSQ.content != ''&&SSQ.content != '_'){
 					lotteryContent.push(`· 中奖情况: ` + SSQ.content);
 				}
 				lotteryContent.push(`· 红球号码: ` + SSQ.red);
