@@ -38,7 +38,8 @@ module.exports = handleLottery = () => {
 	return new Promise(async (resolve, reject) => {
 	try {
 		getLotteryCookie();
-		await sleep(5000); // 等待 3000 毫秒（3 秒）
+		// 等待 5000 毫秒（5 秒）
+		await sleep(5000);
 		let lotteryContent = [];
 		const cookieString = process.env.ck;
 		const expiresString = cookieString.match(/Expires=([^;]+)/)[1];
