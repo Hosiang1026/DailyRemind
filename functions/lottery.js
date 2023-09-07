@@ -57,24 +57,24 @@ module.exports = handleLottery = () => {
 		lotteryContent.push(`📈福利彩票`);
 
 		lotteryContent.push(`\n🎈3D\n`);
-		lotteryContent.push(`· 开奖时间: ` + SD.date);
 		lotteryContent.push(`· 开奖期号: ` + SD.code);
+		lotteryContent.push(`· 开奖时间: ` + SD.date);
 		lotteryContent.push(`· 中奖号码: ` + SD.red);
 
 		lotteryContent.push(`\n🎈快乐8\n`);
-		lotteryContent.push(`· 开奖时间: ` + KL8.date);
 		lotteryContent.push(`· 开奖期号: ` + KL8.code);
+		lotteryContent.push(`· 开奖时间: ` + KL8.date);
 		lotteryContent.push(`· 中奖号码: ` + KL8.red);
 
 		lotteryContent.push(`\n🎈七乐彩\n`);
-		lotteryContent.push(`· 开奖时间: ` + QLC.date);
 		lotteryContent.push(`· 开奖期号: ` + QLC.code);
+		lotteryContent.push(`· 开奖时间: ` + QLC.date);
 		lotteryContent.push(`· 红球号码: ` + QLC.red);
 		lotteryContent.push(`· 蓝球号码: ` + QLC.blue);
 
 		lotteryContent.push(`\n🎈双色球\n`);
-		lotteryContent.push(`· 开奖时间: ` + SSQ.date);
 		lotteryContent.push(`· 开奖期号: ` + SSQ.code);
+		lotteryContent.push(`· 开奖时间: ` + SSQ.date);
 		lotteryContent.push(`· 红球号码: ` + SSQ.red);
 		lotteryContent.push(`· 蓝球号码: ` + SSQ.blue);
 
