@@ -64,7 +64,7 @@ module.exports = handleLottery = () => {
 		let SDArr = lottery.SD;
 		for (let i = 0; i < SDArr.length; i++) {
 			if (SDArr[i] == nowDay){
-				lotteryContent.push(`\n🎈福彩3D\n`);
+				lotteryContent.push(`\n🎱福彩3D\n`);
 				lotteryContent.push(`· 开奖期号: ` + SD.code);
 				lotteryContent.push(`· 开奖日期: ` + SD.date);
 				if (SD.sales != ''){
@@ -83,7 +83,7 @@ module.exports = handleLottery = () => {
 		let KL8Arr = lottery.KL8;
 		for (let i = 0; i < KL8Arr.length; i++) {
 			if (KL8Arr[i] == nowDay){
-				lotteryContent.push(`\n🎈快乐8\n`);
+				lotteryContent.push(`\n🎱快乐8\n`);
 				lotteryContent.push(`· 开奖期号: ` + KL8.code);
 				lotteryContent.push(`· 开奖日期: ` + KL8.date);
 				if (KL8.sales != ''){
@@ -102,7 +102,7 @@ module.exports = handleLottery = () => {
 		let QLCArr = lottery.QLC;
 		for (let i = 0; i < QLCArr.length; i++) {
 			if (QLCArr[i] == nowDay){
-				lotteryContent.push(`\n🎈七乐彩\n`);
+				lotteryContent.push(`\n🎱七乐彩\n`);
 				lotteryContent.push(`· 开奖期号: ` + QLC.code);
 				lotteryContent.push(`· 开奖日期: ` + QLC.date);
 				if (QLC.sales != ''){
@@ -122,7 +122,7 @@ module.exports = handleLottery = () => {
 		let SSQArr = lottery.SSQ;
 		for (let i = 0; i < SSQArr.length; i++) {
 			if (SSQArr[i] == nowDay){
-				lotteryContent.push(`\n🎈双色球\n`);
+				lotteryContent.push(`\n🎱双色球\n`);
 				lotteryContent.push(`· 开奖期号: ` + SSQ.code);
 				lotteryContent.push(`· 开奖日期: ` + SSQ.date);
 				if (SSQ.sales != ''){
@@ -138,6 +138,11 @@ module.exports = handleLottery = () => {
 				}
 			}
 		}
+
+		//lotteryContent.push(`\n🎉备注\n`);
+		//lotteryContent.push(`· 福彩3D、快乐8: 每日开奖`);
+		//lotteryContent.push(`· 七乐彩: 每周一、三、五开奖`);
+		//lotteryContent.push(`· 双色球: 每周二、四、日开奖`);
 
 		resolve(lotteryContent.join('\n'))
 		console.log("获取福利彩票结果" + lotteryContent.join('\n'));
