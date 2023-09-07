@@ -230,7 +230,7 @@ const app = express();
 
 // 启动 web 服务器
 const hostname = getIPAddress()
-const port = 8090
+const port = 8096
 
 app.listen(port, hostname, function (err) {
   if (err) {
@@ -243,8 +243,8 @@ app.listen(port, hostname, function (err) {
 })
 
 app.get('/', async (req, res) => {
-  const pushRes = 'push推送服务 - 启动成功： http://192.168.1.2:8090 ';
-  const appRes = await newsPush()
+  const pushRes = 'push推送服务 - 启动成功： http://192.168.1.2:8096 ';
+  const appRes = await weatherPush()
   console.log(appRes);
   res.send(pushRes + appRes + " " + new Date())
 })

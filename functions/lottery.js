@@ -1,3 +1,4 @@
+const { lottery } = require('./input')
 const axios = require("axios");
 require("dotenv").config();
 
@@ -57,27 +58,50 @@ module.exports = handleLottery = () => {
 
 		lotteryContent.push(`📈福利彩票`);
 
-		lotteryContent.push(`\n🎈3D\n`);
-		lotteryContent.push(`· 开奖期号: ` + SD.code);
-		lotteryContent.push(`· 开奖时间: ` + SD.date);
-		lotteryContent.push(`· 中奖号码: ` + SD.red);
+		let nowDate = new Date();
+		let nowDay = nowDate.getDay();
 
-		lotteryContent.push(`\n🎈快乐8\n`);
-		lotteryContent.push(`· 开奖期号: ` + KL8.code);
-		lotteryContent.push(`· 开奖时间: ` + KL8.date);
-		lotteryContent.push(`· 中奖号码: ` + KL8.red);
+		let SDArr = lottery.SD;
+		for (let i = 0; i < SDArr.length; i++) {
+			if (SDArr[i] == nowDay){
+				lotteryContent.push(`\n🎈福彩3D\n`);
+				lotteryContent.push(`· 开奖期号: ` + SD.code);
+				lotteryContent.push(`· 开奖时间: ` + SD.date);
+				lotteryContent.push(`· 中奖号码: ` + SD.red);
+			}
+		}
 
-		lotteryContent.push(`\n🎈七乐彩\n`);
-		lotteryContent.push(`· 开奖期号: ` + QLC.code);
-		lotteryContent.push(`· 开奖时间: ` + QLC.date);
-		lotteryContent.push(`· 红球号码: ` + QLC.red);
-		lotteryContent.push(`· 蓝球号码: ` + QLC.blue);
+		let KL8Arr = lottery.KL8;
+		for (let i = 0; i < KL8Arr.length; i++) {
+			if (KL8Arr[i] == nowDay){
+				lotteryContent.push(`\n🎈快乐8\n`);
+				lotteryContent.push(`· 开奖期号: ` + KL8.code);
+				lotteryContent.push(`· 开奖时间: ` + KL8.date);
+				lotteryContent.push(`· 中奖号码: ` + KL8.red);
+			}
+		}
 
-		lotteryContent.push(`\n🎈双色球\n`);
-		lotteryContent.push(`· 开奖期号: ` + SSQ.code);
-		lotteryContent.push(`· 开奖时间: ` + SSQ.date);
-		lotteryContent.push(`· 红球号码: ` + SSQ.red);
-		lotteryContent.push(`· 蓝球号码: ` + SSQ.blue);
+		let QLCArr = lottery.QLC;
+		for (let i = 0; i < QLCArr.length; i++) {
+			if (QLCArr[i] == nowDay){
+				lotteryContent.push(`\n🎈七乐彩\n`);
+				lotteryContent.push(`· 开奖期号: ` + QLC.code);
+				lotteryContent.push(`· 开奖时间: ` + QLC.date);
+				lotteryContent.push(`· 红球号码: ` + QLC.red);
+				lotteryContent.push(`· 蓝球号码: ` + QLC.blue);
+			}
+		}
+
+		let SSQArr = lottery.SSQ;
+		for (let i = 0; i < SSQArr.length; i++) {
+			if (SSQArr[i] == nowDay){
+				lotteryContent.push(`\n🎈双色球\n`);
+				lotteryContent.push(`· 开奖期号: ` + SSQ.code);
+				lotteryContent.push(`· 开奖时间: ` + SSQ.date);
+				lotteryContent.push(`· 红球号码: ` + SSQ.red);
+				lotteryContent.push(`· 蓝球号码: ` + SSQ.blue);
+			}
+		}
 
 		resolve(lotteryContent.join('\n'))
 		console.log("获取福利彩票结果" + lotteryContent.join('\n'));
