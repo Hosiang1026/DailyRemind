@@ -73,10 +73,10 @@ module.exports = handleLottery = () => {
 				if (SD.poolmoney != ''){
 					lotteryContent.push(`· 奖池金额: ` + SD.poolmoney + '元');
 				}
+				lotteryContent.push(`· 中奖号码: ` + SD.red);
 				if (SD.content != ''){
 					lotteryContent.push(`· 中奖情况: ` + SD.content);
 				}
-				lotteryContent.push(`· 中奖号码: ` + SD.red);
 			}
 		}
 
@@ -92,10 +92,10 @@ module.exports = handleLottery = () => {
 				if (KL8.poolmoney != ''){
 					lotteryContent.push(`· 奖池金额: ` + KL8.poolmoney + '元');
 				}
+				lotteryContent.push(`· 中奖号码: ` + KL8.red);
 				if (KL8.content != ''){
 					lotteryContent.push(`· 中奖情况: ` + KL8.content);
 				}
-				lotteryContent.push(`· 中奖号码: ` + KL8.red);
 			}
 		}
 
@@ -111,11 +111,11 @@ module.exports = handleLottery = () => {
 				if (QLC.poolmoney != ''){
 					lotteryContent.push(`· 奖池金额: ` + QLC.poolmoney + '元');
 				}
+				lotteryContent.push(`· 红球号码: ` + QLC.red);
+				lotteryContent.push(`· 蓝球号码: ` + QLC.blue);
 				if (QLC.content != ''){
 					lotteryContent.push(`· 中奖情况: ` + QLC.content);
 				}
-				lotteryContent.push(`· 红球号码: ` + QLC.red);
-				lotteryContent.push(`· 蓝球号码: ` + QLC.blue);
 			}
 		}
 
@@ -131,11 +131,11 @@ module.exports = handleLottery = () => {
 				if (SSQ.poolmoney != ''){
 					lotteryContent.push(`· 奖池金额: ` + SSQ.poolmoney + '元');
 				}
+				lotteryContent.push(`· 红球号码: ` + SSQ.red);
+				lotteryContent.push(`· 蓝球号码: ` + SSQ.blue);
 				if (SSQ.content != ''){
 					lotteryContent.push(`· 中奖情况: ` + SSQ.content);
 				}
-				lotteryContent.push(`· 红球号码: ` + SSQ.red);
-				lotteryContent.push(`· 蓝球号码: ` + SSQ.blue);
 			}
 		}
 
