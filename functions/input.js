@@ -103,6 +103,11 @@ let daily = {
             type: 2
         },
         {
+            name: '婚礼吉日',
+            date: '2023-12-16',
+            type: 2
+        },
+        {
             name: 'Dad生日',
             date: '1970-02-14',
             type: 3
