@@ -476,11 +476,11 @@ let end = {
 //课表推送模块
 let classTable = {
     open: true,//是否需要推送时增加课表，需要填true，否则填false  （不需要加引号）
-    homework: '2023-06-15', // homework: 0,
+    homework: '2023-11-15', // homework: 0,
     computer: [//22春计算机本-课程列表
         {
-            name: '软件工程',//课程名称04.11-04.25
-            teacher: '郑炜',//辅导老师
+            name: '数据库应用技术',//课程名称04.11-04.25
+            teacher: '刘旭东',//辅导老师
             exam:
                 {
                     type: 1, //考试方式 1:纸质闭卷 2:上机闭卷
