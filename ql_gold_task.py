@@ -57,7 +57,7 @@ def checkUpdate():
 def getGold():
     try:
         _content = ""
-        domestic_content = "\n🏅国内价格\n"
+        domestic_content = "🏅国内价格\n"
         international_content = "🏅国际价格\n"
         bdurl = "http://www.huangjinjiage.cn"
         headers = {
