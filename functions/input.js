@@ -498,7 +498,7 @@ let classTable = {
             ]
         },
         {
-            name: '计算机网络(本)',//课程名称
+            name: '计算机网络',//课程名称
             teacher: '蒋融融',//辅导老师
             exam: 0,
             classList: [
