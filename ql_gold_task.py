@@ -76,8 +76,8 @@ def getGold():
         tr_tag = soup.find('tr', class_='bg', id='jiage4')
         domestic_gold = [td.get_text(strip=True) for td in tr_tag.find_all('td')][1]
 
-        domestic_content = domestic_content + "白银：" + domestic_silver + "元/克\n";
-        domestic_content = domestic_content + "黄金：" + domestic_gold + "元/克\n\n";
+        domestic_content = domestic_content + "· 白银：" + domestic_silver + "元/克\n";
+        domestic_content = domestic_content + "· 黄金：" + domestic_gold + "元/克\n\n";
 
         #国际银价
         tr_tag = soup.find('tr', class_='bg', id='jiage3')
@@ -89,8 +89,8 @@ def getGold():
         # 提取<tr>标签下的所有<td>标签的文本内容
         international_gold = [td.get_text(strip=True) for td in tr_tag.find_all('td')][1]
 
-        international_content = international_content + "白银：" + international_silver + "美元/盎司\n";
-        international_content = international_content + "黄金：" + international_gold + "美元/盎司\n\n";
+        international_content = international_content + "· 白银：" + international_silver + "美元/盎司\n";
+        international_content = international_content + "· 黄金：" + international_gold + "美元/盎司\n\n";
 
         #金店 - 周大福
         zhoudafu_brand = soup.select('.tabtitle')[11].text.replace("内地", "")
@@ -120,13 +120,13 @@ def getGold():
         zghj_brand = soup.select('.tabtitle')[20].text
         zghj_gold = soup.select('.tabtitle')[20].find_next('td').text
 
-        store_content = store_content + zhoudafu_brand + "：" + zhoudafu_gold + "元/克\n";
-        store_content = store_content + zhouliufu_brand + "：" + zhouliufu_gold + "元/克\n";
-        store_content = store_content + zhoushengsheng_brand + "：" + zhoushengsheng_gold + "元/克\n";
-        store_content = store_content + laofengxiang_brand + "：" + laofengxiang_gold + "元/克\n";
-        store_content = store_content + lfzb_brand + "：" + lfzb_gold + "元/克\n";
-        store_content = store_content + lmhj_brand + "：" + lmhj_gold + "元/克\n";
-        store_content = store_content + zghj_brand + "：" + zghj_gold + "元/克\n\n";
+        store_content = store_content + "· " + zhoudafu_brand + "：" + zhoudafu_gold + "元/克\n";
+        store_content = store_content + "· " + zhouliufu_brand + "：" + zhouliufu_gold + "元/克\n";
+        store_content = store_content + "· " + zhoushengsheng_brand + "：" + zhoushengsheng_gold + "元/克\n";
+        store_content = store_content + "· " + laofengxiang_brand + "：" + laofengxiang_gold + "元/克\n";
+        store_content = store_content + "· " + lfzb_brand + "：" + lfzb_gold + "元/克\n";
+        store_content = store_content + "· " + lmhj_brand + "：" + lmhj_gold + "元/克\n";
+        store_content = store_content + "· " + zghj_brand + "：" + zghj_gold + "元/克\n\n";
 
         #拼接所有价格信息
         _content = _content + domestic_content + international_content + store_content;
