@@ -104,9 +104,29 @@ def getGold():
         zhoushengsheng_brand = soup.select('.tabtitle')[12].text.replace("内地", "")
         zhoushengsheng_gold = soup.select('.tabtitle')[12].find_next('td').text
 
+        #金店 - 老凤祥
+        laofengxiang_brand = soup.select('.tabtitle')[19].text
+        laofengxiang_gold = soup.select('.tabtitle')[19].find_next('td').text
+
+        #金店 - 六福珠宝
+        lfzb_brand = soup.select('.tabtitle')[13].text.replace("内地", "")
+        lfzb_gold = soup.select('.tabtitle')[13].find_next('td').text
+
+        #金店 - 老庙黄金
+        lmhj_brand = soup.select('.tabtitle')[18].text
+        lmhj_gold = soup.select('.tabtitle')[18].find_next('td').text
+
+        #金店 - 中国黄金
+        zghj_brand = soup.select('.tabtitle')[20].text
+        zghj_gold = soup.select('.tabtitle')[20].find_next('td').text
+
         store_content = store_content + zhoudafu_brand + "：" + zhoudafu_gold + "元/克\n";
         store_content = store_content + zhouliufu_brand + "：" + zhouliufu_gold + "元/克\n";
-        store_content = store_content + zhoushengsheng_brand + "：" + zhoushengsheng_gold + "元/克\n\n";
+        store_content = store_content + zhoushengsheng_brand + "：" + zhoushengsheng_gold + "元/克\n";
+        store_content = store_content + laofengxiang_brand + "：" + laofengxiang_gold + "元/克\n";
+        store_content = store_content + lfzb_brand + "：" + lfzb_gold + "元/克\n";
+        store_content = store_content + lmhj_brand + "：" + lmhj_gold + "元/克\n";
+        store_content = store_content + zghj_brand + "：" + zghj_gold + "元/克\n\n";
 
         #拼接所有价格信息
         _content = _content + domestic_content + international_content + store_content;
