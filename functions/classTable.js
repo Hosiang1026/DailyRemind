@@ -40,15 +40,22 @@ const classFunction = {
                         //课程处理
                         for (let j = 0; j < classList.length; j++) {
                             const item = classList[j]
-                            let classType = (item.type) == 1 ? '钉钉直播': '线下教室';
                             let classDate = item.date;
                             let classTime = item.time;
+                            let place = item.place;
                             if (nowDate == classDate){
                                 computerClassContent.push(`· 课程名称: ${eleName}`)
-                                computerClassContent.push(`· 课程时间: ${classTime}`)
+                                computerClassContent.push(`· 辅导老师: ${eleTeacher}`)
                                 computerClassContent.push(`· 教学课时: 第${j+1}节课`)
-                                computerClassContent.push(`· 教学方式: ${classType}`)
-                                computerClassContent.push(`· 辅导老师: ${eleTeacher}\n`)
+                                if (item.type == 1){
+                                    computerClassContent.push(`· 教学方式: 钉钉直播`)
+                                    computerClassContent.push(`· 课程时间: ${classTime}\n`)
+                                }
+                                if (item.type == 2){
+                                    computerClassContent.push(`· 教学方式: 线下教室`)
+                                    computerClassContent.push(`· 课程时间: ${classTime}`)
+                                    computerClassContent.push(`· 上课地点: ${place}\n`)
+                                }
                             }else if (new Date(classDate) >  new Date(nowDate)) {
                                 let diffTime = diffTimeToDaily(nowDate, classDate);
                                 if (tempClassTime == 0) {
@@ -91,7 +98,6 @@ const classFunction = {
                         }
                 }
 
-
                 //22春行政专-课程列表
                 let hrClassContent = []
                 let hrClassArr = []
@@ -107,15 +113,23 @@ const classFunction = {
                         //课程处理
                         for (let j = 0; j < classList.length; j++) {
                             const item = classList[j]
-                            let classType = (item.type) == 1 ? '钉钉直播': '线下教室';
                             let classDate = item.date;
                             let classTime = item.time;
+                            let place = item.place;
                             if (nowDate == classDate){
                                 hrClassContent.push(`· 课程名称: ${eleName}`)
-                                hrClassContent.push(`· 课程时间: ${classTime}`)
+                                hrClassContent.push(`· 辅导老师: ${eleTeacher}`)
                                 hrClassContent.push(`· 教学课时: 第${j+1}节课`)
-                                hrClassContent.push(`· 教学方式: ${classType}`)
-                                hrClassContent.push(`· 辅导老师: ${eleTeacher}\n`)
+                                if (item.type == 1){
+                                    hrClassContent.push(`· 教学方式: 钉钉直播`)
+                                    hrClassContent.push(`· 课程时间: ${classTime}\n`)
+                                }
+
+                                if (item.type == 2){
+                                    hrClassContent.push(`· 教学方式: 线下教室`)
+                                    hrClassContent.push(`· 课程时间: ${classTime}`)
+                                    hrClassContent.push(`· 上课地点: ${place}\n`)
+                                }
                             }else if (new Date(classDate) >  new Date(nowDate)) {
                                 let diffTime = diffTimeToDaily(nowDate, classDate);
                                 if (tempClassTime == 0) {
