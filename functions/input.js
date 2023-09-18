@@ -476,7 +476,7 @@ let end = {
 //课表推送模块
 let classTable = {
     open: true,//是否需要推送时增加课表，需要填true，否则填false  （不需要加引号）
-    homework: '2023-11-15', // homework: 0,
+    homework: 0, // homework: 0,
     computer: [//22春计算机本-课程列表
         {
             name: '数学文化',//课程名称
