@@ -260,7 +260,7 @@ def wecom_key(title, content):
     data = {
         "msgtype":"text",
         "text":{
-            "content":title+"\n"+content.replace("\n", "\n\n")
+            "content":title+"\n"+content
          }
     }
 
@@ -345,8 +345,7 @@ class WeCom:
                         "thumb_media_id": media_id,
                         "author": "Author",
                         "content_source_url": "",
-                        #"content": message.replace('\n', '<br/>'),
-                        "content": message,
+                        "content": message.replace('\n', '<br/>'),
                         "digest": message
                     }
                 ]
