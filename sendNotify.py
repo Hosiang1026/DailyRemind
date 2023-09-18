@@ -67,11 +67,11 @@ if "PUSH_PLUS_TOKEN" in os.environ:
 if "QYWX_AM" in os.environ:
     if len(os.environ["QYWX_AM"]) > 1:
         QYWX_AM = os.environ["QYWX_AM"]
-        
+
 
 if "QYWX_KEY" in os.environ:
     if len(os.environ["QYWX_KEY"]) > 1:
-        QYWX_KEY = os.environ["QYWX_KEY"]        
+        QYWX_KEY = os.environ["QYWX_KEY"]
         # print("已获取并使用Env环境 QYWX_AM")
 
 if BARK:
@@ -257,13 +257,13 @@ def wecom_key(title, content):
     print("QYWX_KEY服务启动")
     print("content"+content)
     headers = {'Content-Type': 'application/json'}
-    data = { 
+    data = {
         "msgtype":"text",
         "text":{
             "content":title+"\n"+content.replace("\n", "\n\n")
          }
     }
-    
+
     print(f"https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key={QYWX_KEY}")
     response = requests.post(f"https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key={QYWX_KEY}", json=data,headers=headers).json()
     print(response)
@@ -290,7 +290,7 @@ def wecom_app(title, content):
         wx = WeCom(corpid, corpsecret, agentid)
         # 如果没有配置 media_id 默认就以 text 方式发送
         if not media_id:
-            message = title + '\n\n' + content
+            message = title + '\n' + content
             response = wx.send_text(message, touser)
         else:
             response = wx.send_mpnews(title, content, media_id, touser)
@@ -345,7 +345,8 @@ class WeCom:
                         "thumb_media_id": media_id,
                         "author": "Author",
                         "content_source_url": "",
-                        "content": message.replace('\n', '<br/>'),
+                        #"content": message.replace('\n', '<br/>'),
+                        "content": message,
                         "digest": message
                     }
                 ]
@@ -409,11 +410,11 @@ def send(title, content):
             continue
         elif i == 'wecom_key':
             if QYWX_KEY:
-                
+
                 for i in range(int(len(content)/2000)+1):
                     wecom_key(title=title, content=content[i*2000:(i+1)*2000])
-                
-                
+
+
             else:
                 print('未启用企业微信应用消息推送')
             continue
