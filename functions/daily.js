@@ -66,7 +66,7 @@ module.exports = handleTimeList = () => {
                     }
                     let diffYear = currentYear - anniversaryYear;
                     let solarAnniversaryDate = calendar.conversion(anniversaryDate);
-                    if (nowDate == nextAnniversaryDate) {
+                    if (nowDate == solarAnniversaryDate) {
                         if (anniversaryType == 0 ||anniversaryType == 1 ||anniversaryType == 2) {
                             let todayDate = '<'+anniversaryDate.split('-').join('.')+'>';
                             let todayContent = ' ' + diffYear+'周年';
