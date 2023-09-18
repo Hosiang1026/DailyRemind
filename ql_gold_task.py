@@ -39,7 +39,7 @@ def checkUpdate():
     #铂金：934.570美元/盎司
     #钯金：1244.650美元/盎司
 
-    #金店金价
+    #金店价格
     #谢瑞麟：608元/克
     #金至尊：608元/克
     #潮宏基：608元/克
@@ -59,6 +59,7 @@ def getGold():
         _content = ""
         domestic_content = "🏅国内价格\n"
         international_content = "🏅国际价格\n"
+        store_content = "🏅金店价格\n"
         bdurl = "http://www.huangjinjiage.cn"
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Edg/96.0.1054.62'}
@@ -69,29 +70,46 @@ def getGold():
 
         #国内银价
         tr_tag = soup.find('tr', id='jiage5')
-        domestic_silver = [td.get_text(strip=True) for td in tr_tag.find_all('td')][1].strip()
+        domestic_silver = [td.get_text(strip=True) for td in tr_tag.find_all('td')][1]
 
         #国内金价
         tr_tag = soup.find('tr', class_='bg', id='jiage4')
-        domestic_gold = [td.get_text(strip=True) for td in tr_tag.find_all('td')][1].strip()
+        domestic_gold = [td.get_text(strip=True) for td in tr_tag.find_all('td')][1]
 
         domestic_content = domestic_content + "白银：" + domestic_silver + "元/克\n";
         domestic_content = domestic_content + "黄金：" + domestic_gold + "元/克\n\n";
 
         #国际银价
         tr_tag = soup.find('tr', class_='bg', id='jiage3')
-        international_silver = [td.get_text(strip=True) for td in tr_tag.find_all('td')][1].strip()
+        international_silver = [td.get_text(strip=True) for td in tr_tag.find_all('td')][1]
 
         #国际金价
         # 定位到<tr>标签
         tr_tag = soup.find('tr', class_='bg', id='jiage1')
         # 提取<tr>标签下的所有<td>标签的文本内容
-        international_gold = [td.get_text(strip=True) for td in tr_tag.find_all('td')][1].strip()
+        international_gold = [td.get_text(strip=True) for td in tr_tag.find_all('td')][1]
 
         international_content = international_content + "白银：" + international_silver + "美元/盎司\n";
         international_content = international_content + "黄金：" + international_gold + "美元/盎司\n\n";
 
-        _content = _content + domestic_content + international_content;
+        #金店 - 周大福
+        zhoudafu_brand = soup.select('.tabtitle')[11].text.replace("内地", "")
+        zhoudafu_gold = soup.select('.tabtitle')[11].find_next('td').text
+
+        #金店 - 周六福
+        zhouliufu_brand = soup.select('.tabtitle')[21].text
+        zhouliufu_gold = soup.select('.tabtitle')[21].find_next('td').text
+
+        #金店 - 周生生
+        zhoushengsheng_brand = soup.select('.tabtitle')[12].text.replace("内地", "")
+        zhoushengsheng_gold = soup.select('.tabtitle')[12].find_next('td').text
+
+        store_content = store_content + zhoudafu_brand + "：" + zhoudafu_gold + "元/克\n";
+        store_content = store_content + zhouliufu_brand + "：" + zhouliufu_gold + "元/克\n";
+        store_content = store_content + zhoushengsheng_brand + "：" + zhoushengsheng_gold + "元/克\n\n";
+
+        #拼接所有价格信息
+        _content = _content + domestic_content + international_content + store_content;
 
         return _content
 
