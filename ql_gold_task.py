@@ -69,24 +69,24 @@ def getGold():
 
         #国内银价
         tr_tag = soup.find('tr', id='jiage5')
-        domestic_silver = [td.get_text(strip=True) for td in tr_tag.find_all('td')][1]
+        domestic_silver = [td.get_text(strip=True) for td in tr_tag.find_all('td')][1].strip()
 
         #国内金价
         tr_tag = soup.find('tr', class_='bg', id='jiage4')
-        domestic_gold = [td.get_text(strip=True) for td in tr_tag.find_all('td')][1]
+        domestic_gold = [td.get_text(strip=True) for td in tr_tag.find_all('td')][1].strip()
 
         domestic_content = domestic_content + "白银：" + domestic_silver + "元/克\n";
         domestic_content = domestic_content + "黄金：" + domestic_gold + "元/克\n\n";
 
         #国际银价
         tr_tag = soup.find('tr', class_='bg', id='jiage3')
-        international_silver = [td.get_text(strip=True) for td in tr_tag.find_all('td')][1]
+        international_silver = [td.get_text(strip=True) for td in tr_tag.find_all('td')][1].strip()
 
         #国际金价
         # 定位到<tr>标签
         tr_tag = soup.find('tr', class_='bg', id='jiage1')
         # 提取<tr>标签下的所有<td>标签的文本内容
-        international_gold = [td.get_text(strip=True) for td in tr_tag.find_all('td')][1]
+        international_gold = [td.get_text(strip=True) for td in tr_tag.find_all('td')][1].strip()
 
         international_content = international_content + "白银：" + international_silver + "美元/盎司\n";
         international_content = international_content + "黄金：" + international_gold + "美元/盎司\n\n";
