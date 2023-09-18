@@ -56,9 +56,9 @@ def checkUpdate():
 # 获取黄金价格
 def getGold():
     try:
-        _content = "今日金价\n"
-        domestic_content = "国内价格\n"
-        international_content = "国际价格\n"
+        _content = ""
+        domestic_content = "🏅国内价格\n"
+        international_content = "🏅国际价格\n"
         bdurl = "http://www.huangjinjiage.cn"
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Edg/96.0.1054.62'}
@@ -75,8 +75,8 @@ def getGold():
         tr_tag = soup.find('tr', class_='bg', id='jiage4')
         domestic_gold = [td.get_text(strip=True) for td in tr_tag.find_all('td')][1]
 
-        domestic_content = domestic_content + "白银:" + domestic_silver + "元/克\n";
-        domestic_content = domestic_content + "黄金:" + domestic_gold + "元/克\n";
+        domestic_content = domestic_content + "白银：" + domestic_silver + "元/克\n";
+        domestic_content = domestic_content + "黄金：" + domestic_gold + "元/克\n";
 
         #国际银价
         tr_tag = soup.find('tr', class_='bg', id='jiage3')
@@ -88,8 +88,8 @@ def getGold():
         # 提取<tr>标签下的所有<td>标签的文本内容
         international_gold = [td.get_text(strip=True) for td in tr_tag.find_all('td')][1]
 
-        international_content = international_content + "白银:" + international_silver + "美元/盎司\n";
-        international_content = international_content + "黄金:" + international_gold + "美元/盎司\n";
+        international_content = international_content + "白银：" + international_silver + "美元/盎司\n";
+        international_content = international_content + "黄金：" + international_gold + "美元/盎司\n";
 
         _content = _content + domestic_content + international_content;
 
@@ -119,7 +119,7 @@ def load_send():
 
 if __name__ == '__main__':
     version = 1.1
-    title = '黄金价格'
+    title = '今日金价'
     checkUpdate()
     if load_send():
         newcontent = getGold()

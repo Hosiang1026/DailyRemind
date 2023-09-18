@@ -160,7 +160,7 @@ module.exports = handleTimeList = () => {
                             }
                             if (legalRepair != 0) {
                                 let legalRepairNum = legalRepair.length;
-                                tipsArr.push(`👩补班${legalRepairNum}天: ${legalRepair.join('、')}`)
+                                tipsArr.push(`📟补班${legalRepairNum}天: ${legalRepair.join('、')}`)
                             }
 
                             if (legalHolidayNum > 2){
@@ -182,7 +182,7 @@ module.exports = handleTimeList = () => {
                                 tipsArr.push(`⏳距离${legalName}开始放假还有${startDiffTime}天\n`)
                                 if (legalRepair != 0) {
                                     let legalRepairNum = legalRepair.length;
-                                    tipsArr.push(`👩‍补班${legalRepairNum}天: ${legalRepair.join('、')}`)
+                                    tipsArr.push(`📟补班${legalRepairNum}天: ${legalRepair.join('、')}`)
                                 }
                                 let legalHolidayNum = legalHoliday.length;
                                 if (legalHolidayNum > 2){
