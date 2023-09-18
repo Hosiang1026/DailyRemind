@@ -75,8 +75,8 @@ def getGold():
         tr_tag = soup.find('tr', class_='bg', id='jiage4')
         domestic_gold = [td.get_text(strip=True) for td in tr_tag.find_all('td')][1]
 
-        domestic_content = domestic_content + "白银：" + domestic_silver + "元/克\n";
-        domestic_content = domestic_content + "黄金：" + domestic_gold + "元/克\n";
+        domestic_content = domestic_content + "\n白银：" + domestic_silver + "元/克";
+        domestic_content = domestic_content + "\n黄金：" + domestic_gold + "元/克";
 
         #国际银价
         tr_tag = soup.find('tr', class_='bg', id='jiage3')
@@ -119,7 +119,7 @@ def load_send():
 
 if __name__ == '__main__':
     version = 1.1
-    title = '今日金价'
+    title = '今日金价\n'
     checkUpdate()
     if load_send():
         newcontent = getGold()
