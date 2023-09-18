@@ -76,7 +76,7 @@ def getGold():
         domestic_gold = [td.get_text(strip=True) for td in tr_tag.find_all('td')][1]
 
         domestic_content = domestic_content + "白银：" + domestic_silver + "元/克\n";
-        domestic_content = domestic_content + "黄金：" + domestic_gold + "元/克\n";
+        domestic_content = domestic_content + "黄金：" + domestic_gold + "元/克\n\n";
 
         #国际银价
         tr_tag = soup.find('tr', class_='bg', id='jiage3')
@@ -89,7 +89,7 @@ def getGold():
         international_gold = [td.get_text(strip=True) for td in tr_tag.find_all('td')][1]
 
         international_content = international_content + "白银：" + international_silver + "美元/盎司\n";
-        international_content = international_content + "黄金：" + international_gold + "美元/盎司\n";
+        international_content = international_content + "黄金：" + international_gold + "美元/盎司\n\n";
 
         _content = _content + domestic_content + international_content;
 

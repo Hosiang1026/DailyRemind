@@ -260,7 +260,7 @@ def wecom_key(title, content):
     data = {
         "msgtype":"text",
         "text":{
-            "content":title+"\n"+content
+            "content":title+"\n\n"+content
          }
     }
 
