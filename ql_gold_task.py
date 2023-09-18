@@ -124,7 +124,7 @@ if __name__ == '__main__':
     if load_send():
         newcontent = getGold()
         if newcontent != '':
-            print('获取黄金价格成功！'+ newcontent)
-            send("黄金价格", newcontent)
+            print('获取黄金价格成功！\n'+ newcontent)
+            send("今日金价", newcontent)
         else:
             print('获取黄金价格失败！')
