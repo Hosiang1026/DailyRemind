@@ -30,10 +30,11 @@ def checkUpdate():
 # 获取黄金价格
 def getGold():
     try:
-        _content = "🏷今日金价\n"
+        _content = "👑今日金价\n\n"
         domestic_content = "🏅国内价格\n"
         international_content = "🏅国际价格\n"
         store_content = "🏅金店价格\n"
+        conver_content = "⚖换算对比\n"
         bdurl = "http://www.huangjinjiage.cn"
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Edg/96.0.1054.62'}
@@ -102,8 +103,23 @@ def getGold():
         store_content = store_content + "· " + lmhj_brand + "：" + lmhj_gold + "元/克\n";
         store_content = store_content + "· " + zghj_brand + "：" + zghj_gold + "元/克\n\n";
 
+        #换算对比
+        usdcny_url = "https://www.exchange-rates.org/zh/converter/usd-cny"
+        usdcny_r = requests.get(usdcny_url, headers=headers)
+        usdcny_r.encoding = usdcny_r.apparent_encoding
+        usdcny_soup = BeautifulSoup(usdcny_r.text, 'html.parser')
+        usdcny_price = usdcny_soup.select('.rate-to')[0].text.replace("CNY", "").strip()
+        conver_gold = float(international_gold) / 31.1035 * float(usdcny_price);
+        difference_gold = float(domestic_gold) - conver_gold;
+
+        conver_content = conver_content + "· 国际换算：" + str(round(conver_gold, 2)) + "元/克\n";
+        conver_content = conver_content + "· 对比差价：" + str(round(difference_gold, 2)) + "元/克\n";
+        conver_content = conver_content + "· 20克差价：" + str(round(difference_gold * 20, 2)) + "元/克\n";
+        conver_content = conver_content + "· 金衡盎司：" + "1盎司 = 31.1035克\n";
+        conver_content = conver_content + "· 今日汇率：" + "1美元 ≈ " + usdcny_price +"人民币\n\n";
+
         #拼接所有价格信息
-        _content = _content + domestic_content + international_content + store_content;
+        _content = _content + domestic_content + international_content + store_content + conver_content;
 
         return _content
 
@@ -137,6 +153,6 @@ if __name__ == '__main__':
         newcontent = getGold()
         if newcontent != '':
             print('获取黄金价格成功！\n'+ newcontent)
-            send("今日金价", newcontent)
+            send(title, newcontent)
         else:
             print('获取黄金价格失败！')
