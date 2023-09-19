@@ -34,7 +34,7 @@ def getGold():
         domestic_content = "🏅国内价格\n"
         international_content = "🏅国际价格\n"
         store_content = "🏅金店价格\n"
-        conver_content = "⚖换算对比\n"
+        conver_content = "⚖金价换算\n"
         bdurl = "http://www.huangjinjiage.cn"
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Edg/96.0.1054.62'}
@@ -103,7 +103,7 @@ def getGold():
         store_content = store_content + "· " + lmhj_brand + "：" + lmhj_gold + "元/克\n";
         store_content = store_content + "· " + zghj_brand + "：" + zghj_gold + "元/克\n\n";
 
-        #换算对比
+        #金价换算
         usdcny_url = "https://www.exchange-rates.org/zh/converter/usd-cny"
         usdcny_r = requests.get(usdcny_url, headers=headers)
         usdcny_r.encoding = usdcny_r.apparent_encoding
@@ -113,8 +113,9 @@ def getGold():
         difference_gold = float(domestic_gold) - conver_gold;
 
         conver_content = conver_content + "· 国际换算：" + str(round(conver_gold, 2)) + "元/克\n";
-        conver_content = conver_content + "· 对比差价：" + str(round(difference_gold, 2)) + "元/克\n";
+        conver_content = conver_content + "· 1克差价：" + str(round(difference_gold, 2)) + "元\n";
         conver_content = conver_content + "· 20克差价：" + str(round(difference_gold * 20, 2)) + "元\n";
+        conver_content = conver_content + "· 20克价格：" + str(round(float(domestic_gold) * 20, 2)) + "元\n";
         conver_content = conver_content + "· 金衡盎司：" + "1盎司 = 31.1035克\n";
         conver_content = conver_content + "· 当前汇率：" + "1美元 ≈ " + usdcny_price +"人民币\n\n";
 
