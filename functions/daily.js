@@ -179,7 +179,7 @@ module.exports = handleTimeList = () => {
                             }
                             let startDiffTime = diffTimeToDaily(nowDate, startYearLegalDate);
                             if (startDiffTime > 0){
-                                tipsArr.push(`⏳距离${legalName}开始放假还有${startDiffTime}天\n`)
+                                tipsArr.push(`⏳距离${legalName}开始放假还有${startDiffTime}天`)
                                 if (legalRepair != 0) {
                                     let legalRepairNum = legalRepair.length;
                                     tipsArr.push(`📟补班${legalRepairNum}天: ${legalRepair.join('、')}`)

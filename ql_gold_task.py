@@ -27,36 +27,10 @@ def checkUpdate():
     except:
         pass
 
-    #今日金价
-
-    #国内价格
-    #白银：5.834元/克
-    #黄金：468.31元/克
-
-    #国际价格
-    #白银：23.06美元/盎司
-    #黄金：1925.70美元/盎司
-    #铂金：934.570美元/盎司
-    #钯金：1244.650美元/盎司
-
-    #金店价格
-    #谢瑞麟：608元/克
-    #金至尊：608元/克
-    #潮宏基：608元/克
-    #菜百首饰：608元/克
-
-    #周大福：608元/克
-    #周六福：608元/克
-    #周生生：608元/克
-    #老凤祥：608元/克
-    #六福珠宝：608元/克
-    #老庙黄金：608元/克
-    #中国黄金：608元/克
-
 # 获取黄金价格
 def getGold():
     try:
-        _content = ""
+        _content = "🏷今日金价\n"
         domestic_content = "🏅国内价格\n"
         international_content = "🏅国际价格\n"
         store_content = "🏅金店价格\n"
@@ -157,7 +131,7 @@ def load_send():
 
 if __name__ == '__main__':
     version = 1.1
-    title = '今日金价'
+    title = '大家好😻'
     checkUpdate()
     if load_send():
         newcontent = getGold()
