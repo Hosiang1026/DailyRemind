@@ -117,7 +117,7 @@ def getGold():
         conver_content = conver_content + "· 20克差价：" + str(round(difference_gold * 20, 2)) + "元\n";
         conver_content = conver_content + "· 20克价格：" + str(round(float(domestic_gold) * 20, 2)) + "元\n";
         conver_content = conver_content + "· 金衡盎司：" + "1盎司 = 31.1035克\n";
-        conver_content = conver_content + "· 当前汇率：" + "1美元 ≈ " + usdcny_price +"人民币\n\n";
+        conver_content = conver_content + "· 兑换汇率：" + "1美元 ≈ " + usdcny_price +"人民币\n\n";
 
         #拼接所有价格信息
         _content = _content + domestic_content + international_content + store_content + conver_content;
