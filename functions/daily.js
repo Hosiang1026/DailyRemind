@@ -79,8 +79,7 @@ module.exports = handleTimeList = () => {
                             nextAnniversaryDate = calendar.conversion(nextAnniversaryDate);
                         }
                     }
-
-                    //获取最近的
+                    
                     if (nowDate == nextAnniversaryDate) {
                         if (anniversaryType == 0 ||anniversaryType == 1 ||anniversaryType == 2) {
                             let diffYear = currentYear - anniversaryYear;
