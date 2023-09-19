@@ -45,6 +45,11 @@ module.exports = handleTimeList = () => {
 
             content.push(`📆重要节日 \n`);
 
+            //type: 0 为累计周年(阳历)
+            //type: 1 为倒计周年(阳历)
+            //type: 2 为倒计周年(阴历)
+            //type: 3 为倒计天数(阴历)
+
             //纪念日/生日
             let anniversaryArr = daily.anniversary;
             if(anniversaryArr.length > 0){
@@ -60,14 +65,25 @@ module.exports = handleTimeList = () => {
                     let anniversaryYear = targetArr[0];
                     let anniversaryMonth = targetArr[1];
                     let anniversaryDay = targetArr[2];
+                    let solarAnniversaryDate = 0;
                     let nextAnniversaryDate = currentYear+'-'+ anniversaryMonth+'-'+anniversaryDay;
-                    if (new Date(nowDate) > new Date(nextAnniversaryDate)){
-                        nextAnniversaryDate = currentYear+1+'-'+ anniversaryMonth+'-'+anniversaryDay;
+                    //阴历转阳历
+                    if (anniversaryType == 2 || anniversaryType == 3) {
+                        nextAnniversaryDate = calendar.conversion(nextAnniversaryDate);
                     }
-                    let diffYear = currentYear - anniversaryYear;
-                    let solarAnniversaryDate = calendar.conversion(anniversaryDate);
-                    if (nowDate == solarAnniversaryDate) {
+                    //如果当前日期大于今年纪念日期，则获取下一年的纪念日期
+                    if (new Date(nowDate) > new Date(nextAnniversaryDate) && new Date(currentYear+1+'-01-01') > new Date(nextAnniversaryDate)){
+                        nextAnniversaryDate = currentYear+1+'-'+ anniversaryMonth+'-'+anniversaryDay;
+                        //阴历转阳历
+                        if (anniversaryType == 2 || anniversaryType == 3) {
+                            nextAnniversaryDate = calendar.conversion(nextAnniversaryDate);
+                        }
+                    }
+
+                    //获取最近的
+                    if (nowDate == nextAnniversaryDate) {
                         if (anniversaryType == 0 ||anniversaryType == 1 ||anniversaryType == 2) {
+                            let diffYear = currentYear - anniversaryYear;
                             let todayDate = '<'+anniversaryDate.split('-').join('.')+'>';
                             let todayContent = ' ' + diffYear+'周年';
                             var obj = {todayName:anniversaryName,todayDate:todayDate, todayContent:todayContent};
@@ -81,6 +97,7 @@ module.exports = handleTimeList = () => {
                             todayArr.push(obj);
                         }
                     }
+
                     let diffTime = diffTimeToDaily(nowDate, nextAnniversaryDate);
                     if (tempTime == 0){
                         tempName = anniversaryName;
@@ -100,8 +117,7 @@ module.exports = handleTimeList = () => {
                     }
 
                     if (anniversaryType == 2||anniversaryType == 3) {
-                        let solarAnniversaryDate = calendar.conversion(nextAnniversaryDate);
-                        let diffTime = diffTimeToDaily(nowDate, solarAnniversaryDate);
+                        let diffTime = diffTimeToDaily(nowDate, nextAnniversaryDate);
                         if (diffTime < tempTime) {
                             tempName = anniversaryName;
                             tempTime = diffTime;
