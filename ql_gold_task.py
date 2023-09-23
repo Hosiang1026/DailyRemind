@@ -114,8 +114,8 @@ def getGold():
 
         conver_content = conver_content + "· 国际换算：" + str(round(conver_gold, 2)) + "元/克\n";
         conver_content = conver_content + "· 1克差价：" + str(round(difference_gold, 2)) + "元\n";
-        conver_content = conver_content + "· 20克差价：" + str(round(difference_gold * 20, 2)) + "元\n";
-        conver_content = conver_content + "· 20克价格：" + str(round(float(domestic_gold) * 20, 2)) + "元\n";
+        conver_content = conver_content + "· 50克差价：" + str(round(difference_gold * 50, 2)) + "元\n";
+        conver_content = conver_content + "· 50克价格：" + str(round(float(domestic_gold) * 50, 2)) + "元\n";
         conver_content = conver_content + "· 金衡盎司：" + "1盎司 = 31.1035克\n";
         conver_content = conver_content + "· 兑换汇率：" + "1美元 ≈ " + usdcny_price +"人民币\n\n";
 
