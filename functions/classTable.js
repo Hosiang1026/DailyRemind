@@ -224,7 +224,7 @@ const classFunction = {
                 }
 
                 if (tempExamContent.length > 0||hrTempExamContent.length > 0) {
-                    content.push(`\n⏰期末考试倒计时`)
+                    content.push(`\n⏰考试倒计时`)
                     if (tempExamContent.length > 0) {
                         content.push(`\n📙‍22春计算机本 \n${tempExamContent.join('\n')}`)
                     }
@@ -233,7 +233,7 @@ const classFunction = {
                     }
                 }
                 if (homeworkArr.length > 0) {
-                    content.push(`\n📝形考任务倒计时: ${homeworkArr.join('\n')}`)
+                    content.push(`\n📝形考倒计时: ${homeworkArr.join('\n')}`)
                 }
 
                 console.log('获取课表成功', content.join('\n'));
