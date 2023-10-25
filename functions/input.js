@@ -122,6 +122,11 @@ let daily = {
             date: '1969-11-23',
             type: 3
         },
+        //{
+            //name: 'Grandfather生日',
+            //date: '1948-11-23',
+            //type: 3
+        //},
         {
             name: 'Mother生日',
             date: '1971-02-03',
