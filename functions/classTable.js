@@ -214,7 +214,7 @@ const classFunction = {
                 }
 
                 if (computerExamContent.length > 0||hrExamContent.length > 0) {
-                    content.push(`💯今日考试`)
+                    content.push(`\n💯今日考试`)
                     if (computerExamContent.length > 0) {
                         content.push(`\n📕‍22春计算机本 \n${computerExamContent.join('\n')}`)
                     }

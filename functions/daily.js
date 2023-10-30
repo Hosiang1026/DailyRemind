@@ -35,13 +35,13 @@ module.exports = handleTimeList = () => {
             let currentYear = date.getFullYear();
             let currentMonth = date.getMonth();
             let currentDate = date.getDate();
-            let firstDate = `${currentYear}` +'-01-01';
+            let firstDate = calendar.conversion(`${(currentYear-1)}` +'-12-30');
             let nowDate = `${currentYear}-${(currentMonth + 1) < 10 ? '0' + (currentMonth + 1) : (currentMonth + 1)}-${(currentDate) < 10 ? '0' + (currentDate) : (currentDate)}`
 
             let yearDiffTime = sumTimeToNow(firstDate, nowDate)+1;
             let lunarDate = calendar.solar2lunar();
-            let lunarDateStr = lunarDate.Animal +'年' +'•'+ lunarDate.gzYear +'年'+ lunarDate.IMonthCn + lunarDate.IDayCn + ' ' + lunarDate.astro;
-            content.push(`${nowDate} ${lunarDate.ncWeek} 第${yearDiffTime}天 \n${lunarDateStr}\n`);
+            let lunarDateStr = lunarDate.Animal +'年' +'•'+ lunarDate.gzYear +'年'+ lunarDate.IMonthCn + lunarDate.IDayCn + ' 第' + yearDiffTime + '天' ;
+            content.push(`${nowDate} ${lunarDate.ncWeek} ${lunarDate.astro} \n${lunarDateStr}\n`);
 
             content.push(`📆重要节日 \n`);
 
@@ -79,7 +79,7 @@ module.exports = handleTimeList = () => {
                             nextAnniversaryDate = calendar.conversion(nextAnniversaryDate);
                         }
                     }
-                    
+
                     if (nowDate == nextAnniversaryDate) {
                         if (anniversaryType == 0 ||anniversaryType == 1 ||anniversaryType == 2) {
                             let diffYear = currentYear - anniversaryYear;
