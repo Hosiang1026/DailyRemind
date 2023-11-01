@@ -388,7 +388,7 @@ module.exports = handleTimeList = () => {
                     let tempName = latelyArr[j].tempName;
                     let tempTime = latelyArr[j].tempTime;
                     if (minTempTime == latelyArr[j].tempTime){
-                        minTempArr.push(`📌${tempName}: 还有${tempTime}天`);
+                        minTempArr.push(`📌${tempName}: 还有${tempTime}天\n`);
                     }else{
                         contentArr.push(`· ${tempName}: 还有${tempTime}天`);
                     }
