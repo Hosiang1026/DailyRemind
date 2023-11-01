@@ -92,7 +92,7 @@ module.exports = handleTimeList = () => {
                             let anniversaryAstro = calendar.conversionAstro(anniversaryDate);
                             let todayDate = '<'+anniversaryDate.split('-').join('.')+'>';
                             let todayAge = currentYear - anniversaryYear;
-                            let todayContent = todayAge + '岁' + anniversaryAstro.split('-').join('/n') + todayDate;
+                            let todayContent = todayAge + '岁' + anniversaryAstro + todayDate;
                             var obj = {todayName:anniversaryName, todayContent:todayContent};
                             todayArr.push(obj);
                         }
