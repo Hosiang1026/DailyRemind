@@ -388,7 +388,7 @@ module.exports = handleTimeList = () => {
                     let tempName = latelyArr[j].tempName;
                     let tempTime = latelyArr[j].tempTime;
                     if (minTempTime == latelyArr[j].tempTime){
-                        minTempArr.push(`📌${tempName}: 还有${tempTime}天\n`);
+                        minTempArr.push(`📌${tempName}: 还有${tempTime}天`);
                     }else{
                         contentArr.push(`· ${tempName}: 还有${tempTime}天`);
                     }
@@ -398,6 +398,7 @@ module.exports = handleTimeList = () => {
                     content.push(`⏳距离下一个节日 \n`);
                     minTempArr.sort((a, b) => a.length - b.length);
                     content = content.concat(minTempArr);
+                    content.push(`----------------`);
                 }
             }
             //输出补班/放假温馨提示
