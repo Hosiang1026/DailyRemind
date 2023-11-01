@@ -808,7 +808,7 @@ calendar.conversionAstro = function(str) {
 
     var solar = calendar.lunar2solar(y, m, d);
 
-    var astroStr = solar.astro + "-" + "生肖属" + solar.Animal;
+    var astroStr = "生肖属" + solar.Animal + "-" + solar.astro;
 
     return astroStr;
 }
