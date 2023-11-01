@@ -31,7 +31,7 @@ module.exports = handleTimeList = () => {
             let loveContent;
 
             //把今日日期转为YYYY-MM-DD的格式 第一天
-            let date = new Date();
+            let date = new Date("2023-10-29");
             let currentYear = date.getFullYear();
             let currentMonth = date.getMonth();
             let currentDate = date.getDate();
@@ -92,7 +92,7 @@ module.exports = handleTimeList = () => {
                             let anniversaryAstro = calendar.conversionAstro(anniversaryDate);
                             let todayDate = '<'+anniversaryDate.split('-').join('.')+'>';
                             let todayAge = currentYear - anniversaryYear;
-                            let todayContent = todayAge + '岁' + anniversaryAstro + todayDate;
+                            let todayContent = todayAge + '岁' + anniversaryAstro.split('-').join('/n') + todayDate;
                             var obj = {todayName:anniversaryName, todayContent:todayContent};
                             todayArr.push(obj);
                         }
@@ -388,13 +388,18 @@ module.exports = handleTimeList = () => {
                     let tempName = latelyArr[j].tempName;
                     let tempTime = latelyArr[j].tempTime;
                     if (minTempTime == latelyArr[j].tempTime){
-                        minTempArr.push(`⏳距离下一个节日 \n📌${tempName}: 还有${tempTime}天\n`);
+                        minTempArr.push(`📌${tempName}: 还有${tempTime}天`);
                     }else{
                         contentArr.push(`· ${tempName}: 还有${tempTime}天`);
                     }
                 }
-                minTempArr.sort((a, b) => a.length - b.length);
-                content = content.concat(minTempArr);
+
+                if (minTempArr.length > 0){
+                    content.push(`⏳距离下一个节日 \n`);
+                    minTempArr.sort((a, b) => a.length - b.length);
+                    content = content.concat(minTempArr);
+                    content.push(`\n`);
+                }
             }
             //输出补班/放假温馨提示
             if(tipsArr.length > 0){
