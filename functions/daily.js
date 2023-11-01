@@ -30,6 +30,9 @@ module.exports = handleTimeList = () => {
             let tipsArr = []
             let loveContent;
 
+            let todayLicenseArr = []
+            let endLicenseArr = []
+
             //把今日日期转为YYYY-MM-DD的格式 第一天
             let date = new Date();
             let currentYear = date.getFullYear();
@@ -363,6 +366,28 @@ module.exports = handleTimeList = () => {
                 latelyArr.push(obj);
             }
 
+            //证件有效期
+            let licenseArr = daily.license;
+            if(licenseArr.length > 0){
+                for (let i = 0; i < licenseArr.length; i++) {
+                    const element = licenseArr[i];
+                    let licenseName = element.name;
+                    let licenseDate = element.date;
+                    if (new Date(nowDate) <= new Date(licenseDate)){
+                        //计算差值
+                        let diffTime = diffTimeToDaily(nowDate, licenseDate);
+                        if (diffTime < 31){
+                            let todayDate = '<'+nowDate.split('-').join('.')+'>';
+                            var obj = {todayName:licenseName,todayDate:todayDate, todayContent:'即将到期了'};
+                            todayLicenseArr.push(obj);
+                        }else{
+                            var obj = {tempName:licenseName,tempTime:diffTime};
+                            endLicenseArr.push(obj);
+                        }
+                    }
+                }
+            }
+
             //最近的节日或今日的节日
             if(todayArr.length > 0){
                 let todayTempArr = [];
@@ -388,7 +413,7 @@ module.exports = handleTimeList = () => {
                     let tempName = latelyArr[j].tempName;
                     let tempTime = latelyArr[j].tempTime;
                     if (minTempTime == latelyArr[j].tempTime){
-                        minTempArr.push(`* ${tempName}: 还有${tempTime}天\n`);
+                        minTempArr.push(`* ${tempName}: 还有${tempTime}天`);
                     }else{
                         contentArr.push(`· ${tempName}: 还有${tempTime}天`);
                     }
@@ -397,6 +422,7 @@ module.exports = handleTimeList = () => {
                 if (minTempArr.length > 0){
                     content.push(`📌距离下一个节日`);
                     minTempArr.sort((a, b) => a.length - b.length);
+                    minTempArr[minTempArr.length-1] = minTempArr[minTempArr.length-1] + '\n';
                     content = content.concat(minTempArr);
                 }
             }
@@ -417,8 +443,33 @@ module.exports = handleTimeList = () => {
                 content = content.concat(tempContentArr);
             }
 
+            //证件有效期
+            if(todayArr.length == 0){
+                content.push(`\n 💳证件有效期`);
+                if (todayLicenseArr.length > 0) {
+                    let todayTempArr = [];
+                    for (var i = 0; i < todayLicenseArr.length; i++) {
+                        let todayName = todayLicenseArr[i].todayName;
+                        let todayDate = todayLicenseArr[i].todayDate;
+                        let todayContent = todayLicenseArr[i].todayContent;
+                        todayTempArr.push(`* ${todayName} ${todayDate} ${todayContent}🎉`);
+                    }
+                    todayTempArr.sort((a, b) => a.length - b.length);
+                    content = content.concat(todayTempArr);
+                } else if(endLicenseArr.length > 0) {
+                    let tempContentArr = [];
+                    for (var j = 0; j < endLicenseArr.length; j++) {
+                        let tempName = endLicenseArr[j].tempName;
+                        let tempTime = endLicenseArr[j].tempTime;
+                        tempContentArr.push(`· ${tempName}: 还有${tempTime}天`);
+                    }
+                    tempContentArr.sort((a, b) => a.length - b.length);
+                    content = content.concat(tempContentArr);
+                }
+            }
+
+            //累计恋爱天数
             if(todayArr.length == 0) {
-                //恋爱天数
                 content.push(loveContent);
                 if (Math.floor(Math.random() * 10) % 2 == 0) {
                     const res = await axios.get('https://api.shadiao.pro/chp')

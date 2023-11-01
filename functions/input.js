@@ -455,6 +455,36 @@ let daily = {
             name:'感恩节',
             date: '11/4/4'
         }
+    ],
+    license: [//证件有效期列表
+        {
+            name:'Howe身份证',
+            date: '2041-03-11'
+        },
+        {
+            name:'Howe驾驶证',
+            date: '2024-09-07'
+        },
+        {
+            name:'SKODA保养',
+            date: '2024-01-06'
+        },
+        {
+            name:'SKODA车险',
+            date: '2023-12-13'
+        },
+        {
+            name:'SKODA年检',
+            date: '2024-12-31'
+        },
+        {
+            name:'雅居乐租房',
+            date: '2024-03-06'
+        },
+        {
+            name:'春熙里交房',
+            date: '2024-03-01'
+        }
     ]
 }
 
@@ -475,6 +505,7 @@ let end = {
 //课表推送模块
 let classTable = {
     open: true,//是否需要推送时增加课表，需要填true，否则填false  （不需要加引号）
+    graduate: '2024-07-10',
     homework: 0, // homework: 0,
     computer: [//22春计算机本-课程列表
         {
@@ -482,7 +513,7 @@ let classTable = {
             teacher: '陈仙柱',//辅导老师
             exam: {
                 type: 2, //考试方式 1:纸质闭卷 2:上机闭卷
-                date: '2023-10-28',
+                date: '2024-05-28',
                 time: '09:00 - 11:00',//考试时间
                 place: '浙江开放大学'//考试地点
             },
