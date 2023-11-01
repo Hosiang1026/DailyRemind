@@ -65,7 +65,6 @@ module.exports = handleTimeList = () => {
                     let anniversaryYear = targetArr[0];
                     let anniversaryMonth = targetArr[1];
                     let anniversaryDay = targetArr[2];
-                    //let solarAnniversaryDate = 0;
                     let nextAnniversaryDate = currentYear+'-'+ anniversaryMonth+'-'+anniversaryDay;
                     //阴历转阳历
                     if (anniversaryType == 2 || anniversaryType == 3) {
