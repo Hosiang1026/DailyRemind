@@ -31,7 +31,7 @@ module.exports = handleTimeList = () => {
             let loveContent;
 
             //把今日日期转为YYYY-MM-DD的格式 第一天
-            let date = new Date("2023-10-29");
+            let date = new Date();
             let currentYear = date.getFullYear();
             let currentMonth = date.getMonth();
             let currentDate = date.getDate();
