@@ -395,10 +395,10 @@ module.exports = handleTimeList = () => {
                 }
 
                 if (minTempArr.length > 0){
-                    content.push(`⏳距离下一个节日 \n`);
+                    content.push(`⏳距离下一个节日`);
                     minTempArr.sort((a, b) => a.length - b.length);
                     content = content.concat(minTempArr);
-                    content.push(`----------------`);
+                    content.push(`--------------------------------`);
                 }
             }
             //输出补班/放假温馨提示
