@@ -365,11 +365,14 @@ module.exports = handleTimeList = () => {
 
             //最近的节日或今日的节日
             if(todayArr.length > 0){
-                for (var i = 0; i < todayArr.length; i++) {
-                    let todayName = todayArr[i].todayName;
-                    let todayContent = todayArr[i].todayContent;
-                    content.push(`· 今天是${todayName} ${todayContent}🎉`);
+                let todayTempArr = [];
+                for (var k = 0; k < todayArr.length; k++) {
+                    let todayName = todayArr[k].todayName;
+                    let todayContent = todayArr[k].todayContent;
+                    todayTempArr.push(`· 今天是${todayName} ${todayContent}🎉`);
                 }
+                todayTempArr.sort((a, b) => a.length - b.length);
+                content.concat(todayTempArr);
                 //随机笑话
                 if (Math.floor(Math.random() * 10) % 2 == 0) {
                     const res = await axios.get('https://api.vvhan.com/api/joke?type=json')
@@ -379,16 +382,19 @@ module.exports = handleTimeList = () => {
                     content.push(`\n${res.data.data.content} \n-- 来自@${res.data.data.nickname}「${res.data.data.name}」${res.data.data.artistsname}\n`)
                 }
             }else{
-                let minTempTime = Math.min.apply(Math, latelyArr.map(item => { return item['tempTime'] }))
+                let minTempTime = Math.min.apply(Math, latelyArr.map(item => { return item['tempTime'] }));
+                let minTempArr = [];
                 for (var j = 0; j < latelyArr.length; j++) {
                     let tempName = latelyArr[j].tempName;
                     let tempTime = latelyArr[j].tempTime;
                     if (minTempTime == latelyArr[j].tempTime){
-                        content.push(`⏳距离下一个节日 \n📌${tempName}: 还有${tempTime}天\n`);
+                        minTempArr.push(`⏳距离下一个节日 \n📌${tempName}: 还有${tempTime}天\n`);
                     }else{
                         contentArr.push(`· ${tempName}: 还有${tempTime}天`);
                     }
                 }
+                minTempArr.sort((a, b) => a.length - b.length);
+                content.concat(minTempArr);
             }
             //输出补班/放假温馨提示
             if(tipsArr.length > 0){
@@ -399,21 +405,12 @@ module.exports = handleTimeList = () => {
 
             //输出内容按长度排序
             if(contentArr.length > 0) {
-                for (var i = 0; i < contentArr.length - 1; i++) {
-                    // 内层循环,控制比较的次数，并且判断两个数的大小
-                    for (var j = 0; j < contentArr.length - 1 - i; j++) {
-                        // 如果前面的数大，放到后面(当然是从小到大的冒泡排序)
-                        if (contentArr[j].length > contentArr[j + 1].length) {
-                            var temp = contentArr[j];
-                            contentArr[j] = contentArr[j + 1];
-                            contentArr[j + 1] = temp;
-                        }
-                    }
-                }
-
+                let tempContentArr = [];
                 for (var i = 0; i < contentArr.length; i++) {
-                    content.push(contentArr[i]);
+                    tempContentArr.push(contentArr[i]);
                 }
+                tempContentArr.sort((a, b) => a.length - b.length);
+                content.concat(tempContentArr);
             }
 
             if(todayArr.length == 0) {
