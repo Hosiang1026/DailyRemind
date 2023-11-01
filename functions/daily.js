@@ -366,13 +366,13 @@ module.exports = handleTimeList = () => {
             //最近的节日或今日的节日
             if(todayArr.length > 0){
                 let todayTempArr = [];
-                for (var k = 0; k < todayArr.length; k++) {
-                    let todayName = todayArr[k].todayName;
-                    let todayContent = todayArr[k].todayContent;
+                for (var i = 0; i < todayArr.length; i++) {
+                    let todayName = todayArr[i].todayName;
+                    let todayContent = todayArr[i].todayContent;
                     todayTempArr.push(`· 今天是${todayName} ${todayContent}🎉`);
                 }
                 todayTempArr.sort((a, b) => a.length - b.length);
-                content.concat(todayTempArr);
+                content = content.concat(todayTempArr);
                 //随机笑话
                 if (Math.floor(Math.random() * 10) % 2 == 0) {
                     const res = await axios.get('https://api.vvhan.com/api/joke?type=json')
@@ -394,7 +394,7 @@ module.exports = handleTimeList = () => {
                     }
                 }
                 minTempArr.sort((a, b) => a.length - b.length);
-                content.concat(minTempArr);
+                content = content.concat(minTempArr);
             }
             //输出补班/放假温馨提示
             if(tipsArr.length > 0){
@@ -410,7 +410,7 @@ module.exports = handleTimeList = () => {
                     tempContentArr.push(contentArr[i]);
                 }
                 tempContentArr.sort((a, b) => a.length - b.length);
-                content.concat(tempContentArr);
+                content = content.concat(tempContentArr);
             }
 
             if(todayArr.length == 0) {
