@@ -65,7 +65,7 @@ module.exports = handleTimeList = () => {
                     let anniversaryYear = targetArr[0];
                     let anniversaryMonth = targetArr[1];
                     let anniversaryDay = targetArr[2];
-                    let solarAnniversaryDate = 0;
+                    //let solarAnniversaryDate = 0;
                     let nextAnniversaryDate = currentYear+'-'+ anniversaryMonth+'-'+anniversaryDay;
                     //阴历转阳历
                     if (anniversaryType == 2 || anniversaryType == 3) {
@@ -90,9 +90,11 @@ module.exports = handleTimeList = () => {
                         }
                         if (anniversaryType == 3) {
                             //获取生日星座
-                            let anniversaryAstro = calendar.conversionAstro(solarAnniversaryDate);
-                            let todayDate = '<'+anniversaryDate.split('-').join('.')+'>';
-                            var obj = {todayName:anniversaryName,todayDate:todayDate, todayContent:anniversaryAstro};
+                            let anniversaryAstro = calendar.conversionAstro(anniversaryDate);
+                            //let todayDate = '<'+anniversaryDate.split('-').join('.')+'>';
+                            let todayAge = currentYear - anniversaryYear;
+                            let todayContent = todayAge + '岁 ' + anniversaryAstro;
+                            var obj = {todayName:anniversaryName, todayContent:todayContent};
                             todayArr.push(obj);
                         }
                     }
