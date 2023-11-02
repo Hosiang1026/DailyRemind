@@ -473,7 +473,6 @@ let daily = {
             name:'Fang身份证',
             date: '2031-03-11'
         },
-
         {
             name:'Howe驾驶证',
             date: '2024-09-07'
