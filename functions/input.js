@@ -458,14 +458,6 @@ let daily = {
     ],
     license: [//证件有效期列表
         {
-            name:'Howe身份证',
-            date: '2041-03-11'
-        },
-        {
-            name:'Howe驾驶证',
-            date: '2024-09-07'
-        },
-        {
             name:'SKODA保养',
             date: '2024-01-06'
         },
@@ -476,6 +468,14 @@ let daily = {
         {
             name:'SKODA年检',
             date: '2024-12-31'
+        },
+        {
+            name:'Howe驾驶证',
+            date: '2024-09-07'
+        },
+        {
+            name:'Howe身份证',
+            date: '2041-03-11'
         },
         {
             name:'雅居乐租房',

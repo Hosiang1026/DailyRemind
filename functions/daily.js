@@ -445,7 +445,7 @@ module.exports = handleTimeList = () => {
 
             //证件有效期
             if(todayArr.length == 0){
-                content.push(`\n 💳证件有效期`);
+                content.push(`\n 💳证件有效期 \n`);
                 if (todayLicenseArr.length > 0) {
                     let todayTempArr = [];
                     for (var i = 0; i < todayLicenseArr.length; i++) {
@@ -456,15 +456,13 @@ module.exports = handleTimeList = () => {
                     }
                     todayTempArr.sort((a, b) => a.length - b.length);
                     content = content.concat(todayTempArr);
-                } else if(endLicenseArr.length > 0) {
-                    let tempContentArr = [];
+                }
+                if(endLicenseArr.length > 0) {
                     for (var j = 0; j < endLicenseArr.length; j++) {
                         let tempName = endLicenseArr[j].tempName;
                         let tempTime = endLicenseArr[j].tempTime;
-                        tempContentArr.push(`· ${tempName}: 还有${tempTime}天`);
+                        content.push(`· ${tempName}: 还有${tempTime}天`);
                     }
-                    tempContentArr.sort((a, b) => a.length - b.length);
-                    content = content.concat(tempContentArr);
                 }
             }
 
