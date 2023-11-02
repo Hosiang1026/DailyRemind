@@ -466,20 +466,21 @@ let daily = {
             date: '2024-12-31'
         },
         {
-            name:'Howe驾驶证',
-            date: '2024-09-07'
-        },
-        {
             name:'Fang驾驶证',
             date: '2031-03-10'
         },
         {
-            name:'Howe身份证',
-            date: '2041-03-11'
-        },
-        {
             name:'Fang身份证',
             date: '2031-03-11'
+        },
+
+        {
+            name:'Howe驾驶证',
+            date: '2024-09-07'
+        },
+        {
+            name:'Howe身份证',
+            date: '2041-03-11'
         },
         {
             name:'雅居乐租房',
