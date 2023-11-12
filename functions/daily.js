@@ -403,8 +403,9 @@ module.exports = handleTimeList = () => {
                         let solarBeginDate = calendar.conversion(beginDate);
                         if (new Date(solarBeginDate) <= new Date(nowDate)) {
                             let diffNum = sumTimeToNow(solarBeginDate, nowDate);
-                            if (diffNum >= 0 && diffNum <= clothesNum) {
-                                endClothesObj = {clothesName: clothesName, clothesRemark: clothesRemark, clothesBeginDate: solarBeginDate, diffNum: diffNum};
+                            let keepNum = clothesNum - diffNum;
+                            if (keepNum >= 0) {
+                                endClothesObj = {clothesName: clothesName, clothesRemark: clothesRemark, clothesBeginDate: solarBeginDate, keepNum: keepNum+1};
                             }
                         }
                     }
@@ -416,8 +417,8 @@ module.exports = handleTimeList = () => {
             let clothesName = endClothesObj.clothesName;
             let clothesRemark = endClothesObj.clothesRemark;
             let clothesBeginDate = endClothesObj.clothesBeginDate;
-            let diffNum = endClothesObj.diffNum;
-            content.push(`· 推荐天数: `+ diffNum);
+            let keepNum = endClothesObj.keepNum;
+            content.push(`· 推荐天数: `+ keepNum);
             content.push(`· 开始时间: `+ clothesBeginDate);
             content.push(`· 夜间睡觉: `+ clothesRemark);
             content.push(`· 白天活动: `+ clothesName);
