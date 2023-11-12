@@ -417,10 +417,10 @@ module.exports = handleTimeList = () => {
             let clothesRemark = endClothesObj.clothesRemark;
             let clothesBeginDate = endClothesObj.clothesBeginDate;
             let clothesNum = endClothesObj.clothesNum;
+            content.push(`· 推荐天数: `+ clothesNum);
+            content.push(`· 开始时间: `+ clothesBeginDate);
             content.push(`· 夜间睡觉: `+ clothesRemark);
             content.push(`· 白天活动: `+ clothesName);
-            content.push(`· 开始时间: `+ clothesBeginDate);
-            content.push(`· 推荐天数: `+ clothesNum);
 
             content.push(`\n 📆重要节日 \n`);
 
