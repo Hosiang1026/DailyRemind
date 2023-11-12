@@ -533,6 +533,7 @@ var calendar = {
 
     /**
      * 传入农历年月日以及传入的月份是否闰月获得详细的公历、农历object信息 <=>JSON
+     * 获取详细的农历有BUG 例如：2023-11-16的农历转换公历不正确
      * @param y  lunar year
      * @param m  lunar month
      * @param d  lunar day
@@ -540,7 +541,34 @@ var calendar = {
      * @return JSON object
      * @eg:console.log(calendar.lunar2solar(1987,9,10));
      */
-    lunar2solar: function (y, m, d, isLeapMonth) {   //参数区间1900.1.31~2100.12.1
+    lunar2solarDetail: function (y, m, d, isLeapMonth) {
+        var offset = lunar2solarOffset(y, m, d, isLeapMonth);
+        //1900年农历正月一日的公历时间为1900年1月30日0时0分0秒(该时间也是本农历的最开始起始点)
+        var stmap = Date.UTC(1900, 1, 30, 0, 0, 0);
+        var calObj = new Date((offset + d - 31) * 86400000 + stmap);
+        var cY = calObj.getUTCFullYear();
+        var cM = calObj.getUTCMonth() + 1;
+        var cD = calObj.getUTCDate();
+
+        return this.solar2lunar(cY, cM, cD);
+    },
+
+    lunar2solar: function (y, m, d, isLeapMonth) {
+        var offset = this.lunar2solarOffset(y, m, d, isLeapMonth);
+        //1900年农历正月一日的公历时间为1900年1月30日0时0分0秒(该时间也是本农历的最开始起始点)
+        var stmap = Date.UTC(1900, 1, 30, 0, 0, 0);
+        var calObj = new Date((offset + d - 31) * 86400000 + stmap);
+        var cY = calObj.getUTCFullYear();
+        var cM = calObj.getUTCMonth() + 1;
+        var cD = calObj.getUTCDate();
+        return {
+            'cYear': cY,
+            'cMonth': cM,
+            'cDay': cD
+        };
+    },
+
+    lunar2solarOffset: function (y, m, d, isLeapMonth) {   //参数区间1900.1.31~2100.12.1
         var isLeapMonth = !!isLeapMonth;
         var leapOffset = 0;
         var leapMonth = this.leapMonth(y);
@@ -582,14 +610,8 @@ var calendar = {
         if (isLeapMonth) {
             offset += day;
         }
-        //1900年农历正月一日的公历时间为1900年1月30日0时0分0秒(该时间也是本农历的最开始起始点)
-        var stmap = Date.UTC(1900, 1, 30, 0, 0, 0);
-        var calObj = new Date((offset + d - 31) * 86400000 + stmap);
-        var cY = calObj.getUTCFullYear();
-        var cM = calObj.getUTCMonth() + 1;
-        var cD = calObj.getUTCDate();
 
-        return this.solar2lunar(cY, cM, cD);
+        return offset;
     }
 };
 
@@ -769,9 +791,8 @@ calendar.conversion = function(str) {
     var d = parseInt(str.substring(8, 10));
 
     var solar = calendar.lunar2solar(y, m, d);
-    //var solarBirthday = solar.cYear + "-" + solar.cMonth + "-" + solar.cDay;
 
-    var solarCMonth = (solar.cMonth-1) < 10 ? '0' + (solar.cMonth-1) : (solar.cMonth-1);
+    var solarCMonth = (solar.cMonth) < 10 ? '0' + (solar.cMonth) : (solar.cMonth);
     var solarCDay = (solar.cDay) < 10 ? '0' + (solar.cDay) : (solar.cDay)
     var solarBirthday = solar.cYear + "-" + solarCMonth  + "-" + solarCDay;
 
@@ -806,7 +827,7 @@ calendar.conversionAstro = function(str) {
     var m = parseInt(str.substring(5, 7));
     var d = parseInt(str.substring(8, 10));
 
-    var solar = calendar.lunar2solar(y, m, d);
+    var solar = calendar.lunar2solarDetail(y, m, d);
 
     var astroStr = solar.astro + " " + "生肖属" + solar.Animal;
 

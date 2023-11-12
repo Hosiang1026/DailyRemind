@@ -2,7 +2,8 @@ const { daily } = require('./input')
 var calendar = require("./calendar");
 const axios = require('axios')
 var calendarplus = require("./calendarplus");
-//计算节日时间到今天的时间差，参数格式为 YYYY-MM-DD
+
+//计算节日时间到今天的时间差，参数格式为 YYYY-MM-DD (日期差的绝对值)
 const sumTimeToNow = (targetTime, nowTime) => {
     let diff = (new Date(targetTime.replace(/-/g, '/'))).getTime() - (new Date(nowTime.replace(/-/g, '/'))).getTime()//日期的差值，有正负
     const absTime = Math.abs(diff) //日期差的绝对值
@@ -32,6 +33,7 @@ module.exports = handleTimeList = () => {
 
             let todayLicenseArr = []
             let endLicenseArr = []
+            var endClothesObj;
 
             //把今日日期转为YYYY-MM-DD的格式 第一天
             let date = new Date();
@@ -45,8 +47,6 @@ module.exports = handleTimeList = () => {
             let lunarDate = calendar.solar2lunar();
             let lunarDateStr = lunarDate.Animal +'年' +'•'+ lunarDate.gzYear +'年'+ lunarDate.IMonthCn + lunarDate.IDayCn + ' 第' + yearDiffTime + '天' ;
             content.push(`${nowDate} ${lunarDate.ncWeek} ${lunarDate.astro} \n${lunarDateStr}\n`);
-
-            content.push(`📆重要节日 \n`);
 
             //type: 0 为累计周年(阳历)
             //type: 1 为倒计周年(阳历)
@@ -388,6 +388,38 @@ module.exports = handleTimeList = () => {
                 }
             }
 
+            //季节穿衣搭配 - 阴历
+            let clothesArr = daily.clothes;
+            if(clothesArr.length > 0){
+                for (let i = 0; i < clothesArr.length; i++) {
+                    const element = clothesArr[i];
+                    let clothesName = element.name;
+                    let clothesDateArr = element.date;
+                    let clothesNum = element.num;
+                    let clothesRemark = element.remark;
+                    for (let j = 0; j < clothesDateArr.length; j++) {
+                        const clothesDate = clothesDateArr[j];
+                        let beginDate = currentYear + '-' + clothesDate;
+                        let solarBeginDate = calendar.conversion(beginDate);
+                        if (new Date(solarBeginDate) <= new Date("2023-11-14")) {
+                            let diffNum = sumTimeToNow(solarBeginDate, "2023-11-14");
+                            if (diffNum >= 0 && diffNum <= clothesNum) {
+                                endClothesObj = {clothesName: clothesName, clothesRemark: clothesRemark};
+                            }
+                        }
+                    }
+                }
+            }
+
+            //季节穿衣搭配
+            content.push(`\n 👕穿衣推荐 \n`);
+            let clothesName = endClothesObj.clothesName;
+            let clothesRemark = endClothesObj.clothesRemark;
+            content.push(`· 夜间睡觉: `+ clothesRemark);
+            content.push(`· 白天活动: `+ clothesName);
+
+            content.push(`📆重要节日 \n`);
+
             //最近的节日或今日的节日
             if(todayArr.length > 0){
                 let todayTempArr = [];
@@ -477,6 +509,7 @@ module.exports = handleTimeList = () => {
                     content.push(`\n💘${res.data.ishan}`)
                 }
             }
+
             console.log('获取重要节日成功\n', content.join('\n'));
             resolve(content.join('\n'))
         } catch (error) {
