@@ -401,10 +401,10 @@ module.exports = handleTimeList = () => {
                         const clothesDate = clothesDateArr[j];
                         let beginDate = currentYear + '-' + clothesDate;
                         let solarBeginDate = calendar.conversion(beginDate);
-                        if (new Date(solarBeginDate) <= new Date("2023-11-14")) {
-                            let diffNum = sumTimeToNow(solarBeginDate, "2023-11-14");
+                        if (new Date(solarBeginDate) <= new Date(nowDate)) {
+                            let diffNum = sumTimeToNow(solarBeginDate, nowDate);
                             if (diffNum >= 0 && diffNum <= clothesNum) {
-                                endClothesObj = {clothesName: clothesName, clothesRemark: clothesRemark};
+                                endClothesObj = {clothesName: clothesName, clothesRemark: clothesRemark, clothesBeginDate: solarBeginDate, clothesNum: clothesNum};
                             }
                         }
                     }
@@ -415,8 +415,12 @@ module.exports = handleTimeList = () => {
             content.push(`👕穿衣推荐 \n`);
             let clothesName = endClothesObj.clothesName;
             let clothesRemark = endClothesObj.clothesRemark;
+            let clothesBeginDate = endClothesObj.clothesBeginDate;
+            let clothesNum = endClothesObj.clothesNum;
             content.push(`· 夜间睡觉: `+ clothesRemark);
             content.push(`· 白天活动: `+ clothesName);
+            content.push(`· 开始时间: `+ clothesBeginDate);
+            content.push(`· 推荐天数: `+ clothesNum);
 
             content.push(`\n 📆重要节日 \n`);
 
