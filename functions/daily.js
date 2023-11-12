@@ -412,13 +412,13 @@ module.exports = handleTimeList = () => {
             }
 
             //季节穿衣搭配
-            content.push(`\n 👕穿衣推荐 \n`);
+            content.push(`👕穿衣推荐 \n`);
             let clothesName = endClothesObj.clothesName;
             let clothesRemark = endClothesObj.clothesRemark;
             content.push(`· 夜间睡觉: `+ clothesRemark);
             content.push(`· 白天活动: `+ clothesName);
 
-            content.push(`📆重要节日 \n`);
+            content.push(`\n 📆重要节日 \n`);
 
             //最近的节日或今日的节日
             if(todayArr.length > 0){
