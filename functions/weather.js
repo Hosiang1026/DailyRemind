@@ -1,4 +1,5 @@
 const { weather } = require('./input')
+var calendar = require("./calendar");
 const axios = require('axios')
 const publicIp = require('public-ip');
 
@@ -99,8 +100,12 @@ module.exports = handleWeather = () => {
     return new Promise(async (resolve, reject) => {
         try {
 			let weatherCityContent = []
-			//获取当天是周几、此刻是上午OR下午
 			let nowDate = new Date();
+			let currentYear = nowDate.getFullYear();
+			let currentMonth = nowDate.getMonth();
+			let currentDate = nowDate.getDate();
+			let nowDateStr = `${currentYear}-${(currentMonth + 1) < 10 ? '0' + (currentMonth + 1) : (currentMonth + 1)}-${(currentDate) < 10 ? '0' + (currentDate) : (currentDate)}`
+			//获取当天是周几、此刻是上午OR下午
 			let nowDay = nowDate.getDay();
             let nowHour = nowDate.getHours();
 			let nowTime;
@@ -155,6 +160,42 @@ module.exports = handleWeather = () => {
 				}
 			}
 
+			//季节穿衣搭配 - 阴历
+			var endClothesObj;
+			let clothesArr = weather.clothes;
+			if(clothesArr.length > 0){
+				for (let i = 0; i < clothesArr.length; i++) {
+					const element = clothesArr[i];
+					let clothesName = element.name;
+					let clothesDateArr = element.date;
+					let clothesNum = element.num;
+					let clothesRemark = element.remark;
+					for (let j = 0; j < clothesDateArr.length; j++) {
+						const clothesDate = clothesDateArr[j];
+						let beginDate = currentYear + '-' + clothesDate;
+						let solarBeginDate = calendar.conversion(beginDate);
+						if (new Date(solarBeginDate) <= new Date(nowDateStr)) {
+							let diffNum = calendar.sumTimeToNow(solarBeginDate, nowDateStr);
+							let keepNum = clothesNum - diffNum;
+							if (keepNum >= 0) {
+								endClothesObj = {clothesName: clothesName, clothesRemark: clothesRemark, clothesBeginDate: solarBeginDate, keepNum: keepNum+1};
+							}
+						}
+					}
+				}
+			}
+
+			//季节穿衣搭配
+			weatherCityContent.push(`👕穿衣推荐 \n`);
+			let clothesName = endClothesObj.clothesName;
+			let clothesRemark = endClothesObj.clothesRemark;
+			let clothesBeginDate = endClothesObj.clothesBeginDate;
+			let keepNum = endClothesObj.keepNum;
+			weatherCityContent.push(`· 推荐时间: `+ keepNum + `天`);
+			weatherCityContent.push(`· 开始日期: `+ clothesBeginDate);
+			weatherCityContent.push(`· 夜间睡觉: `+ clothesRemark);
+			weatherCityContent.push(`· 白天活动: `+ clothesName);
+
 			/*if(baseCityCodeArr.length > 0) {
 				if (allBrellaFlag){
 					if (nowDay != 6 && nowDay != 0) {
@@ -168,7 +209,7 @@ module.exports = handleWeather = () => {
 					}
 				}
 			}*/
-
+			console.log('获取全部天气成功数据：', weatherCityContent);
 			resolve(weatherCityContent.join('\n'))
         } catch (error) {
             console.log('处理天气数据失败', error.message || error);

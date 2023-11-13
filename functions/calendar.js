@@ -542,7 +542,7 @@ var calendar = {
      * @eg:console.log(calendar.lunar2solar(1987,9,10));
      */
     lunar2solarDetail: function (y, m, d, isLeapMonth) {
-        var offset = lunar2solarOffset(y, m, d, isLeapMonth);
+        var offset = this.lunar2solarOffset(y, m, d, isLeapMonth);
         //1900年农历正月一日的公历时间为1900年1月30日0时0分0秒(该时间也是本农历的最开始起始点)
         var stmap = Date.UTC(1900, 1, 30, 0, 0, 0);
         var calObj = new Date((offset + d - 31) * 86400000 + stmap);
@@ -914,6 +914,22 @@ calendar.conversionParentDate = function(year, month, weeks, nums) {
         }
     }
     return parentDate;
+}
+
+//计算节日时间到今天的时间差，参数格式为 YYYY-MM-DD (日期差的绝对值)
+calendar.sumTimeToNow = function(targetTime, nowTime){
+    let diff = (new Date(targetTime.replace(/-/g, '/'))).getTime() - (new Date(nowTime.replace(/-/g, '/'))).getTime()//日期的差值，有正负
+    const absTime = Math.abs(diff) //日期差的绝对值
+    let formatTimeDiff = parseInt(absTime / (3600 * 1000 * 24))
+    return formatTimeDiff
+}
+
+//计算今天到下次节日时间的时间差，参数格式为 YYYY-MM-DD
+calendar.diffTimeToDaily = function(nowTime, targetTime){
+    let diff = (new Date(nowTime.replace(/-/g, '/'))).getTime() - (new Date(targetTime.replace(/-/g, '/'))).getTime()//日期的差值，有正负
+    const absTime = Math.abs(diff) //日期差的绝对值
+    let formatTimeDiff = parseInt(absTime / (3600 * 1000 * 24))
+    return formatTimeDiff
 }
 
 if (typeof define === 'function'){

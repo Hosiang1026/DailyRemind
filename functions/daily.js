@@ -1,23 +1,7 @@
 const { daily } = require('./input')
 var calendar = require("./calendar");
 const axios = require('axios')
-var calendarplus = require("./calendarplus");
-
-//计算节日时间到今天的时间差，参数格式为 YYYY-MM-DD (日期差的绝对值)
-const sumTimeToNow = (targetTime, nowTime) => {
-    let diff = (new Date(targetTime.replace(/-/g, '/'))).getTime() - (new Date(nowTime.replace(/-/g, '/'))).getTime()//日期的差值，有正负
-    const absTime = Math.abs(diff) //日期差的绝对值
-    let formatTimeDiff = parseInt(absTime / (3600 * 1000 * 24))
-    return formatTimeDiff
-}
-
-//计算今天到下次节日时间的时间差，参数格式为 YYYY-MM-DD
-const diffTimeToDaily = (nowTime, targetTime) => {
-    let diff = (new Date(nowTime.replace(/-/g, '/'))).getTime() - (new Date(targetTime.replace(/-/g, '/'))).getTime()//日期的差值，有正负
-    const absTime = Math.abs(diff) //日期差的绝对值
-    let formatTimeDiff = parseInt(absTime / (3600 * 1000 * 24))
-    return formatTimeDiff
-}
+//var calendarplus = require("./calendarplus");
 
 //把列表处理为字符串
 module.exports = handleTimeList = () => {
@@ -33,7 +17,6 @@ module.exports = handleTimeList = () => {
 
             let todayLicenseArr = []
             let endLicenseArr = []
-            var endClothesObj;
 
             //把今日日期转为YYYY-MM-DD的格式 第一天
             let date = new Date();
@@ -43,7 +26,7 @@ module.exports = handleTimeList = () => {
             let firstDate = calendar.conversion(`${(currentYear-1)}` +'-12-30');
             let nowDate = `${currentYear}-${(currentMonth + 1) < 10 ? '0' + (currentMonth + 1) : (currentMonth + 1)}-${(currentDate) < 10 ? '0' + (currentDate) : (currentDate)}`
 
-            let yearDiffTime = sumTimeToNow(firstDate, nowDate)+1;
+            let yearDiffTime = calendar.sumTimeToNow(firstDate, nowDate)+1;
             let lunarDate = calendar.solar2lunar();
             let lunarDateStr = lunarDate.Animal +'年' +'•'+ lunarDate.gzYear +'年'+ lunarDate.IMonthCn + lunarDate.IDayCn + ' 第' + yearDiffTime + '天' ;
             content.push(`${nowDate} ${lunarDate.ncWeek} ${lunarDate.astro} \n${lunarDateStr}\n`);
@@ -101,14 +84,14 @@ module.exports = handleTimeList = () => {
                         }
                     }
 
-                    let diffTime = diffTimeToDaily(nowDate, nextAnniversaryDate);
+                    let diffTime = calendar.diffTimeToDaily(nowDate, nextAnniversaryDate);
                     if (tempTime == 0){
                         tempName = anniversaryName;
                         tempTime = diffTime;
                     }
                     if (anniversaryType == 0) {
                         //计算累计值
-                        let sumTime = sumTimeToNow(anniversaryDate, nowDate);
+                        let sumTime = calendar.sumTimeToNow(anniversaryDate, nowDate);
                         loveContent = `\n❤我们在一起恋爱: 已经${sumTime}天`;
                     }
 
@@ -120,7 +103,7 @@ module.exports = handleTimeList = () => {
                     }
 
                     if (anniversaryType == 2||anniversaryType == 3) {
-                        let diffTime = diffTimeToDaily(nowDate, nextAnniversaryDate);
+                        let diffTime = calendar.diffTimeToDaily(nowDate, nextAnniversaryDate);
                         if (diffTime < tempTime) {
                             tempName = anniversaryName;
                             tempTime = diffTime;
@@ -150,7 +133,7 @@ module.exports = handleTimeList = () => {
                     if (new Date(nowDate) > new Date(nextLegalDate)) {
                         nextLegalDate = currentYear + 1 + '-' + targetArr[0] + '-' + targetArr[1];
                     }
-                    let diffTime = diffTimeToDaily(nowDate, nextLegalDate);
+                    let diffTime = calendar.diffTimeToDaily(nowDate, nextLegalDate);
 
                     if (nowDate == nextLegalDate) {
                         let todayDate = '<'+nowDate.split('-').join('.')+'>';
@@ -196,7 +179,7 @@ module.exports = handleTimeList = () => {
                             if (new Date(nowDate) > new Date(endYearLegalDate)) {
                                 endYearLegalDate = currentYear + 1 + '-' + endLegalHoliday;
                             }
-                            let startDiffTime = diffTimeToDaily(nowDate, startYearLegalDate);
+                            let startDiffTime = calendar.diffTimeToDaily(nowDate, startYearLegalDate);
                             if (startDiffTime > 0){
                                 tipsArr.push(`⏳距离${legalName}开始放假还有${startDiffTime}天`)
                                 if (legalRepair != 0) {
@@ -234,7 +217,7 @@ module.exports = handleTimeList = () => {
                         nextSFtvDate = currentYear+1+'-'+ targetArr[0]+'-'+targetArr[1];
                     }
                     //计算差值
-                    let diffTime = diffTimeToDaily(nowDate, nextSFtvDate);
+                    let diffTime = calendar.diffTimeToDaily(nowDate, nextSFtvDate);
                     if (nowDate == nextSFtvDate) {
                         let todayDate = '<'+nowDate.split('-').join('.')+'>';
                         var obj = {todayName:sFtvName,todayDate:todayDate, todayContent:''};
@@ -271,7 +254,7 @@ module.exports = handleTimeList = () => {
                         nextlFtvSolarDate = currentYear + 1+'-'+ targetArr[1]+'-'+targetArr[2];
                     }
                     //计算差值
-                    let diffTime = diffTimeToDaily(nowDate, nextlFtvSolarDate);
+                    let diffTime = calendar.diffTimeToDaily(nowDate, nextlFtvSolarDate);
                     if (nowDate == nextlFtvSolarDate) {
                         let todayDate = '<'+nowDate.split('-').join('.')+'>';
                         var obj = {todayName:lFtvName,todayDate:todayDate, todayContent:''};
@@ -307,7 +290,7 @@ module.exports = handleTimeList = () => {
                         nextTermSolarDate = calendar.conversionTerm(currentYear+1, termMonth, termSort);
                     }
                     //计算差值
-                    let diffTime = diffTimeToDaily(nowDate, nextTermSolarDate);
+                    let diffTime = calendar.diffTimeToDaily(nowDate, nextTermSolarDate);
                     if (diffTime == 0) {
                         let todayDate = '<'+nowDate.split('-').join('.')+'>';
                         var obj = {todayName:termName,todayDate:todayDate, todayContent:''};
@@ -347,7 +330,7 @@ module.exports = handleTimeList = () => {
                         nextSpecialSolarDate = calendar.conversionParentDate(currentYear+1, specialMonth, specialWeek, specialNums);
                     }
                     //计算差值
-                    let diffTime = diffTimeToDaily(nowDate, nextSpecialSolarDate);
+                    let diffTime = calendar.diffTimeToDaily(nowDate, nextSpecialSolarDate);
                     if (nowDate == nextSpecialSolarDate) {
                         let todayDate = '<'+nowDate.split('-').join('.')+'>';
                         var obj = {todayName:specialName,todayDate:todayDate, todayContent:''};
@@ -375,7 +358,7 @@ module.exports = handleTimeList = () => {
                     let licenseDate = element.date;
                     if (new Date(nowDate) <= new Date(licenseDate)){
                         //计算差值
-                        let diffTime = diffTimeToDaily(nowDate, licenseDate);
+                        let diffTime = calendar.diffTimeToDaily(nowDate, licenseDate);
                         if (diffTime < 31){
                             let todayDate = '<'+nowDate.split('-').join('.')+'>';
                             var obj = {todayName:licenseName,todayDate:todayDate, todayContent:'即将到期了'};
@@ -388,42 +371,7 @@ module.exports = handleTimeList = () => {
                 }
             }
 
-            //季节穿衣搭配 - 阴历
-            let clothesArr = daily.clothes;
-            if(clothesArr.length > 0){
-                for (let i = 0; i < clothesArr.length; i++) {
-                    const element = clothesArr[i];
-                    let clothesName = element.name;
-                    let clothesDateArr = element.date;
-                    let clothesNum = element.num;
-                    let clothesRemark = element.remark;
-                    for (let j = 0; j < clothesDateArr.length; j++) {
-                        const clothesDate = clothesDateArr[j];
-                        let beginDate = currentYear + '-' + clothesDate;
-                        let solarBeginDate = calendar.conversion(beginDate);
-                        if (new Date(solarBeginDate) <= new Date(nowDate)) {
-                            let diffNum = sumTimeToNow(solarBeginDate, nowDate);
-                            let keepNum = clothesNum - diffNum;
-                            if (keepNum >= 0) {
-                                endClothesObj = {clothesName: clothesName, clothesRemark: clothesRemark, clothesBeginDate: solarBeginDate, keepNum: keepNum+1};
-                            }
-                        }
-                    }
-                }
-            }
-
-            //季节穿衣搭配
-            content.push(`👕穿衣推荐 \n`);
-            let clothesName = endClothesObj.clothesName;
-            let clothesRemark = endClothesObj.clothesRemark;
-            let clothesBeginDate = endClothesObj.clothesBeginDate;
-            let keepNum = endClothesObj.keepNum;
-            content.push(`· 推荐天数: `+ keepNum);
-            content.push(`· 开始时间: `+ clothesBeginDate);
-            content.push(`· 夜间睡觉: `+ clothesRemark);
-            content.push(`· 白天活动: `+ clothesName);
-
-            content.push(`\n 📆重要节日 \n`);
+            content.push(`📆重要节日 \n`);
 
             //最近的节日或今日的节日
             if(todayArr.length > 0){
