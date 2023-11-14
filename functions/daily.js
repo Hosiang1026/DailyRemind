@@ -437,7 +437,7 @@ module.exports = handleTimeList = () => {
                         let todayName = todayLicenseArr[i].todayName;
                         let todayDate = todayLicenseArr[i].todayDate;
                         let todayContent = todayLicenseArr[i].todayContent;
-                        todayTempArr.push(`* ${todayName} ${todayDate} ${todayContent}🎉`);
+                        todayTempArr.push(`* ${todayName} ${todayDate} ${todayContent} 🔊\n`);
                     }
                     todayTempArr.sort((a, b) => a.length - b.length);
                     content = content.concat(todayTempArr);
