@@ -532,7 +532,7 @@ let daily = {
     license: [//证件有效期列表
         {
             name:'SKODA车险',
-            date: '2023-12-13'
+            date: '2024-12-14'
         },
         {
             name:'SKODA年检',
