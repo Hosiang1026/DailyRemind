@@ -360,8 +360,8 @@ module.exports = handleTimeList = () => {
                         //计算差值
                         let diffTime = calendar.diffTimeToDaily(nowDate, licenseDate);
                         if (diffTime < 31){
-                            let todayDate = '<'+nowDate.split('-').join('.')+'>';
-                            var obj = {todayName:licenseName,todayDate:licenseDate, todayContent:'即将到期了'};
+                            let todayDate = '<'+licenseDate.split('-').join('.')+'>';
+                            var obj = {todayName:licenseName,todayDate:todayDate, todayContent:'即将到期了'};
                             todayLicenseArr.push(obj);
                         }else{
                             var obj = {tempName:licenseName,tempTime:diffTime};
@@ -379,7 +379,7 @@ module.exports = handleTimeList = () => {
                 for (var i = 0; i < todayArr.length; i++) {
                     let todayName = todayArr[i].todayName;
                     let todayContent = todayArr[i].todayContent;
-                    todayTempArr.push(`· 今天是${todayName} ${todayContent}🎉`);
+                    todayTempArr.push(`· 今天是${todayName} \n ${todayContent}🎉`);
                 }
                 todayTempArr.sort((a, b) => a.length - b.length);
                 content = content.concat(todayTempArr);
@@ -437,7 +437,7 @@ module.exports = handleTimeList = () => {
                         let todayName = todayLicenseArr[i].todayName;
                         let todayDate = todayLicenseArr[i].todayDate;
                         let todayContent = todayLicenseArr[i].todayContent;
-                        todayTempArr.push(`* ${todayName} ${todayDate} ${todayContent} 🔊\n`);
+                        todayTempArr.push(`* ${todayName} ${todayDate} \n ${todayContent} 🚨\n`);
                     }
                     todayTempArr.sort((a, b) => a.length - b.length);
                     content = content.concat(todayTempArr);
