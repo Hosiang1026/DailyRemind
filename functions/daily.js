@@ -361,7 +361,7 @@ module.exports = handleTimeList = () => {
                         let diffTime = calendar.diffTimeToDaily(nowDate, licenseDate);
                         if (diffTime < 31){
                             let todayDate = '<'+nowDate.split('-').join('.')+'>';
-                            var obj = {todayName:licenseName,todayDate:todayDate, todayContent:'即将到期了'};
+                            var obj = {todayName:licenseName,todayDate:licenseDate, todayContent:'即将到期了'};
                             todayLicenseArr.push(obj);
                         }else{
                             var obj = {tempName:licenseName,tempTime:diffTime};
