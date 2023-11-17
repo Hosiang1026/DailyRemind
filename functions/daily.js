@@ -420,12 +420,21 @@ module.exports = handleTimeList = () => {
 
             //输出内容按长度排序
             if(contentArr.length > 0) {
-                let tempContentArr = [];
-                for (var i = 0; i < contentArr.length; i++) {
-                    tempContentArr.push(contentArr[i]);
+                for (var i = 0; i < contentArr.length - 1; i++) {
+                    // 内层循环,控制比较的次数，并且判断两个数的大小
+                    for (var j = 0; j < contentArr.length - 1 - i; j++) {
+                        // 如果前面的数大，放到后面(当然是从小到大的冒泡排序)
+                        if (contentArr[j].length > contentArr[j + 1].length) {
+                            var temp = contentArr[j];
+                            contentArr[j] = contentArr[j + 1];
+                            contentArr[j + 1] = temp;
+                        }
+                    }
                 }
-                tempContentArr.sort((a, b) => a.length - b.length);
-                content = content.concat(tempContentArr);
+
+                for (var i = 0; i < contentArr.length; i++) {
+                    content.push(contentArr[i]);
+                }
             }
 
             //证件有效期
@@ -456,10 +465,10 @@ module.exports = handleTimeList = () => {
                 content.push(loveContent);
                 if (Math.floor(Math.random() * 10) % 2 == 0) {
                     const res = await axios.get('https://api.shadiao.pro/chp')
-                    content.push(`\n💘${res.data.data.text}`)
+                    content.push(`💘${res.data.data.text}`)
                 }else{
                     const res = await axios.get('https://api.vvhan.com/api/sao?type=json')
-                    content.push(`\n💘${res.data.ishan}`)
+                    content.push(`💘${res.data.ishan}`)
                 }
             }
 
