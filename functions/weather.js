@@ -192,9 +192,9 @@ module.exports = handleWeather = () => {
 			let clothesBeginDate = endClothesObj.clothesBeginDate;
 			let keepNum = endClothesObj.keepNum;
 			weatherCityContent.push(`· 推荐时间: `+ keepNum + `天`);
-			weatherCityContent.push(`· 开始日期: `+ clothesBeginDate);
 			weatherCityContent.push(`· 夜间睡觉: `+ clothesRemark);
 			weatherCityContent.push(`· 白天活动: `+ clothesName);
+			weatherCityContent.push(`· 开始日期: `+ clothesBeginDate);
 
 			/*if(baseCityCodeArr.length > 0) {
 				if (allBrellaFlag){
