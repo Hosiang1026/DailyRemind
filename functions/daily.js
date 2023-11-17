@@ -75,7 +75,7 @@ module.exports = handleTimeList = () => {
                         }
                         if (anniversaryType == 3) {
                             //获取生日星座
-                            let anniversaryAstro = calendar.conversionAstro(anniversaryDate);
+                            let anniversaryAstro = lunarDate.astro;
                             let todayDate = '<'+anniversaryDate.split('-').join('.')+'>';
                             let todayAge = currentYear - anniversaryYear;
                             let todayContent = todayAge + '岁' + anniversaryAstro + todayDate;
