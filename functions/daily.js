@@ -420,21 +420,12 @@ module.exports = handleTimeList = () => {
 
             //输出内容按长度排序
             if(contentArr.length > 0) {
-                for (var i = 0; i < contentArr.length - 1; i++) {
-                    // 内层循环,控制比较的次数，并且判断两个数的大小
-                    for (var j = 0; j < contentArr.length - 1 - i; j++) {
-                        // 如果前面的数大，放到后面(当然是从小到大的冒泡排序)
-                        if (contentArr[j].length > contentArr[j + 1].length) {
-                            var temp = contentArr[j];
-                            contentArr[j] = contentArr[j + 1];
-                            contentArr[j + 1] = temp;
-                        }
-                    }
-                }
-
+                let tempContentArr = [];
                 for (var i = 0; i < contentArr.length; i++) {
-                    content.push(contentArr[i]);
+                    tempContentArr.push(contentArr[i]);
                 }
+                tempContentArr.sort((a, b) => calendar.getTextLength(a) - calendar.getTextLength(b));
+                content = content.concat(tempContentArr);
             }
 
             //证件有效期

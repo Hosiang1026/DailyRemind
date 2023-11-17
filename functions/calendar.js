@@ -932,6 +932,20 @@ calendar.diffTimeToDaily = function(nowTime, targetTime){
     return formatTimeDiff
 }
 
+//获取包含中文的字符串字节长度
+calendar.getTextLength = function(str){
+    var length = 0;
+    for(var i=0;i<str.length;i++){
+        var code = str.charCodeAt(i);
+        if(code >= 0 && code <= 127){
+            length++;
+        }else{
+            length+=2;
+        }
+    }
+    return length;
+}
+
 if (typeof define === 'function'){
     define (function (){
         return calendar;
