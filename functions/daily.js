@@ -361,11 +361,10 @@ module.exports = handleTimeList = () => {
                         let diffTime = calendar.diffTimeToDaily(nowDate, licenseDate);
                         if (diffTime < 31){
                             let todayDate = '<'+licenseDate.split('-').join('.')+'>';
-                            var obj = {todayName:licenseName,todayDate:todayDate, todayContent:'即将到期了'};
-                            todayLicenseArr.push(obj);
+                            //var obj = {todayName:licenseName,todayDate:todayDate, todayContent:'即将到期了'};
+                            todayLicenseArr.push(`* ${licenseName} ${todayDate} \n 即将到期了 🚨\n`);
                         }else{
-                            var obj = {tempName:licenseName,tempTime:diffTime};
-                            endLicenseArr.push(obj);
+                            endLicenseArr.push(`· ${licenseName}: 还有${diffTime}天`);
                         }
                     }
                 }
@@ -432,22 +431,12 @@ module.exports = handleTimeList = () => {
             if(todayArr.length == 0){
                 content.push(`\n 💳证件有效期 \n`);
                 if (todayLicenseArr.length > 0) {
-                    let todayTempArr = [];
-                    for (var i = 0; i < todayLicenseArr.length; i++) {
-                        let todayName = todayLicenseArr[i].todayName;
-                        let todayDate = todayLicenseArr[i].todayDate;
-                        let todayContent = todayLicenseArr[i].todayContent;
-                        todayTempArr.push(`* ${todayName} ${todayDate} \n ${todayContent} 🚨\n`);
-                    }
-                    todayTempArr.sort((a, b) => calendar.getTextLength(a) - calendar.getTextLength(b));
-                    content = content.concat(todayTempArr);
+                    todayLicenseArr.sort((a, b) => calendar.getTextLength(a) - calendar.getTextLength(b));
+                    content = content.concat(todayLicenseArr);
                 }
                 if(endLicenseArr.length > 0) {
-                    for (var j = 0; j < endLicenseArr.length; j++) {
-                        let tempName = endLicenseArr[j].tempName;
-                        let tempTime = endLicenseArr[j].tempTime;
-                        content.push(`· ${tempName}: 还有${tempTime}天`);
-                    }
+                    endLicenseArr.sort((a, b) => calendar.getTextLength(a) - calendar.getTextLength(b));
+                    content = content.concat(endLicenseArr);
                 }
             }
 
