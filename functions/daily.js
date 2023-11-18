@@ -439,7 +439,7 @@ module.exports = handleTimeList = () => {
                         let todayContent = todayLicenseArr[i].todayContent;
                         todayTempArr.push(`* ${todayName} ${todayDate} \n ${todayContent} 🚨\n`);
                     }
-                    todayTempArr.sort((a, b) => a.length - b.length);
+                    todayTempArr.sort((a, b) => calendar.getTextLength(a) - calendar.getTextLength(b));
                     content = content.concat(todayTempArr);
                 }
                 if(endLicenseArr.length > 0) {
