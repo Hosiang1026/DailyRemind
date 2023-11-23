@@ -583,11 +583,12 @@ let end = {
 let classTable = {
     open: true,//是否需要推送时增加课表，需要填true，否则填false  （不需要加引号）
     graduate: '2024-07-10',
-    homework: 0, // homework: 0,
+    homework: '2023-12-15', // homework: 0,
     computer: [//22春计算机本-课程列表
         {
             name: '学士学位英语',//课程名称
             teacher: '陈仙柱',//辅导老师
+            //exam: 0,
             exam: {
                 type: 2, //考试方式 1:纸质闭卷 2:上机闭卷
                 date: '2024-05-28',
@@ -619,7 +620,12 @@ let classTable = {
         {
             name: '计算机网络',//课程名称
             teacher: '蒋融融',//辅导老师
-            exam: 0,
+            exam: {
+                type: 1, //考试方式 1:纸质闭卷 2:上机闭卷
+                date: '2024-01-12',
+                time: '09:00 - 11:00',//考试时间
+                place: '浙江开放大学'//考试地点
+            },
             classList: [
                 {
                     type: 2, //教学方式 1:钉钉直播 2:线下教室
@@ -657,7 +663,12 @@ let classTable = {
         {
             name: '数据库应用技术',//课程名称
             teacher: '刘旭东',//辅导老师
-            exam: 0,
+            exam: {
+                type: 2, //考试方式 1:纸质闭卷 2:上机闭卷
+                date: '2024-05-28',
+                time: '09:00 - 11:00',//考试时间
+                place: '浙江开放大学'//考试地点
+            },
             classList: [
                 {
                     type: 2, //教学方式 1:钉钉直播 2:线下教室
