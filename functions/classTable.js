@@ -233,7 +233,7 @@ const classFunction = {
                     }
                 }
                 if (homeworkArr.length > 0) {
-                    content.push(`\n📝形考倒计时: ${homeworkArr.join('\n')}`)
+                    content.push(`\n📝形考作业倒计时: ${homeworkArr.join('\n')}`)
                 }
 
                 let graduateDate = classTable.graduate;
