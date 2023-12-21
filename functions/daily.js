@@ -166,9 +166,9 @@ module.exports = handleTimeList = () => {
                             }
 
                             if (legalHolidayNum > 2){
-                                tipsArr.push(`⛱放假${legalHolidayNum}天: ${startLegalHoliday} ~ ${endLegalHoliday}\n`)
+                                tipsArr.push(`⛱假期${legalHolidayNum}天: ${startLegalHoliday} ~ ${endLegalHoliday}\n`)
                             }else{
-                                tipsArr.push(`⛱放假${legalHolidayNum}天: ${legalHoliday.join('、')}\n`)
+                                tipsArr.push(`⛱假期${legalHolidayNum}天: ${legalHoliday.join('、')}\n`)
                             }
                         } else {
                             startYearLegalDate = currentYearBar + startLegalHoliday;
@@ -188,9 +188,9 @@ module.exports = handleTimeList = () => {
                                 }
                                 let legalHolidayNum = legalHoliday.length;
                                 if (legalHolidayNum > 2){
-                                    tipsArr.push(`⛱放假${legalHolidayNum}天: ${startLegalHoliday} ~ ${endLegalHoliday}\n`)
+                                    tipsArr.push(`⛱假期${legalHolidayNum}天: ${startLegalHoliday} ~ ${endLegalHoliday}\n`)
                                 }else{
-                                    tipsArr.push(`⛱放假${legalHolidayNum}天: ${legalHoliday.join('、')}\n`)
+                                    tipsArr.push(`⛱假期${legalHolidayNum}天: ${legalHoliday.join('、')}\n`)
                                 }
                             }
                         }
