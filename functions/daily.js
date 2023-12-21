@@ -23,7 +23,7 @@ module.exports = handleTimeList = () => {
             let currentYear = date.getFullYear();
             let currentMonth = date.getMonth();
             let currentDate = date.getDate();
-            let firstDate = calendar.conversion(`${(currentYear-1)}` +'-12-30');
+            let firstDate = calendar.conversion(`${(currentYear)}` +'-01-01');
             let nowDate = `${currentYear}-${(currentMonth + 1) < 10 ? '0' + (currentMonth + 1) : (currentMonth + 1)}-${(currentDate) < 10 ? '0' + (currentDate) : (currentDate)}`
 
             let yearDiffTime = calendar.sumTimeToNow(firstDate, nowDate)+1;
