@@ -284,7 +284,12 @@ module.exports = handleTimeList = () => {
                     let termSort = element.sort;
                     let termName = element.name;
                     let termMonth = element.month;
-                    let termSolarDate = calendar.conversionTerm(currentYear, termMonth, termSort);
+                    let termSolarDate;
+                    if(termSort < 23){
+                        termSolarDate = calendar.conversionTerm(currentYear, termMonth, termSort);
+                    }else{
+                        termSolarDate = calendar.conversionTerm(currentYear+1, termMonth, termSort);
+                    }
                     let nextTermSolarDate = termSolarDate;
                     if (new Date(nowDate) > new Date(nextTermSolarDate)){
                         nextTermSolarDate = calendar.conversionTerm(currentYear+1, termMonth, termSort);
