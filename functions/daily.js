@@ -284,11 +284,13 @@ module.exports = handleTimeList = () => {
                     let termSort = element.sort;
                     let termName = element.name;
                     let termMonth = element.month;
-                    let termSolarDate;
-                    if(termSort < 23){
-                        termSolarDate = calendar.conversionTerm(currentYear, termMonth, termSort);
-                    }else{
-                        termSolarDate = calendar.conversionTerm(currentYear+1, termMonth, termSort);
+                    let termSolarDate = calendar.conversionTerm(currentYear+1, termMonth, termSort);
+                    if(termSort == 23 || termSort == 24){
+                        if(currentMonth == 11||currentMonth == 12){
+                            termSolarDate = calendar.conversionTerm(currentYear+1, termMonth, termSort);
+                        }else{
+                            termSolarDate = calendar.conversionTerm(currentYear, termMonth, termSort);
+                        }
                     }
                     let nextTermSolarDate = termSolarDate;
                     if (new Date(nowDate) > new Date(nextTermSolarDate)){
