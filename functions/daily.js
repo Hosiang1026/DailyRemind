@@ -172,9 +172,6 @@ module.exports = handleTimeList = () => {
                             }
                         } else {
                             startYearLegalDate = currentYearBar + startLegalHoliday;
-                            if (new Date(nowDate) > new Date(startYearLegalDate)) {
-                                startYearLegalDate = currentYear + 1 + '-' + startLegalHoliday;
-                            }
                             endYearLegalDate = currentYearBar + endLegalHoliday;
                             if (new Date(nowDate) > new Date(endYearLegalDate)) {
                                 endYearLegalDate = currentYear + 1 + '-' + endLegalHoliday;
