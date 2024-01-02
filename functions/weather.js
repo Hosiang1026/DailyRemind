@@ -172,6 +172,19 @@ module.exports = handleWeather = () => {
 					let clothesRemark = element.remark;
 					for (let j = 0; j < clothesDateArr.length; j++) {
 						const clothesDate = clothesDateArr[j];
+						let beginDate = currentYear-1 + '-' + clothesDate;
+						let solarBeginDate = calendar.conversion(beginDate);
+						if (new Date(solarBeginDate) <= new Date(nowDateStr)) {
+							let diffNum = calendar.sumTimeToNow(solarBeginDate, nowDateStr);
+							let keepNum = clothesNum - diffNum;
+							if (keepNum >= 0) {
+								endClothesObj = {clothesName: clothesName, clothesRemark: clothesRemark, clothesBeginDate: solarBeginDate, keepNum: keepNum+1};
+							}
+						}
+					}
+
+					for (let j = 0; j < clothesDateArr.length; j++) {
+						const clothesDate = clothesDateArr[j];
 						let beginDate = currentYear + '-' + clothesDate;
 						let solarBeginDate = calendar.conversion(beginDate);
 						if (new Date(solarBeginDate) <= new Date(nowDateStr)) {
