@@ -28,25 +28,31 @@ module.exports = handleTimeList = () => {
             let FinlFtvSolarDate;
 
             //往前推两年
-            let lFtvYearPre2Date = currentYear-2 + '-' + '01-01';
+            let lFtvYearPre2Date = currentYear-2 + '-' + '12-30';
             let lFtvSolarPre2Date = calendar.conversion(lFtvYearPre2Date);
 
             //上一年
-            let lFtvYearPreDate = currentYear-1 + '-' + '01-01';
+            let lFtvYearPreDate = currentYear-1 + '-' + '12-30';
             let lFtvSolarPreDate = calendar.conversion(lFtvYearPreDate);
 
             //本年
-            let lFtvYearDate = currentYear + '-' + '01-01';
+            let lFtvYearDate = currentYear + '-' + '12-30';
             let lFtvSolarDate = calendar.conversion(lFtvYearDate);
 
-            //获取已经过完的春节
-            if(new Date(lFtvSolarPre2Date) < new Date(lFtvSolarPreDate) && date >= new Date(lFtvSolarPre2Date)){
+            //当前时间>往前推两年的春节 并且 <=上一年的春节
+            if(date > new Date(lFtvSolarPre2Date)&&date <= new Date(lFtvSolarPreDate)){
+                //获取刚过完的春节
                 FinlFtvSolarDate = lFtvSolarPre2Date;
-            }else{
+            }
+            //当前时间>上一年的春节 并且 <=本年的春节
+            if(date > new Date(lFtvSolarPreDate)&&date <= new Date(lFtvSolarDate)){
+                //获取刚过完的春节
                 FinlFtvSolarDate = lFtvSolarPreDate;
             }
-            if(new Date(lFtvSolarPreDate) < new Date(lFtvSolarDate) && date >= new Date(lFtvSolarPreDate)){
-                FinlFtvSolarDate = lFtvSolarPreDate;
+            //当前时间>本年的春节 并且 <=下一年的春节
+            if(date > new Date(lFtvSolarDate)&&date <= new Date(lFtvSolarNextDate)){
+                //获取刚过完的春节
+                FinlFtvSolarDate = lFtvSolarDate;
             }
 
             //计算差值
