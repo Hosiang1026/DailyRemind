@@ -39,6 +39,10 @@ module.exports = handleTimeList = () => {
             let lFtvYearDate = currentYear + '-' + '12-30';
             let lFtvSolarDate = calendar.conversion(lFtvYearDate);
 
+            //下一年的春节2025
+            let lFtvYearNextDate = currentYear+1 + '-' + '12-30';
+            let lFtvSolarNextDate = calendar.conversion(lFtvYearNextDate);
+
             //当前时间>往前推两年的春节 并且 <=上一年的春节
             if(date > new Date(lFtvSolarPre2Date)&&date <= new Date(lFtvSolarPreDate)){
                 //获取刚过完的春节
