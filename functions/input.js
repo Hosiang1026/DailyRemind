@@ -567,6 +567,10 @@ let daily = {
         {
             name:'Howe驾驶证',
             date: '2024-09-07'
+        },
+        {
+            name:'Howe居住证',
+            date: '2024-05-20'
         }
     ]
 }
