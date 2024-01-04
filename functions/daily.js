@@ -28,15 +28,15 @@ module.exports = handleTimeList = () => {
             let FinlFtvSolarDate;
 
             //往前推两年
-            let lFtvYearPre2Date = currentYear-2 + '-' + '12-30';
+            let lFtvYearPre2Date = currentYear-2 + '-' + '01-01';
             let lFtvSolarPre2Date = calendar.conversion(lFtvYearPre2Date);
 
             //上一年
-            let lFtvYearPreDate = currentYear-1 + '-' + '12-30';
+            let lFtvYearPreDate = currentYear-1 + '-' + '01-01';
             let lFtvSolarPreDate = calendar.conversion(lFtvYearPreDate);
 
             //本年
-            let lFtvYearDate = currentYear + '-' + '12-30';
+            let lFtvYearDate = currentYear + '-' + '01-01';
             let lFtvSolarDate = calendar.conversion(lFtvYearDate);
 
             //获取已经过完的春节
@@ -76,7 +76,7 @@ module.exports = handleTimeList = () => {
                     let anniversaryYear = targetArr[0];
                     let anniversaryMonth = targetArr[1];
                     let anniversaryDay = targetArr[2];
-                    let nextAnniversaryDate = currentYear+'-'+ anniversaryMonth+'-'+anniversaryDay;
+                    let nextAnniversaryDate = currentYear-1 +'-'+ anniversaryMonth+'-'+anniversaryDay;
                     //阴历转阳历
                     if (anniversaryType == 2 || anniversaryType == 3) {
                         nextAnniversaryDate = calendar.conversion(nextAnniversaryDate);
@@ -267,7 +267,7 @@ module.exports = handleTimeList = () => {
                     const element = lFtvArr[i];
                     let lFtvName = element.name;
                     let lFtvDate = element.date;
-                    let lFtvYearDate = currentYear + '-' + lFtvDate;
+                    let lFtvYearDate = currentYear-1 + '-' + lFtvDate;
                     let lFtvSolarDate = calendar.conversion(lFtvYearDate);
                     let targetArr = lFtvSolarDate.split('-');
                     let nextlFtvSolarDate = lFtvSolarDate;
