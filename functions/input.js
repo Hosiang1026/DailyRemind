@@ -32,7 +32,7 @@ let news = {
 //天气模块
 let weather = {
     open: true, //是否需要推送天气，需要填true，否则填false （不需要加引号，填了false的话下面天气有关的配置项就不用填了）
-	key: 'd8045d9dd3eb0db5dc3f2a807a6a64e0', //这里输入天气申请到的key
+	key: 'd5b029e10a22ed366640b200ad1207fa', //这里输入天气申请到的key
     //工作日推送实况天气
     //城市编码, 滨江区330108 西湖区330106 余杭区330110
     //城市编码, 吴兴区330502 枞阳县340722，怀宁县340822 鼓楼区350102
@@ -200,16 +200,16 @@ let daily = {
             date: '1972-01-12',
             type: 3
         },
-        {
-            name: 'Father生日',
-            date: '1969-11-23',
-            type: 3
-        },
         //{
-            //name: 'Grandfather生日',
-            //date: '1948-11-23',
+            //name: 'Father生日',
+            //date: '1969-11-23',
             //type: 3
         //},
+        {
+            name: 'Grandfather生日',
+            date: '1948-11-23',
+            type: 3
+        },
         {
             name: 'Mother生日',
             date: '1971-02-03',
