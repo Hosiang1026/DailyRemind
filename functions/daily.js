@@ -324,24 +324,24 @@ module.exports = handleTimeList = () => {
                         }
                     }
                     let nextTermSolarDate = termSolarDate;
-                    if (new Date(nowDate) > new Date(nextTermSolarDate)){
-                        nextTermSolarDate = calendar.conversionTerm(preCurrentYear+1, termMonth, termSort);
-                    }
+
                     //计算差值
-                    let diffTime = calendar.diffTimeToDaily(nowDate, nextTermSolarDate);
-                    if (diffTime == 0) {
-                        let todayDate = '<'+nowDate.split('-').join('.')+'>';
-                        var obj = {todayName:termName,todayDate:todayDate, todayContent:''};
-                        todayArr.push(obj);
-                    }else{
-                        if (tempTime == 0){
-                            tempSort = termSort;
-                            tempName = termName;
-                            tempTime = diffTime;
-                        }else if (diffTime < tempTime){
-                            tempSort = termSort;
-                            tempName = termName;
-                            tempTime = diffTime;
+                    if (new Date(nowDate) < new Date(nextTermSolarDate)){
+                        let diffTime = calendar.diffTimeToDaily(nowDate, nextTermSolarDate);
+                        if (diffTime == 0) {
+                            let todayDate = '<'+nowDate.split('-').join('.')+'>';
+                            var obj = {todayName:termName,todayDate:todayDate, todayContent:''};
+                            todayArr.push(obj);
+                        }else{
+                            if (tempTime == 0){
+                                tempSort = termSort;
+                                tempName = termName;
+                                tempTime = diffTime;
+                            }else if (diffTime < tempTime){
+                                tempSort = termSort;
+                                tempName = termName;
+                                tempTime = diffTime;
+                            }
                         }
                     }
                 }
