@@ -23,45 +23,10 @@ module.exports = handleTimeList = () => {
             let currentYear = date.getFullYear();
             let currentMonth = date.getMonth();
             let currentDate = date.getDate();
+            let firstDate = calendar.conversion(`${(currentYear)}` +'-01-01');
             let nowDate = `${currentYear}-${(currentMonth + 1) < 10 ? '0' + (currentMonth + 1) : (currentMonth + 1)}-${(currentDate) < 10 ? '0' + (currentDate) : (currentDate)}`
 
-            let FinlFtvSolarDate;
-
-            //往前推两年
-            let lFtvYearPre2Date = currentYear-2 + '-' + '12-30';
-            let lFtvSolarPre2Date = calendar.conversion(lFtvYearPre2Date);
-
-            //上一年
-            let lFtvYearPreDate = currentYear-1 + '-' + '12-30';
-            let lFtvSolarPreDate = calendar.conversion(lFtvYearPreDate);
-
-            //本年
-            let lFtvYearDate = currentYear + '-' + '12-30';
-            let lFtvSolarDate = calendar.conversion(lFtvYearDate);
-
-            //下一年的春节2025
-            let lFtvYearNextDate = currentYear+1 + '-' + '12-30';
-            let lFtvSolarNextDate = calendar.conversion(lFtvYearNextDate);
-
-            //当前时间>往前推两年的春节 并且 <=上一年的春节
-            if(date > new Date(lFtvSolarPre2Date)&&date <= new Date(lFtvSolarPreDate)){
-                //获取刚过完的春节
-                FinlFtvSolarDate = lFtvSolarPre2Date;
-            }
-            //当前时间>上一年的春节 并且 <=本年的春节
-            if(date > new Date(lFtvSolarPreDate)&&date <= new Date(lFtvSolarDate)){
-                //获取刚过完的春节
-                FinlFtvSolarDate = lFtvSolarPreDate;
-            }
-            //当前时间>本年的春节 并且 <=下一年的春节
-            if(date > new Date(lFtvSolarDate)&&date <= new Date(lFtvSolarNextDate)){
-                //获取刚过完的春节
-                FinlFtvSolarDate = lFtvSolarDate;
-            }
-
-            //计算差值
-            let yearDiffTime = calendar.diffTimeToDaily(nowDate, FinlFtvSolarDate);
-
+            let yearDiffTime = calendar.sumTimeToNow(firstDate, nowDate)+1;
             let lunarDate = calendar.solar2lunar();
             let lunarDateStr = lunarDate.Animal +'年' +'•'+ lunarDate.gzYear +'年'+ lunarDate.IMonthCn + lunarDate.IDayCn + ' 第' + yearDiffTime + '天' ;
             content.push(`${nowDate} ${lunarDate.ncWeek} ${lunarDate.astro} \n${lunarDateStr}\n`);
