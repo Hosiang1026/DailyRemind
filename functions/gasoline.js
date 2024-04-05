@@ -1,12 +1,14 @@
 const { gasoline } = require('./input')
-const axios = require('axios')
+const axios = require('axios');
+const cheerio = require('cheerio');
+//内容数组
+let content = [];
 
 //汽油价格API: https://api.help.bj.cn/apis/youjia/
 module.exports = handleGasoline = () => {
+    fetchContent(`http://www.qiyoujiage.com`);
     return new Promise(async (resolve, reject) => {
         try {
-            //内容数组
-            let content = []
             const provinceArr = gasoline.province;
             const modelArr = gasoline.model;
             if (provinceArr.length == 0 || modelArr.length == 0){
@@ -15,7 +17,7 @@ module.exports = handleGasoline = () => {
             }else{
                 content.push(`⛽今日油价 `)
             }
-            const gasolineReq = axios(`https://api.help.bj.cn/apis/youjia/`)
+            const gasolineReq = axios(`http://api.help.bj.cn/apis/youjia/`)
             const gasolineRes = await gasolineReq
             if (gasolineRes.status == 200) {
                 const gasolineArr = gasolineRes.data.data;
@@ -53,8 +55,9 @@ module.exports = handleGasoline = () => {
                     }
                }
             }
+
             console.log('获取汽油价格成功', content);
-            resolve(content.join('\n'))
+             resolve(content.join('\n'))
             } else {
             reject(weatherRes.weatherinfo)
             }
@@ -64,4 +67,19 @@ module.exports = handleGasoline = () => {
             reject(error.message || error)
         }
     })
+
+    async function fetchContent(url) {
+        try {
+            const { data } = await axios.get(url);
+            const $ = cheerio.load(data);
+            //选择id为"left"的div下的第一个div
+            const firstDiv = $('#left > div:first-child');
+            //使用text()获取文本内容，并通过replace()去除document.writeln部分
+            const textContent = firstDiv.text().replace(/document\.writeln\(.*?\);?/, '');
+            console.log(textContent);
+            content.push(textContent);
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
+    }
 }
