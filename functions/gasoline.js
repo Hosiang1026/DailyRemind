@@ -79,7 +79,7 @@ module.exports = handleGasoline = () => {
             // 使用.split()分割字符串，保留split之前的部分
             const splitIndex = textContent.split('document.writeln').shift().lastIndexOf('');
             if (splitIndex >= 0) {
-                textContent = textContent.substring(0, splitIndex);
+                textContent = textContent.substring(0, splitIndex-1);
             }
             content.push(textContent);
         } catch (error) {
