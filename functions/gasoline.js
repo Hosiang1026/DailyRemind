@@ -74,8 +74,13 @@ module.exports = handleGasoline = () => {
             const $ = cheerio.load(data);
             //选择id为"left"的div下的第一个div
             const firstDiv = $('#left > div:first-child');
-            //使用text()获取文本内容，并通过replace()去除document.writeln部分
-            const textContent = firstDiv.text().replace(/document\.writeln\(.*?\);?/, '');
+            // 使用text()获取文本内容，不包括子元素的HTML
+            let textContent = firstDiv.text();
+            // 使用.split()分割字符串，保留split之前的部分
+            const splitIndex = textContent.split('document.writeln').shift().lastIndexOf('');
+            if (splitIndex >= 0) {
+                textContent = textContent.substring(0, splitIndex);
+            }
             console.log(textContent);
             content.push(textContent);
         } catch (error) {
