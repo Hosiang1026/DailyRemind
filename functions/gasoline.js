@@ -55,9 +55,9 @@ module.exports = handleGasoline = () => {
                     }
                }
             }
-            content.push(textContent);
+            content.push('\n'+textContent);
             console.log('获取汽油价格成功', content);
-             resolve(content.join('\n'))
+            resolve(content.join('\n'))
             } else {
             reject(weatherRes.weatherinfo)
             }
