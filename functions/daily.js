@@ -92,7 +92,7 @@ module.exports = handleTimeList = () => {
                     if (anniversaryType == 0) {
                         //计算累计值
                         let sumTime = calendar.sumTimeToNow(anniversaryDate, nowDate);
-                        loveContent = `\n❤我们在一起恋爱: 已经${sumTime}天`;
+                        loveContent = `\n💘我们在一起恋爱: 已经${sumTime}天`;
                     }
 
                     if (anniversaryType == 1) {
@@ -481,13 +481,13 @@ module.exports = handleTimeList = () => {
             //累计恋爱天数
             if(todayArr.length == 0) {
                 content.push(loveContent);
-                if (Math.floor(Math.random() * 10) % 2 == 0) {
+                /*if (Math.floor(Math.random() * 10) % 2 == 0) {
                     const res = await axios.get('https://api.shadiao.pro/chp')
                     content.push(`💘${res.data.data.text}`)
                 }else{
                     const res = await axios.get('https://api.vvhan.com/api/sao?type=json')
                     content.push(`💘${res.data.ishan}`)
-                }
+                }*/
             }
 
             console.log('获取重要节日成功\n', content.join('\n'));

@@ -81,7 +81,6 @@ module.exports = handleGasoline = () => {
             if (splitIndex >= 0) {
                 textContent = textContent.substring(0, splitIndex);
             }
-            console.log(textContent);
             content.push(textContent);
         } catch (error) {
             console.error('An error occurred:', error);
