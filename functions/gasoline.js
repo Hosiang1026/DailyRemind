@@ -46,7 +46,7 @@ module.exports = handleGasoline = () => {
                                 content.push(`· ${keyName.model92} : ${dataArr[1]}`);
                             }
                             if (keyName.model95 == modelArr[k]){
-                                content.push(`· ${keyName.model95} : ${dataArr[2]}`);
+                                content.push(`· ${keyName.model95} : ${dataArr[2]}🚩`);
                             }
                             if (keyName.model98 == modelArr[k]){
                                 content.push(`· ${keyName.model98} : ${dataArr[3]}`);
