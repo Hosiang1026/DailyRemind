@@ -51,7 +51,7 @@ module.exports = handleTimeList = () => {
                     let anniversaryYear = targetArr[0];
                     let anniversaryMonth = targetArr[1];
                     let anniversaryDay = targetArr[2];
-                    let nextAnniversaryDate = currentYear-1 +'-'+ anniversaryMonth+'-'+anniversaryDay;
+                    let nextAnniversaryDate = currentYear +'-'+ anniversaryMonth+'-'+anniversaryDay;
                     //阴历转阳历
                     if (anniversaryType == 2 || anniversaryType == 3) {
                         nextAnniversaryDate = calendar.conversion(nextAnniversaryDate);
@@ -112,7 +112,7 @@ module.exports = handleTimeList = () => {
                 }
 
                 var obj = {tempName:tempName,tempTime:tempTime};
-                //latelyArr.push(obj);
+                latelyArr.push(obj);
             }
 
             //法定节假日
@@ -247,8 +247,9 @@ module.exports = handleTimeList = () => {
                     let targetArr = lFtvSolarDate.split('-');
                     let nextlFtvSolarDate = lFtvSolarDate;
                     if (new Date(nowDate) > new Date(nextlFtvSolarDate)){
-                        nextlFtvSolarDate = currentYear + 1+'-'+ targetArr[1]+'-'+targetArr[2];
+                        nextlFtvSolarDate = currentYear +'-'+ targetArr[1]+'-'+targetArr[2];
                     }
+
                     //计算差值
                     let diffTime = calendar.diffTimeToDaily(nowDate, nextlFtvSolarDate);
                     if (nowDate == nextlFtvSolarDate) {
