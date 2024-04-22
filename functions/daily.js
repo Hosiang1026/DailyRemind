@@ -92,7 +92,7 @@ module.exports = handleTimeList = () => {
                     if (anniversaryType == 0) {
                         //计算累计值
                         let sumTime = calendar.sumTimeToNow(anniversaryDate, nowDate);
-                        loveContent = `\n💘我们在一起恋爱: 已经${sumTime}天`;
+                        loveContent = `\n💘我们在一起恋爱: ${sumTime}天`;
                     }
 
                     if (anniversaryType == 1) {
