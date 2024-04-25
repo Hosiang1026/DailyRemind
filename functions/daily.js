@@ -14,61 +14,43 @@ module.exports = handleTimeList = () => {
             let latelyArr = []
             let tipsArr = []
             let loveContent;
-
             let todayLicenseArr = []
             let endLicenseArr = []
 
             //把今日日期转为YYYY-MM-DD的格式 第一天
-            let date = new Date();
+            let date = new Date("2025-01-15");
             let currentYear = date.getFullYear();
             let currentMonth = date.getMonth();
             let currentDate = date.getDate();
             let nowDate = `${currentYear}-${(currentMonth + 1) < 10 ? '0' + (currentMonth + 1) : (currentMonth + 1)}-${(currentDate) < 10 ? '0' + (currentDate) : (currentDate)}`
 
-            //N+1年 - 获取数据
-            let next2FestivalDate = (currentYear+1) + '-' + '12-30';
-            let next2FestivalSolarDate = calendar.conversion(next2FestivalDate);
-
-            //N年 - 获取数据
-            let nextFestivalDate = currentYear + '-' + '12-30';
-            let nextFestivalSolarDate = calendar.conversion(nextFestivalDate);
-
             //N-1年 - 获取数据
-            let curlFtvYearDate = (currentYear-1) + '-' + '12-30';
-            let curFestivalSolarDate = calendar.conversion(curlFtvYearDate);
+            let preFestivalDate = (currentYear-1) + '-' + '12-30';
+            let preFestivalSolarDate = calendar.conversion(preFestivalDate);
 
             //N-2年 - 获取数据
-            let prelFtvYearDate = (currentYear-2) + '-' + '12-30';
-            let preFestivalSolarDate = calendar.conversion(prelFtvYearDate);
+            let pre2FestivalDate = (currentYear-2) + '-' + '12-30';
+            let pre2FestivalSolarDate = calendar.conversion(pre2FestivalDate);
 
             //N-3年 - 获取数据
-            let pre2lFtvYearDate = (currentYear-3) + '-' + '12-30';
-            let pre2FestivalSolarDate = calendar.conversion(pre2lFtvYearDate);
-
-            //N+1年 -> N年
-            let newlFtvYearDate = next2FestivalSolarDate;
-            let oldlFtvYearDate = nextFestivalSolarDate;
+            let pre3FestivalDate = (currentYear-3) + '-' + '12-30';
+            let pre3FestivalSolarDate = calendar.conversion(pre3FestivalDate);
 
             //N年 -> N-1年
-            if (new Date(nowDate) <= new Date(nextFestivalSolarDate)){
-                newlFtvYearDate = nextFestivalSolarDate;
-                oldlFtvYearDate = curFestivalSolarDate;
-            }
+            let oldlFtvYearDate = preFestivalSolarDate;
+
             //N-1年 -> N-2年
-            if (new Date(nowDate) <= new Date(curFestivalSolarDate)){
-                newlFtvYearDate = curFestivalSolarDate;
-                oldlFtvYearDate = preFestivalSolarDate;
+            if (new Date(nowDate) <= new Date(preFestivalSolarDate)){
+                oldlFtvYearDate = pre2FestivalSolarDate;
             }
 
             //N-2年 -> N-3年
-            if (new Date(nowDate) <= new Date(prelFtvYearDate)){
-                newlFtvYearDate = prelFtvYearDate;
-                oldlFtvYearDate = pre2FestivalSolarDate;
+            if (new Date(nowDate) <= new Date(pre2FestivalSolarDate)){
+                oldlFtvYearDate = pre3FestivalSolarDate;
             }
 
             //计算差值
             let yearDiffTime = calendar.diffTimeToDaily(nowDate, oldlFtvYearDate);
-            let diffTime = calendar.diffTimeToDaily(nowDate, newlFtvYearDate);
 
             let lunarDate = calendar.solar2lunar();
             let lunarDateStr = lunarDate.gzYear + lunarDate.Animal +'年' + lunarDate.IMonthCn + lunarDate.IDayCn + ' 第' + yearDiffTime + '天' ;
@@ -77,9 +59,8 @@ module.exports = handleTimeList = () => {
             //type: 0 为累计周年(阳历)
             //type: 1 为倒计周年(阳历)
             //type: 2 为倒计周年(阴历)
-            //type: 3 为倒计天数(阴历)
 
-            //纪念日/生日
+            //纪念日
             let anniversaryArr = daily.anniversary;
             if(anniversaryArr.length > 0){
                 let tempName = '';
@@ -98,7 +79,7 @@ module.exports = handleTimeList = () => {
                     //N+1年
                     let nextAnniversaryDate = (currentYear+1) + '-' + anniversaryMonth+'-'+anniversaryDay;
                     //阴历转阳历
-                    if (anniversaryType == 2 || anniversaryType == 3) {
+                    if (anniversaryType == 2) {
                         nextAnniversaryDate = calendar.conversion(nextAnniversaryDate);
                     }
                     let resAnniversaryDate = nextAnniversaryDate;
@@ -106,7 +87,7 @@ module.exports = handleTimeList = () => {
                     //N年
                     let curAnniversaryDate = currentYear + '-' + anniversaryMonth+'-'+anniversaryDay;
                     //阴历转阳历
-                    if (anniversaryType == 2 || anniversaryType == 3) {
+                    if (anniversaryType == 2) {
                         curAnniversaryDate = calendar.conversion(curAnniversaryDate);
                     }
                     if (new Date(nowDate) <= new Date(curAnniversaryDate)){
@@ -116,7 +97,7 @@ module.exports = handleTimeList = () => {
                     //N-1年
                     let preAnniversaryDate = (currentYear-1) + '-' + anniversaryMonth+'-'+anniversaryDay;
                     //阴历转阳历
-                    if (anniversaryType == 2 || anniversaryType == 3) {
+                    if (anniversaryType == 2) {
                         preAnniversaryDate = calendar.conversion(preAnniversaryDate);
                     }
                     if (new Date(nowDate) <= new Date(preAnniversaryDate)){
@@ -124,21 +105,11 @@ module.exports = handleTimeList = () => {
                     }
 
                     if (nowDate == resAnniversaryDate) {
-                        if (anniversaryType == 3) {
-                            //获取生日星座
-                            let anniversaryAstro = lunarDate.astro;
-                            let todayDate = '<'+anniversaryDate.split('-').join('.')+'>';
-                            let todayAge = currentYear - anniversaryYear;
-                            let todayContent = todayAge + '岁' + anniversaryAstro + todayDate;
-                            var obj = {todayName:anniversaryName, todayContent:todayContent};
-                            todayArr.push(obj);
-                        }else{
-                            let diffYear = currentYear - anniversaryYear;
-                            let todayDate = '<'+anniversaryDate.split('-').join('.')+'>';
-                            let todayContent = ' ' + diffYear+'周年';
-                            var obj = {todayName:anniversaryName,todayDate:todayDate, todayContent:todayContent};
-                            todayArr.push(obj);
-                        }
+                        let diffYear = currentYear - anniversaryYear;
+                        let todayDate = '<'+anniversaryDate.split('-').join('.')+'>';
+                        let todayContent = ' ' + diffYear+'周年';
+                        var obj = {todayName:anniversaryName,todayDate:todayDate, todayContent:todayContent};
+                        todayArr.push(obj);
                     }
 
                     let diffTime = calendar.diffTimeToDaily(nowDate, resAnniversaryDate);
@@ -155,6 +126,66 @@ module.exports = handleTimeList = () => {
                             tempName = anniversaryName;
                             tempTime = diffTime;
                         }
+                    }
+                }
+
+                var obj = {tempName:tempName,tempTime:tempTime};
+                latelyArr.push(obj);
+            }
+
+            //生日
+            let birthdayArr = daily.birthday;
+            if(birthdayArr.length > 0){
+                let tempName = '';
+                let tempTime = 0;
+                for (let i = 0; i < birthdayArr.length; i++) {
+                    const element = birthdayArr[i];
+                    let birthdayName = element.name;
+                    let birthdayDate = element.date;
+                    //计算差值
+                    let targetArr = birthdayDate.split('-');
+                    let birthdayYear = targetArr[0];
+                    let birthdayMonth = targetArr[1];
+                    let birthdayDay = targetArr[2];
+
+                    //N+1年
+                    let nextBirthdayDate = (currentYear+1) + '-' + birthdayMonth+'-'+birthdayDay;
+                    let nextBirthdaySolarDate = calendar.conversion(nextBirthdayDate);
+                    let resBirthdayDate = nextBirthdaySolarDate;
+
+                    //N年
+                    let curBirthdayDate = currentYear + '-' + birthdayMonth+'-'+birthdayDay;
+                    let curBirthdaySolarDate = calendar.conversion(curBirthdayDate);
+                    if (new Date(nowDate) <= new Date(curBirthdaySolarDate)){
+                        resBirthdayDate = curBirthdaySolarDate;
+                    }
+
+                    //N-1年
+                    let preBirthdayDate = (currentYear-1) + '-' + birthdayMonth+'-'+birthdayDay;
+                    let preBirthdaySolarDate = calendar.conversion(preBirthdayDate);
+                    if (new Date(nowDate) <= new Date(preBirthdaySolarDate)){
+                        resBirthdayDate = preBirthdaySolarDate;
+                    }
+
+                    if (nowDate == resBirthdayDate) {
+                        //获取生日星座
+                        let anniversaryAstro = lunarDate.astro;
+                        let todayDate = '<'+birthdayDate.split('-').join('.')+'>';
+                        let todayAge = currentYear - birthdayYear;
+                        let todayContent = todayAge + '岁' + anniversaryAstro + todayDate;
+                        var obj = {todayName:birthdayName, todayContent:todayContent};
+                        todayArr.push(obj);
+                    }
+
+                    let diffTime = calendar.diffTimeToDaily(nowDate, resBirthdayDate);
+                    if (tempTime == 0){
+                        tempName = birthdayName;
+                        tempTime = diffTime;
+                    }
+
+                    if (diffTime < tempTime) {
+                        tempName = birthdayName;
+                        tempTime = diffTime;
                     }
                 }
 
@@ -202,7 +233,7 @@ module.exports = handleTimeList = () => {
                     let endLegalHoliday = legalHoliday[legalHoliday.length - 1];
 
                     let legalHolidayNum = legalHoliday.length;
-                    if (diffTime > legalHolidayNum && diffTime < 15) {
+                    if (diffTime >= legalHolidayNum && diffTime < 15) {
                         let legalHolidayNum = legalHoliday.length;
                         if (legalHolidayNum == 1) {
                             startYearLegalDate = currentYearBar + startLegalHoliday;
@@ -453,8 +484,9 @@ module.exports = handleTimeList = () => {
                 let todayTempArr = [];
                 for (var i = 0; i < todayArr.length; i++) {
                     let todayName = todayArr[i].todayName;
+                    let todayDate = todayArr[i].todayDate;
                     let todayContent = todayArr[i].todayContent;
-                    todayTempArr.push(`🎉今天是${todayName} \n ${todayContent}`);
+                    todayTempArr.push(`🎉今天是${todayName} \n ${todayContent} ${todayDate} \n`);
                 }
                 todayTempArr.sort((a, b) => a.length - b.length);
                 content = content.concat(todayTempArr);

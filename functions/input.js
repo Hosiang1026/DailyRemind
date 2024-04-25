@@ -169,7 +169,7 @@ let weather = {
 //纪念日模块
 let daily = {
     open: true,//是否需要推送纪念日，需要填true，否则填false （不需要加引号）
-    anniversary: [//纪念日/生日列表
+    anniversary: [//纪念日列表
         {
             name: '恋爱纪念日',
             date: '2019-03-27',
@@ -189,41 +189,36 @@ let daily = {
             name: '结婚纪念日',
             date: '2023-12-16',
             type: 2
-        },
+        }
+    ],
+    birthday: [//生日列表
         {
             name: 'Mon生日',
-            date: '1972-01-12',
-            type: 3
+            date: '1972-01-12'
         },
         {
             name: 'Mother生日',
-            date: '1971-02-03',
-            type: 3
+            date: '1971-02-03'
         },
         {
             name: 'Dad生日',
-            date: '1970-02-14',
-            type: 3
+            date: '1970-02-14'
         },
         {
             name: 'Howe生日',
-            date: '1992-09-18',
-            type: 3
+            date: '1992-09-18'
         },
         {
             name: 'Lover生日',
-            date: '1995-10-01',
-            type: 3
+            date: '1995-10-01'
         },
         {
             name: 'Father生日',
-            date: '1969-11-23',
-            type: 3
+            date: '1969-11-23'
         },
         {
             name: 'Brother生日',
-            date: '2000-12-15',
-            type: 3
+            date: '2000-12-15'
         }
     ],
     legal: [//法定节假日列表(每年根据国务院公布情况)
