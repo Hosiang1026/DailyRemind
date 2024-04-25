@@ -292,59 +292,37 @@ module.exports = handleTimeList = () => {
                 let tempName = '';
                 let tempTime = 0;
                 let tempSort = 0;
-                let preCurrentYear = currentYear-1;
                 for (let i = 0; i < termArr.length; i++) {
                     const element = termArr[i];
                     let termSort = element.sort;
                     let termName = element.name;
                     let termMonth = element.month;
 
-                    let termSolarDate = calendar.conversionTerm(preCurrentYear, termMonth, termSort+2);
+                    //特殊处理
+                    termSort = termSort +2;
                     if(termSort == 23 || termSort == 24){
                         if(currentMonth == 0||currentMonth == 11||currentMonth == 12){
-                            termSolarDate = calendar.conversionTerm(preCurrentYear+1, termMonth, termSort);
+                            termSort = termSort;
                         }
                     }
-                    let nextTermSolarDate = termSolarDate;
 
-                    //计算差值
-                    if (new Date(nowDate) < new Date(nextTermSolarDate)){
-                        let diffTime = calendar.diffTimeToDaily(nowDate, nextTermSolarDate);
-                        if (diffTime == 0) {
-                            let todayDate = '<'+nowDate.split('-').join('.')+'>';
-                            var obj = {todayName:termName,todayDate:todayDate, todayContent:''};
-                            todayArr.push(obj);
-                        }else{
-                            if (tempTime == 0){
-                                tempSort = termSort;
-                                tempName = termName;
-                                tempTime = diffTime;
-                            }else if (diffTime < tempTime){
-                                tempSort = termSort;
-                                tempName = termName;
-                                tempTime = diffTime;
-                            }
-                        }
-                    }
-                }
+                    //N+1年
+                    let nextTermSolarDate = calendar.conversionTerm(currentYear+1, termMonth, termSort);
+                    let resTermSolarDate = nextTermSolarDate;
 
-                for (let i = 0; i < termArr.length; i++) {
-                    const element = termArr[i];
-                    let termSort = element.sort;
-                    let termName = element.name;
-                    let termMonth = element.month;
-                    let termSolarDate = calendar.conversionTerm(currentYear, termMonth, termSort+2);
-                    if(termSort == 23 || termSort == 24){
-                        if(currentMonth == 0||currentMonth == 11||currentMonth == 12){
-                            termSolarDate = calendar.conversionTerm(currentYear+1, termMonth, termSort);
-                        }
+                    //N年
+                    let curTermSolarDate = calendar.conversionTerm(currentYear, termMonth, termSort);
+                    if (new Date(nowDate) < new Date(curTermSolarDate)){
+                        resTermSolarDate = curTermSolarDate;
                     }
-                    let nextTermSolarDate = termSolarDate;
-                    if (new Date(nowDate) > new Date(nextTermSolarDate)){
-                        nextTermSolarDate = calendar.conversionTerm(currentYear+1, termMonth, termSort);
+
+                    //N-1年
+                    let preTermSolarDate = calendar.conversionTerm(currentYear-1, termMonth, termSort);
+                    if (new Date(nowDate) < new Date(preTermSolarDate)){
+                        resTermSolarDate = preTermSolarDate;
                     }
-                    //计算差值
-                    let diffTime = calendar.diffTimeToDaily(nowDate, nextTermSolarDate);
+
+                    let diffTime = calendar.diffTimeToDaily(nowDate, resTermSolarDate);
                     if (diffTime == 0) {
                         let todayDate = '<'+nowDate.split('-').join('.')+'>';
                         var obj = {todayName:termName,todayDate:todayDate, todayContent:''};
