@@ -186,7 +186,7 @@ let daily = {
             type: 2
         },
         {
-            name: '结婚吉日',
+            name: '结婚纪念日',
             date: '2023-12-16',
             type: 2
         },
@@ -569,7 +569,7 @@ let daily = {
         },
         {
             name:'Howe居住证',
-            date: '2024-05-20'
+            date: '2024-06-19'
         },
         {
             name:'Mon身份证',

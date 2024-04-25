@@ -28,8 +28,8 @@ module.exports = handleTimeList = () => {
 
             let yearDiffTime = calendar.sumTimeToNow(firstDate, nowDate)+1;
             let lunarDate = calendar.solar2lunar();
-            let lunarDateStr = lunarDate.Animal +'年' +'•'+ lunarDate.gzYear +'年'+ lunarDate.IMonthCn + lunarDate.IDayCn + ' 第' + yearDiffTime + '天' ;
-            content.push(`${nowDate} ${lunarDate.ncWeek} ${lunarDate.astro} \n${lunarDateStr}\n`);
+            let lunarDateStr = lunarDate.gzYear + lunarDate.Animal +'年' + lunarDate.IMonthCn + lunarDate.IDayCn + ' 第' + yearDiffTime + '天' ;
+            content.push(`${lunarDateStr}\n ${nowDate} ${lunarDate.ncWeek} ${lunarDate.astro} \n`);
 
             //type: 0 为累计周年(阳历)
             //type: 1 为倒计周年(阳历)
@@ -51,28 +51,36 @@ module.exports = handleTimeList = () => {
                     let anniversaryYear = targetArr[0];
                     let anniversaryMonth = targetArr[1];
                     let anniversaryDay = targetArr[2];
-                    let nextAnniversaryDate = currentYear +'-'+ anniversaryMonth+'-'+anniversaryDay;
+
+                    //N+1年
+                    let nextAnniversaryDate = (currentYear+1) + '-' + anniversaryMonth+'-'+anniversaryDay;
                     //阴历转阳历
                     if (anniversaryType == 2 || anniversaryType == 3) {
                         nextAnniversaryDate = calendar.conversion(nextAnniversaryDate);
                     }
-                    //如果当前日期大于今年纪念日期，则获取下一年的纪念日期
-                    if (new Date(nowDate) > new Date(nextAnniversaryDate) && new Date(currentYear+1+'-01-01') > new Date(nextAnniversaryDate)){
-                        nextAnniversaryDate = currentYear+1+'-'+ anniversaryMonth+'-'+anniversaryDay;
-                        //阴历转阳历
-                        if (anniversaryType == 2 || anniversaryType == 3) {
-                            nextAnniversaryDate = calendar.conversion(nextAnniversaryDate);
-                        }
+                    let resAnniversaryDate = nextAnniversaryDate;
+
+                    //N年
+                    let curAnniversaryDate = currentYear + '-' + anniversaryMonth+'-'+anniversaryDay;
+                    //阴历转阳历
+                    if (anniversaryType == 2 || anniversaryType == 3) {
+                        curAnniversaryDate = calendar.conversion(curAnniversaryDate);
+                    }
+                    if (new Date(nowDate) < new Date(curAnniversaryDate)){
+                        resAnniversaryDate = curAnniversaryDate;
                     }
 
-                    if (nowDate == nextAnniversaryDate) {
-                        if (anniversaryType == 0 ||anniversaryType == 1 ||anniversaryType == 2) {
-                            let diffYear = currentYear - anniversaryYear;
-                            let todayDate = '<'+anniversaryDate.split('-').join('.')+'>';
-                            let todayContent = ' ' + diffYear+'周年';
-                            var obj = {todayName:anniversaryName,todayDate:todayDate, todayContent:todayContent};
-                            todayArr.push(obj);
-                        }
+                    //N-1年
+                    let preAnniversaryDate = (currentYear-1) + '-' + anniversaryMonth+'-'+anniversaryDay;
+                    //阴历转阳历
+                    if (anniversaryType == 2 || anniversaryType == 3) {
+                        preAnniversaryDate = calendar.conversion(preAnniversaryDate);
+                    }
+                    if (new Date(nowDate) < new Date(preAnniversaryDate)){
+                        resAnniversaryDate = preAnniversaryDate;
+                    }
+
+                    if (nowDate == resAnniversaryDate) {
                         if (anniversaryType == 3) {
                             //获取生日星座
                             let anniversaryAstro = lunarDate.astro;
@@ -81,10 +89,16 @@ module.exports = handleTimeList = () => {
                             let todayContent = todayAge + '岁' + anniversaryAstro + todayDate;
                             var obj = {todayName:anniversaryName, todayContent:todayContent};
                             todayArr.push(obj);
+                        }else{
+                            let diffYear = currentYear - anniversaryYear;
+                            let todayDate = '<'+anniversaryDate.split('-').join('.')+'>';
+                            let todayContent = ' ' + diffYear+'周年';
+                            var obj = {todayName:anniversaryName,todayDate:todayDate, todayContent:todayContent};
+                            todayArr.push(obj);
                         }
                     }
 
-                    let diffTime = calendar.diffTimeToDaily(nowDate, nextAnniversaryDate);
+                    let diffTime = calendar.diffTimeToDaily(nowDate, resAnniversaryDate);
                     if (tempTime == 0){
                         tempName = anniversaryName;
                         tempTime = diffTime;
@@ -93,17 +107,7 @@ module.exports = handleTimeList = () => {
                         //计算累计值
                         let sumTime = calendar.sumTimeToNow(anniversaryDate, nowDate);
                         loveContent = `\n💘我们在一起恋爱: ${sumTime}天`;
-                    }
-
-                    if (anniversaryType == 1) {
-                        if (diffTime < tempTime) {
-                            tempName = anniversaryName;
-                            tempTime = diffTime;
-                        }
-                    }
-
-                    if (anniversaryType == 2||anniversaryType == 3) {
-                        let diffTime = calendar.diffTimeToDaily(nowDate, nextAnniversaryDate);
+                    }else{
                         if (diffTime < tempTime) {
                             tempName = anniversaryName;
                             tempTime = diffTime;
@@ -143,7 +147,7 @@ module.exports = handleTimeList = () => {
                         if (tempTime == 0) {
                             tempName = legalName;
                             tempTime = diffTime;
-                        } else if (diffTime < tempTime&&diffTime > 14) {
+                        } else if (diffTime < tempTime&&diffTime < 14) {
                             tempName = legalName;
                             tempTime = diffTime;
                         }
@@ -242,17 +246,29 @@ module.exports = handleTimeList = () => {
                     const element = lFtvArr[i];
                     let lFtvName = element.name;
                     let lFtvDate = element.date;
-                    let lFtvYearDate = currentYear-1 + '-' + lFtvDate;
-                    let lFtvSolarDate = calendar.conversion(lFtvYearDate);
-                    let targetArr = lFtvSolarDate.split('-');
-                    let nextlFtvSolarDate = lFtvSolarDate;
-                    if (new Date(nowDate) > new Date(nextlFtvSolarDate)){
-                        nextlFtvSolarDate = currentYear +'-'+ targetArr[1]+'-'+targetArr[2];
+
+                    //N+1年
+                    let nextlFtvYearDate = (currentYear+1) + '-' + lFtvDate;
+                    let nextlFtvSolarDate = calendar.conversion(nextlFtvYearDate);
+                    let reslFtvSolarDate = nextlFtvSolarDate;
+
+                    //N年
+                    let curlFtvYearDate = (currentYear) + '-' + lFtvDate;
+                    let curlFtvSolarDate = calendar.conversion(curlFtvYearDate);
+                    if (new Date(nowDate) < new Date(curlFtvSolarDate)){
+                        reslFtvSolarDate = curlFtvSolarDate;
+                    }
+
+                    //N-1年
+                    let prelFtvYearDate = (currentYear-1) + '-' + lFtvDate;
+                    let prelFtvSolarDate = calendar.conversion(prelFtvYearDate);
+                    if (new Date(nowDate) < new Date(prelFtvSolarDate)){
+                        reslFtvSolarDate = prelFtvSolarDate;
                     }
 
                     //计算差值
-                    let diffTime = calendar.diffTimeToDaily(nowDate, nextlFtvSolarDate);
-                    if (nowDate == nextlFtvSolarDate) {
+                    let diffTime = calendar.diffTimeToDaily(nowDate, reslFtvSolarDate);
+                    if (nowDate == reslFtvSolarDate) {
                         let todayDate = '<'+nowDate.split('-').join('.')+'>';
                         var obj = {todayName:lFtvName,todayDate:todayDate, todayContent:''};
                         todayArr.push(obj);
@@ -401,7 +417,7 @@ module.exports = handleTimeList = () => {
                         if (diffTime < 31){
                             let todayDate = '<'+licenseDate.split('-').join('.')+'>';
                             //var obj = {todayName:licenseName,todayDate:todayDate, todayContent:'即将到期了'};
-                            todayLicenseArr.push(`* ${licenseName} ${todayDate} \n 即将到期了 🚨\n`);
+                            todayLicenseArr.push(`* ${licenseName} ${todayDate} \n ${diffTime}天后到期，请及时处理 🚨\n`);
                         }else{
                             endLicenseArr.push(`· ${licenseName}: 还有${diffTime}天`);
                         }
@@ -422,13 +438,8 @@ module.exports = handleTimeList = () => {
                 todayTempArr.sort((a, b) => a.length - b.length);
                 content = content.concat(todayTempArr);
                 //随机笑话
-                if (Math.floor(Math.random() * 10) % 2 == 0) {
-                    const res = await axios.get('https://api.vvhan.com/api/joke?type=json')
-                    content.push(`\n ${res.data.joke}  \n-- 「${res.data.title}」\n`)
-                }else{
-                    const res = await axios.get('https://api.uomg.com/api/comments.163?format=json')
-                    content.push(`\n${res.data.data.content} \n-- 来自@${res.data.data.nickname}「${res.data.data.name}」${res.data.data.artistsname}\n`)
-                }
+                const res = await axios.get('https://api.uomg.com/api/comments.163?format=json')
+                content.push(`${res.data.data.content} \n-- 来自@${res.data.data.nickname}「${res.data.data.name}」${res.data.data.artistsname}\n`)
             }else{
                 let minTempTime = Math.min.apply(Math, latelyArr.map(item => { return item['tempTime'] }));
                 let minTempArr = [];
