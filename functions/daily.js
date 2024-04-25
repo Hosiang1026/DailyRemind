@@ -23,10 +23,53 @@ module.exports = handleTimeList = () => {
             let currentYear = date.getFullYear();
             let currentMonth = date.getMonth();
             let currentDate = date.getDate();
-            let firstDate = calendar.conversion(`${(currentYear)}` +'-01-01');
             let nowDate = `${currentYear}-${(currentMonth + 1) < 10 ? '0' + (currentMonth + 1) : (currentMonth + 1)}-${(currentDate) < 10 ? '0' + (currentDate) : (currentDate)}`
 
-            let yearDiffTime = calendar.sumTimeToNow(firstDate, nowDate)+1;
+            //N+1年 - 获取数据
+            let next2FestivalDate = (currentYear+1) + '-' + '12-30';
+            let next2FestivalSolarDate = calendar.conversion(next2FestivalDate);
+
+            //N年 - 获取数据
+            let nextFestivalDate = currentYear + '-' + '12-30';
+            let nextFestivalSolarDate = calendar.conversion(nextFestivalDate);
+
+            //N-1年 - 获取数据
+            let curlFtvYearDate = (currentYear-1) + '-' + '12-30';
+            let curFestivalSolarDate = calendar.conversion(curlFtvYearDate);
+
+            //N-2年 - 获取数据
+            let prelFtvYearDate = (currentYear-2) + '-' + '12-30';
+            let preFestivalSolarDate = calendar.conversion(prelFtvYearDate);
+
+            //N-3年 - 获取数据
+            let pre2lFtvYearDate = (currentYear-3) + '-' + '12-30';
+            let pre2FestivalSolarDate = calendar.conversion(pre2lFtvYearDate);
+
+            //N+1年 -> N年
+            let newlFtvYearDate = next2FestivalSolarDate;
+            let oldlFtvYearDate = nextFestivalSolarDate;
+
+            //N年 -> N-1年
+            if (new Date(nowDate) <= new Date(nextFestivalSolarDate)){
+                newlFtvYearDate = nextFestivalSolarDate;
+                oldlFtvYearDate = curFestivalSolarDate;
+            }
+            //N-1年 -> N-2年
+            if (new Date(nowDate) <= new Date(curFestivalSolarDate)){
+                newlFtvYearDate = curFestivalSolarDate;
+                oldlFtvYearDate = preFestivalSolarDate;
+            }
+
+            //N-2年 -> N-3年
+            if (new Date(nowDate) <= new Date(prelFtvYearDate)){
+                newlFtvYearDate = prelFtvYearDate;
+                oldlFtvYearDate = pre2FestivalSolarDate;
+            }
+
+            //计算差值
+            let yearDiffTime = calendar.diffTimeToDaily(nowDate, oldlFtvYearDate);
+            let diffTime = calendar.diffTimeToDaily(nowDate, newlFtvYearDate);
+
             let lunarDate = calendar.solar2lunar();
             let lunarDateStr = lunarDate.gzYear + lunarDate.Animal +'年' + lunarDate.IMonthCn + lunarDate.IDayCn + ' 第' + yearDiffTime + '天' ;
             content.push(`${lunarDateStr}\n ${nowDate} ${lunarDate.ncWeek} ${lunarDate.astro} \n`);
@@ -66,7 +109,7 @@ module.exports = handleTimeList = () => {
                     if (anniversaryType == 2 || anniversaryType == 3) {
                         curAnniversaryDate = calendar.conversion(curAnniversaryDate);
                     }
-                    if (new Date(nowDate) < new Date(curAnniversaryDate)){
+                    if (new Date(nowDate) <= new Date(curAnniversaryDate)){
                         resAnniversaryDate = curAnniversaryDate;
                     }
 
@@ -76,7 +119,7 @@ module.exports = handleTimeList = () => {
                     if (anniversaryType == 2 || anniversaryType == 3) {
                         preAnniversaryDate = calendar.conversion(preAnniversaryDate);
                     }
-                    if (new Date(nowDate) < new Date(preAnniversaryDate)){
+                    if (new Date(nowDate) <= new Date(preAnniversaryDate)){
                         resAnniversaryDate = preAnniversaryDate;
                     }
 
@@ -255,14 +298,14 @@ module.exports = handleTimeList = () => {
                     //N年
                     let curlFtvYearDate = currentYear + '-' + lFtvDate;
                     let curlFtvSolarDate = calendar.conversion(curlFtvYearDate);
-                    if (new Date(nowDate) < new Date(curlFtvSolarDate)){
+                    if (new Date(nowDate) <= new Date(curlFtvSolarDate)){
                         reslFtvSolarDate = curlFtvSolarDate;
                     }
 
                     //N-1年
                     let prelFtvYearDate = (currentYear-1) + '-' + lFtvDate;
                     let prelFtvSolarDate = calendar.conversion(prelFtvYearDate);
-                    if (new Date(nowDate) < new Date(prelFtvSolarDate)){
+                    if (new Date(nowDate) <= new Date(prelFtvSolarDate)){
                         reslFtvSolarDate = prelFtvSolarDate;
                     }
 
@@ -312,13 +355,13 @@ module.exports = handleTimeList = () => {
 
                     //N年
                     let curTermSolarDate = calendar.conversionTerm(currentYear, termMonth, termSort);
-                    if (new Date(nowDate) < new Date(curTermSolarDate)){
+                    if (new Date(nowDate) <= new Date(curTermSolarDate)){
                         resTermSolarDate = curTermSolarDate;
                     }
 
                     //N-1年
                     let preTermSolarDate = calendar.conversionTerm(currentYear-1, termMonth, termSort);
-                    if (new Date(nowDate) < new Date(preTermSolarDate)){
+                    if (new Date(nowDate) <= new Date(preTermSolarDate)){
                         resTermSolarDate = preTermSolarDate;
                     }
 
