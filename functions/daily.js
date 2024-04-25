@@ -253,7 +253,7 @@ module.exports = handleTimeList = () => {
                     let reslFtvSolarDate = nextlFtvSolarDate;
 
                     //N年
-                    let curlFtvYearDate = (currentYear) + '-' + lFtvDate;
+                    let curlFtvYearDate = currentYear + '-' + lFtvDate;
                     let curlFtvSolarDate = calendar.conversion(curlFtvYearDate);
                     if (new Date(nowDate) < new Date(curlFtvSolarDate)){
                         reslFtvSolarDate = curlFtvSolarDate;
