@@ -18,7 +18,7 @@ module.exports = handleTimeList = () => {
             let endLicenseArr = []
 
             //把今日日期转为YYYY-MM-DD的格式 第一天
-            let date = new Date("2025-01-15");
+            let date = new Date();
             let currentYear = date.getFullYear();
             let currentMonth = date.getMonth();
             let currentDate = date.getDate();
@@ -105,9 +105,26 @@ module.exports = handleTimeList = () => {
                     }
 
                     if (nowDate == resAnniversaryDate) {
+                        if (anniversaryType == 2) {
+                            let anniversarySolarDate = calendar.conversion(anniversaryDate);
+                            let targetSolarArr = anniversarySolarDate.split('-');
+                            anniversaryYear = targetSolarArr[0];
+                        }
+
                         let diffYear = currentYear - anniversaryYear;
                         let todayDate = '<'+anniversaryDate.split('-').join('.')+'>';
-                        let todayContent = ' ' + diffYear+'周年';
+                        let todayContent = ' ' + diffYear+'周年快乐';
+                        if (anniversaryName == '结婚纪念日'){
+                            let marriageArr = daily.marriage;
+                            for (let i = 0; i < marriageArr.length; i++) {
+                                const element = marriageArr[i];
+                                let marriageName = element.name;
+                                let marriageAge = element.age;
+                                if(marriageAge == diffYear){
+                                    todayContent = marriageName +'-'+ diffYear+'周年快乐';
+                                }
+                            }
+                        }
                         var obj = {todayName:anniversaryName,todayDate:todayDate, todayContent:todayContent};
                         todayArr.push(obj);
                     }
