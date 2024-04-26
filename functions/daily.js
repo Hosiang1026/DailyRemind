@@ -301,7 +301,7 @@ module.exports = handleTimeList = () => {
                             endYearLegalDate = currentYearBar + endLegalHoliday;
                             let startDiffTime = calendar.diffTimeToDaily(nowDate, startYearLegalDate);
                             if (startDiffTime > 0){
-                                tipsArr.push(`⏳距离${legalName}开始放假还有${startDiffTime}天`)
+                                tipsArr.push(`⏳距离${legalName}放假还有${startDiffTime}天`)
                                 if (legalRepair != 0) {
                                     let legalRepairNum = legalRepair.length;
                                     tipsArr.push(`* 补班${legalRepairNum}天: ${legalRepair.join('、')}`)
@@ -525,13 +525,6 @@ module.exports = handleTimeList = () => {
 
             content.push(`📆重要节日 \n`);
 
-            //输出补班/放假温馨提示
-            if(tipsArr.length > 0){
-                for (var i = 0; i < tipsArr.length; i++) {
-                    content.push(tipsArr[i]);
-                }
-            }
-
             //最近的节日或今日的节日
             if(todayArr.length > 0){
                 let todayTempArr = [];
@@ -564,6 +557,13 @@ module.exports = handleTimeList = () => {
                     minTempArr.sort((a, b) => a.length - b.length);
                     minTempArr[minTempArr.length-1] = minTempArr[minTempArr.length-1] + '\n';
                     content = content.concat(minTempArr);
+                }
+            }
+
+            //输出补班/放假温馨提示
+            if(tipsArr.length > 0){
+                for (var i = 0; i < tipsArr.length; i++) {
+                    content.push(tipsArr[i]);
                 }
             }
 
