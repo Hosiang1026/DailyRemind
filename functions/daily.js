@@ -18,7 +18,7 @@ module.exports = handleTimeList = () => {
             let endLicenseArr = []
 
             //把今日日期转为YYYY-MM-DD的格式 第一天
-            let date = new Date();
+            let date = new Date("2024-04-28");
             let currentYear = date.getFullYear();
             let currentMonth = date.getMonth();
             let currentDate = date.getDate();
@@ -288,13 +288,13 @@ module.exports = handleTimeList = () => {
                             }
                             if (legalRepair != 0) {
                                 let legalRepairNum = legalRepair.length;
-                                tipsArr.push(`📟补班${legalRepairNum}天: ${legalRepair.join('、')}`)
+                                tipsArr.push(`* 补班${legalRepairNum}天: ${legalRepair.join('、')}`)
                             }
 
                             if (legalHolidayNum > 2){
-                                tipsArr.push(`⛱假期${legalHolidayNum}天: ${startLegalHoliday} ~ ${endLegalHoliday}\n`)
+                                tipsArr.push(`* 假期${legalHolidayNum}天: ${startLegalHoliday} ~ ${endLegalHoliday}\n`)
                             }else{
-                                tipsArr.push(`⛱假期${legalHolidayNum}天: ${legalHoliday.join('、')}\n`)
+                                tipsArr.push(`* 假期${legalHolidayNum}天: ${legalHoliday.join('、')}\n`)
                             }
                         } else {
                             startYearLegalDate = currentYearBar + startLegalHoliday;
@@ -304,13 +304,13 @@ module.exports = handleTimeList = () => {
                                 tipsArr.push(`⏳距离${legalName}开始放假还有${startDiffTime}天`)
                                 if (legalRepair != 0) {
                                     let legalRepairNum = legalRepair.length;
-                                    tipsArr.push(`📟补班${legalRepairNum}天: ${legalRepair.join('、')}`)
+                                    tipsArr.push(`* 补班${legalRepairNum}天: ${legalRepair.join('、')}`)
                                 }
 
                                 if (legalHolidayNum > 2){
-                                    tipsArr.push(`⛱假期${legalHolidayNum}天: ${startLegalHoliday} ~ ${endLegalHoliday}\n`)
+                                    tipsArr.push(`* 假期${legalHolidayNum}天: ${startLegalHoliday} ~ ${endLegalHoliday}\n`)
                                 }else{
-                                    tipsArr.push(`⛱假期${legalHolidayNum}天: ${legalHoliday.join('、')}\n`)
+                                    tipsArr.push(`* 假期${legalHolidayNum}天: ${legalHoliday.join('、')}\n`)
                                 }
                             }
                         }
