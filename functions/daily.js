@@ -18,7 +18,7 @@ module.exports = handleTimeList = () => {
             let endLicenseArr = []
 
             //把今日日期转为YYYY-MM-DD的格式 第一天
-            let date = new Date("2024-05-02");
+            let date = new Date();
             let currentYear = date.getFullYear();
             let currentMonth = date.getMonth();
             let currentDate = date.getDate();
@@ -515,6 +515,13 @@ module.exports = handleTimeList = () => {
 
             content.push(`📆重要节日 \n`);
 
+            //输出补班/放假温馨提示
+            if(tipsArr.length > 0){
+                for (var i = 0; i < tipsArr.length; i++) {
+                    content.push(tipsArr[i]);
+                }
+            }
+
             //最近的节日或今日的节日
             if(todayArr.length > 0){
                 let todayTempArr = [];
@@ -547,12 +554,6 @@ module.exports = handleTimeList = () => {
                     minTempArr.sort((a, b) => a.length - b.length);
                     minTempArr[minTempArr.length-1] = minTempArr[minTempArr.length-1] + '\n';
                     content = content.concat(minTempArr);
-                }
-            }
-            //输出补班/放假温馨提示
-            if(tipsArr.length > 0){
-                for (var i = 0; i < tipsArr.length; i++) {
-                    content.push(tipsArr[i]);
                 }
             }
 
