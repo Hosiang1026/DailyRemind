@@ -24,33 +24,43 @@ module.exports = handleTimeList = () => {
             let currentDate = date.getDate();
             let currentMDDate = `${(currentMonth + 1) < 10 ? '0' + (currentMonth + 1) : (currentMonth + 1)}-${(currentDate) < 10 ? '0' + (currentDate) : (currentDate)}`;
             let nowDate = `${currentYear}-${currentMDDate}`;
-            //N-1年 - 获取数据
-            let preFestivalDate = (currentYear-1) + '-' + '12-30';
-            let preFestivalSolarDate = calendar.conversion(preFestivalDate);
+            let festivalDate = '01-01';
 
-            //N-2年 - 获取数据
-            let pre2FestivalDate = (currentYear-2) + '-' + '12-30';
+            //N-2年
+            let pre2FestivalDate = (currentYear-2) + '-' + festivalDate;
             let pre2FestivalSolarDate = calendar.conversion(pre2FestivalDate);
+            let newlFtvYearDate = pre2FestivalSolarDate;
 
-            //N-3年 - 获取数据
-            let pre3FestivalDate = (currentYear-3) + '-' + '12-30';
-            let pre3FestivalSolarDate = calendar.conversion(pre3FestivalDate);
-
-            //N年 -> N-1年
-            let oldlFtvYearDate = preFestivalSolarDate;
-
-            //N-1年 -> N-2年
-            if (new Date(nowDate) <= new Date(preFestivalSolarDate)){
-                oldlFtvYearDate = pre2FestivalSolarDate;
+            //N-1年
+            let preFestivalDate = (currentYear-1) + '-' + festivalDate;
+            let preFestivalSolarDate = calendar.conversion(preFestivalDate);
+            if (new Date(nowDate) >= new Date(preFestivalSolarDate)){
+                newlFtvYearDate = preFestivalSolarDate;
             }
 
-            //N-2年 -> N-3年
-            if (new Date(nowDate) <= new Date(pre2FestivalSolarDate)){
-                oldlFtvYearDate = pre3FestivalSolarDate;
+            //N年
+            let curFestivalDate = currentYear + '-' + festivalDate;
+            let curFestivalSolarDate = calendar.conversion(curFestivalDate);
+            if (new Date(nowDate) >= new Date(curFestivalSolarDate)){
+                newlFtvYearDate = curFestivalSolarDate;
             }
 
-            //计算差值
-            let yearDiffTime = calendar.diffTimeToDaily(nowDate, oldlFtvYearDate);
+            //N+1年
+            let nextFestivalDate = (currentYear+1) + '-' + festivalDate;
+            let nextFestivalSolarDate = calendar.conversion(nextFestivalDate);
+            if (new Date(nowDate) >= new Date(nextFestivalSolarDate)){
+                newlFtvYearDate = nextFestivalSolarDate;
+            }
+
+            //N+2年
+            let next2FestivalDate = (currentYear+2) + '-' + festivalDate;
+            let next2FestivalSolarDate = calendar.conversion(next2FestivalDate);
+            if (new Date(nowDate) >= new Date(next2FestivalSolarDate)){
+                newlFtvYearDate = next2FestivalSolarDate;
+            }
+
+            //当前天数
+            let yearDiffTime = calendar.diffTimeToDaily(nowDate, newlFtvYearDate)+1;
 
             let lunarDate = calendar.solar2lunar();
             let lunarDateStr = lunarDate.gzYear + lunarDate.Animal +'年' + lunarDate.IMonthCn + lunarDate.IDayCn + ' 第' + yearDiffTime + '天' ;
