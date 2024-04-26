@@ -18,7 +18,7 @@ module.exports = handleTimeList = () => {
             let endLicenseArr = []
 
             //把今日日期转为YYYY-MM-DD的格式 第一天
-            let date = new Date();
+            let date = new Date("2024-05-02");
             let currentYear = date.getFullYear();
             let currentMonth = date.getMonth();
             let currentDate = date.getDate();
@@ -228,7 +228,9 @@ module.exports = handleTimeList = () => {
                         if(existHoliday){
                             let holidayFrist =currentYear + '-'+ legalHoliday[0];
                             let holidayDiff = calendar.sumTimeToNow(holidayFrist, nowDate);
-                            tipsArr.push(`⛱${legalName}放假第${holidayDiff+1}天，祝大家假期愉快！ \n`);
+                            tipsArr.push(`⛱祝大家假期愉快！`);
+                            tipsArr.push(`* ${legalName}放假: 第${holidayDiff+1}天 \n`)
+
                         }
                     }
                     if(legalRepair != 0){
