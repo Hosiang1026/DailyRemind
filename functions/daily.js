@@ -22,8 +22,8 @@ module.exports = handleTimeList = () => {
             let currentYear = date.getFullYear();
             let currentMonth = date.getMonth();
             let currentDate = date.getDate();
-            let nowDate = `${currentYear}-${(currentMonth + 1) < 10 ? '0' + (currentMonth + 1) : (currentMonth + 1)}-${(currentDate) < 10 ? '0' + (currentDate) : (currentDate)}`
-
+            let currentMDDate = `${(currentMonth + 1) < 10 ? '0' + (currentMonth + 1) : (currentMonth + 1)}-${(currentDate) < 10 ? '0' + (currentDate) : (currentDate)}`;
+            let nowDate = `${currentYear}-${currentMDDate}`;
             //N-1年 - 获取数据
             let preFestivalDate = (currentYear-1) + '-' + '12-30';
             let preFestivalSolarDate = calendar.conversion(preFestivalDate);
@@ -221,6 +221,23 @@ module.exports = handleTimeList = () => {
                     let legalDate = element.date;
                     let legalHoliday = element.holiday;
                     let legalRepair = element.repair;
+
+                    //补班或放假提示
+                    if(legalHoliday != 0){
+                        let existHoliday = legalHoliday.includes(currentMDDate);
+                        if(existHoliday){
+                            let holidayFrist =currentYear + '-'+ legalHoliday[0];
+                            let holidayDiff = calendar.sumTimeToNow(holidayFrist, nowDate);
+                            tipsArr.push(`⛱${legalName}放假第${holidayDiff+1}天，祝大家假期愉快！ \n`);
+                        }
+                    }
+                    if(legalRepair != 0){
+                        let existRepair = legalRepair.includes(currentMDDate);
+                        if(existRepair){
+                            tipsArr.push(`📟今天${legalName}补班，努力工作！\n `);
+                        }
+                    }
+
                     //计算差值
                     let targetArr = legalDate.split('-');
                     let currentYearBar = currentYear + '-';
@@ -250,7 +267,7 @@ module.exports = handleTimeList = () => {
                     let endLegalHoliday = legalHoliday[legalHoliday.length - 1];
 
                     let legalHolidayNum = legalHoliday.length;
-                    if (diffTime >= legalHolidayNum && diffTime < 15) {
+                    if (diffTime+legalHolidayNum < 15) {
                         let legalHolidayNum = legalHoliday.length;
                         if (legalHolidayNum == 1) {
                             startYearLegalDate = currentYearBar + startLegalHoliday;
@@ -266,23 +283,6 @@ module.exports = handleTimeList = () => {
                                 tipsArr.push(`⛱假期${legalHolidayNum}天: ${startLegalHoliday} ~ ${endLegalHoliday}\n`)
                             }else{
                                 tipsArr.push(`⛱假期${legalHolidayNum}天: ${legalHoliday.join('、')}\n`)
-                            }
-                        } else {
-                            startYearLegalDate = currentYearBar + startLegalHoliday;
-                            endYearLegalDate = currentYearBar + endLegalHoliday;
-                            let startDiffTime = calendar.diffTimeToDaily(nowDate, startYearLegalDate);
-                            if (startDiffTime > 0){
-                                tipsArr.push(`⏳距离${legalName}开始放假还有${startDiffTime}天`)
-                                if (legalRepair != 0) {
-                                    let legalRepairNum = legalRepair.length;
-                                    tipsArr.push(`📟补班${legalRepairNum}天: ${legalRepair.join('、')}`)
-                                }
-
-                                if (legalHolidayNum > 2){
-                                    tipsArr.push(`⛱假期${legalHolidayNum}天: ${startLegalHoliday} ~ ${endLegalHoliday}\n`)
-                                }else{
-                                    tipsArr.push(`⛱假期${legalHolidayNum}天: ${legalHoliday.join('、')}\n`)
-                                }
                             }
                         }
                     }
