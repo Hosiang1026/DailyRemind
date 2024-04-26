@@ -284,6 +284,23 @@ module.exports = handleTimeList = () => {
                             }else{
                                 tipsArr.push(`⛱假期${legalHolidayNum}天: ${legalHoliday.join('、')}\n`)
                             }
+                        } else {
+                            startYearLegalDate = currentYearBar + startLegalHoliday;
+                            endYearLegalDate = currentYearBar + endLegalHoliday;
+                            let startDiffTime = calendar.diffTimeToDaily(nowDate, startYearLegalDate);
+                            if (startDiffTime > 0){
+                                tipsArr.push(`⏳距离${legalName}开始放假还有${startDiffTime}天`)
+                                if (legalRepair != 0) {
+                                    let legalRepairNum = legalRepair.length;
+                                    tipsArr.push(`📟补班${legalRepairNum}天: ${legalRepair.join('、')}`)
+                                }
+
+                                if (legalHolidayNum > 2){
+                                    tipsArr.push(`⛱假期${legalHolidayNum}天: ${startLegalHoliday} ~ ${endLegalHoliday}\n`)
+                                }else{
+                                    tipsArr.push(`⛱假期${legalHolidayNum}天: ${legalHoliday.join('、')}\n`)
+                                }
+                            }
                         }
                     }
 
