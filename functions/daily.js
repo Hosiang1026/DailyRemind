@@ -547,6 +547,11 @@ module.exports = handleTimeList = () => {
                 content = content.concat(tempContentArr);
             }
 
+            //累计恋爱天数
+            if(todayArr.length == 0) {
+                content.push(loveContent);
+            }
+
             //证件有效期
             if(todayArr.length == 0){
                 content.push(`\n 💳证件有效期 \n`);
@@ -558,18 +563,6 @@ module.exports = handleTimeList = () => {
                     endLicenseArr.sort((a, b) => calendar.getTextLength(a) - calendar.getTextLength(b));
                     content = content.concat(endLicenseArr);
                 }
-            }
-
-            //累计恋爱天数
-            if(todayArr.length == 0) {
-                content.push(loveContent);
-                /*if (Math.floor(Math.random() * 10) % 2 == 0) {
-                    const res = await axios.get('https://api.shadiao.pro/chp')
-                    content.push(`💘${res.data.data.text}`)
-                }else{
-                    const res = await axios.get('https://api.vvhan.com/api/sao?type=json')
-                    content.push(`💘${res.data.ishan}`)
-                }*/
             }
 
             console.log('获取重要节日成功\n', content.join('\n'));
