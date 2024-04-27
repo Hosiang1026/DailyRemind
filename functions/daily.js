@@ -18,7 +18,7 @@ module.exports = handleTimeList = () => {
             let endLicenseArr = []
 
             //把今日日期转为YYYY-MM-DD的格式 第一天
-            let date = new Date("2024-07-14");
+            let date = new Date();
             let currentYear = date.getFullYear();
             let currentMonth = date.getMonth();
             let currentDate = date.getDate();
