@@ -18,7 +18,7 @@ module.exports = handleTimeList = () => {
             let endLicenseArr = []
 
             //把今日日期转为YYYY-MM-DD的格式 第一天
-            let date = new Date();
+            let date = new Date("2024-07-14");
             let currentYear = date.getFullYear();
             let currentMonth = date.getMonth();
             let currentDate = date.getDate();
@@ -199,8 +199,8 @@ module.exports = handleTimeList = () => {
                         let anniversaryAstro = lunarDate.astro;
                         let todayDate = '<'+birthdayDate.split('-').join('.')+'>';
                         let todayAge = currentYear - birthdayYear;
-                        let todayContent = todayAge + '岁' + anniversaryAstro + todayDate;
-                        var obj = {todayName:birthdayName, todayContent:todayContent};
+                        let todayContent = todayAge + '岁' + anniversaryAstro;
+                        var obj = {todayName:birthdayName, todayDate:todayDate, todayContent:todayContent};
                         todayArr.push(obj);
                     }
 
@@ -514,7 +514,6 @@ module.exports = handleTimeList = () => {
                         let diffTime = calendar.diffTimeToDaily(nowDate, licenseDate);
                         if (diffTime < 31){
                             let todayDate = '<'+licenseDate.split('-').join('.')+'>';
-                            //var obj = {todayName:licenseName,todayDate:todayDate, todayContent:'即将到期了'};
                             todayLicenseArr.push(`* ${licenseName} ${todayDate} \n ${diffTime}天后到期，请及时处理 🚨\n`);
                         }else{
                             endLicenseArr.push(`· ${licenseName}: 还有${diffTime}天`);
