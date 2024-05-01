@@ -77,9 +77,9 @@ module.exports = handleGasoline = () => {
             // 使用text()获取文本内容，不包括子元素的HTML
             textContent = firstDiv.text();
             // 使用.split()分割字符串，保留split之前的部分
-            const splitIndex = textContent.split('document.writeln').shift().lastIndexOf('大家相互转告');
+            const splitIndex = textContent.split('document.writeln').shift().lastIndexOf(')，');
             if (splitIndex >= 0) {
-                textContent = textContent.substring(0, splitIndex-1);
+                textContent = textContent.substring(0, splitIndex+1);
             }
         } catch (error) {
             console.error('An error occurred:', error);
