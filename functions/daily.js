@@ -267,7 +267,7 @@ module.exports = handleTimeList = () => {
                         if (tempTime == 0) {
                             tempName = legalName;
                             tempTime = diffTime;
-                        } else if (diffTime < tempTime&&diffTime < 14) {
+                        } else if (diffTime < tempTime&&diffTime > 0) {
                             tempName = legalName;
                             tempTime = diffTime;
                         }
@@ -514,7 +514,7 @@ module.exports = handleTimeList = () => {
                         let diffTime = calendar.diffTimeToDaily(nowDate, licenseDate);
                         if (diffTime < 31){
                             let todayDate = '<'+licenseDate.split('-').join('.')+'>';
-                            todayLicenseArr.push(`* ${licenseName} ${todayDate} \n ${diffTime}天后到期，请及时处理 🚨\n`);
+                            todayLicenseArr.push(`* ${licenseName} \n ${todayDate} \n ${diffTime}天后到期，请及时处理 🚨\n`);
                         }else{
                             endLicenseArr.push(`· ${licenseName}: 还有${diffTime}天`);
                         }
