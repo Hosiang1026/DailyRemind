@@ -238,7 +238,7 @@ const classFunction = {
 
                 let graduateDate = classTable.graduate;
                 let graduateDiffTime = diffTimeToDaily(nowDate, graduateDate);
-                content.push(`\n🎊距离国家开放大学毕业: 还有${graduateDiffTime}天`)
+                content.push(`\n🎊距离大学毕业: 还有${graduateDiffTime}天`)
 
                 console.log('获取课表成功', content.join('\n'));
                 resolve(content.join('\n'))
