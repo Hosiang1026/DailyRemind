@@ -654,7 +654,7 @@ let daily = {
         },
         {
             name:'Howe居住证',
-            date: '2024-06-19'
+            date: '2025-06-19'
         },
         {
             name:'Mon身份证',
