@@ -231,10 +231,10 @@ module.exports = handleTimeList = () => {
                     let legalDate = element.date;
                     let legalHoliday = element.holiday;
                     let legalRepair = element.repair;
-
+                    var existHoliday = false;
                     //补班或放假提示
                     if(legalHoliday != 0){
-                        let existHoliday = legalHoliday.includes(currentMDDate);
+                        existHoliday = legalHoliday.includes(currentMDDate);
                         if(existHoliday){
                             let holidayFrist =currentYear + '-'+ legalHoliday[0];
                             let holidayDiff = calendar.sumTimeToNow(holidayFrist, nowDate);
@@ -296,7 +296,7 @@ module.exports = handleTimeList = () => {
                             }else{
                                 tipsArr.push(`* 假期${legalHolidayNum}天: ${legalHoliday.join('、')}\n`)
                             }
-                        } else {
+                        } else if (!existHoliday){
                             startYearLegalDate = currentYearBar + startLegalHoliday;
                             endYearLegalDate = currentYearBar + endLegalHoliday;
                             let startDiffTime = calendar.diffTimeToDaily(nowDate, startYearLegalDate);
