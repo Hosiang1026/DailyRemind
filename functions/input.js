@@ -679,7 +679,7 @@ let end = {
 
 //课表推送模块
 let classTable = {
-    open: true,//是否需要推送时增加课表，需要填true，否则填false  （不需要加引号）
+    open: false,//是否需要推送时增加课表，需要填true，否则填false  （不需要加引号）
     graduate: '2024-07-10',
     homework: '2023-12-30', // homework: 0,
     computer: [//22春计算机本-课程列表

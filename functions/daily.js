@@ -419,25 +419,25 @@ module.exports = handleTimeList = () => {
                     let termMonth = element.month;
 
                     //特殊处理
-                    termSort = termSort +2;
-                    if(termSort == 23 || termSort == 24){
-                        if(currentMonth == 0||currentMonth == 11||currentMonth == 12){
-                            termSort = termSort;
-                        }
+                    let termSortStr;
+                    if(termSort <= 22){
+                        termSortStr = termSort + 2;
+                    }else{
+                        termSortStr = termSort - 22;
                     }
 
                     //N+1年
-                    let nextTermSolarDate = calendar.conversionTerm(currentYear+1, termMonth, termSort);
+                    let nextTermSolarDate = calendar.conversionTerm(currentYear+1, termMonth, termSortStr);
                     let resTermSolarDate = nextTermSolarDate;
 
                     //N年
-                    let curTermSolarDate = calendar.conversionTerm(currentYear, termMonth, termSort);
+                    let curTermSolarDate = calendar.conversionTerm(currentYear, termMonth, termSortStr);
                     if (new Date(nowDate) <= new Date(curTermSolarDate)){
                         resTermSolarDate = curTermSolarDate;
                     }
 
                     //N-1年
-                    let preTermSolarDate = calendar.conversionTerm(currentYear-1, termMonth, termSort);
+                    let preTermSolarDate = calendar.conversionTerm(currentYear-1, termMonth, termSortStr);
                     if (new Date(nowDate) <= new Date(preTermSolarDate)){
                         resTermSolarDate = preTermSolarDate;
                     }
