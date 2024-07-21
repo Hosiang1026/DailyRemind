@@ -629,7 +629,7 @@ let daily = {
             date: '2024-12-01'
         },
         {
-            name:'CMCC移动宽带',
+            name:'CMCC宽带',
             date: '2025-03-01'
         },
         {
