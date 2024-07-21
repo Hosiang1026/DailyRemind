@@ -629,6 +629,10 @@ let daily = {
             date: '2024-12-01'
         },
         {
+            name:'CMCC移动宽带',
+            date: '2025-03-01'
+        },
+        {
             name:'Skoda车险',
             date: '2024-12-14'
         },
@@ -659,6 +663,10 @@ let daily = {
         {
             name:'Mon身份证',
             date: '2026-06-06'
+        },
+        {
+            name:'Dad身份证',
+            date: '2026-06-04'
         }
     ]
 }
