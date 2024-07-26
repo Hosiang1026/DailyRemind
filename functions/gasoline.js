@@ -115,7 +115,7 @@ module.exports = handleGasoline = async () => {
 
         content.push('\n' + textContent);
         console.log('获取汽油价格成功：\n', content);
-        content.push('\n' + updateText);
+        content.push(updateText);
         console.log('获取汽油调价情况成功：\n', updateText);
         return content.join('\n');
 
