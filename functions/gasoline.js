@@ -5,84 +5,122 @@ const cheerio = require('cheerio');
 let content = [];
 let textContent = '';
 //汽油价格API: https://api.help.bj.cn/apis/youjia/
-module.exports = handleGasoline = () => {
-    fetchContent(`http://www.qiyoujiage.com`);
-    return new Promise(async (resolve, reject) => {
-        try {
-            const provinceArr = gasoline.province;
-            const modelArr = gasoline.model;
-            if (provinceArr.length == 0 || modelArr.length == 0){
-                console.log('汽油价格模块参数未配置');
-                reject('')
-            }else{
-                content.push(`⛽今日油价 `)
-            }
-            const gasolineReq = axios(`http://api.help.bj.cn/apis/youjia/`)
-            const gasolineRes = await gasolineReq
-            if (gasolineRes.status == 200) {
-                const gasolineArr = gasolineRes.data.data;
-                //名称
-                const keyNameArr = gasolineArr[0];
-                let keyName = {
-                    province: keyNameArr[0],//地区
-                    model92: keyNameArr[1],//92
-                    model95: keyNameArr[2],//95
-                    model98: keyNameArr[3],//98
-                    model0: keyNameArr[4],//0
-                }
+//抓取各个城市的汽油价格
+async function fetchContent(url) {
+    try {
+        const { data } = await axios.get(url);
+        const $ = cheerio.load(data);
 
-            for (let i = 0; i < provinceArr.length; i++) {
-                const provinceName = provinceArr[i];
-               for (let j = 1; j < gasolineArr.length; j++) {
-                    const dataArr = gasolineArr[j];
-                    const value = dataArr[0];
-                    if (value == provinceName){
-                        content.push(`\n🚘${value}`);
-                        for (let k = 0; k < modelArr.length; k++) {
-                            if (keyName.model0 == modelArr[k]){
-                                content.push(`· ${keyName.model0} : ${dataArr[4]}`);
-                            }
-                            if (keyName.model92 == modelArr[k]){
-                                content.push(`· ${keyName.model92} : ${dataArr[1]}`);
-                            }
-                            if (keyName.model95 == modelArr[k]){
-                                content.push(`· ${keyName.model95} : ${dataArr[2]}🚩`);
-                            }
-                            if (keyName.model98 == modelArr[k]){
-                                content.push(`· ${keyName.model98} : ${dataArr[3]}`);
-                            }
+        // 选择 <ul class="ylist"> 元素
+        const priceList = $('.ylist');
+
+        // 用于存储价格信息的对象
+        const prices = {};
+
+        // 获取所有 <li> 元素
+        const allItems = priceList.find('li');
+
+        // 遍历所有的 <li> 元素
+        allItems.each((index, element) => {
+            const $element = $(element);
+
+            // 查找城市名
+            if ($element.hasClass('t')) {
+                // 获取城市名
+                const city = $element.find('a').text().trim();
+
+                // 获取该城市下的四个价格
+                const cityPrices = {};
+                // 从当前城市开始的下一个元素开始取价格
+                for (let i = 0; i < 4; i++) {
+                    const priceElement = allItems.eq(index + 1 + i);
+                    if (priceElement.length) {
+                        const price = priceElement.text().trim();
+                        switch (i) {
+                            case 0:
+                                cityPrices['92号汽油'] = price;
+                                break;
+                            case 1:
+                                cityPrices['95号汽油'] = price;
+                                break;
+                            case 2:
+                                cityPrices['98号汽油'] = price;
+                                break;
+                            case 3:
+                                cityPrices['0号柴油'] = price;
+                                break;
                         }
                     }
-               }
-            }
-            content.push('\n'+textContent);
-            console.log('获取汽油价格成功', content);
-            resolve(content.join('\n'))
-            } else {
-            reject(weatherRes.weatherinfo)
-            }
+                }
 
-        } catch (error) {
-            console.log('获取汽油价格失败', error.message || error);
-            reject(error.message || error)
-        }
-    })
-
-    async function fetchContent(url) {
-        try {
-            const { data } = await axios.get(url);
-            const $ = cheerio.load(data);
-            //选择id为"left"的div下的第一个div
-            const firstDiv = $('#left > div:first-child');
-            // 使用text()获取文本内容，不包括子元素的HTML
-            textContent = firstDiv.text();
-            // 使用.split()分割字符串，保留split之前的部分
-            const splitIndex = textContent.split('document.writeln').shift().lastIndexOf(')，');
-            if (splitIndex >= 0) {
-                textContent = textContent.substring(0, splitIndex+1);
+                // 将价格存储到对象中
+                prices[city] = cityPrices;
             }
-        } catch (error) {
-            console.error('An error occurred:', error);
-        }
+        });
+
+        return prices;
+    } catch (error) {
+        throw new Error('An error occurred while fetching the content: ' + error.message);
     }
 }
+
+//抓取汽油调价情况
+async function fetchUpdateText(url) {
+    try {
+        const { data } = await axios.get(url);
+        const $ = cheerio.load(data);
+
+        // Extract specific text about oil price changes
+        const priceUpdateText = $('#rightTop').text().trim().split('\n').filter(line => line.includes('油价今晚')).join(' ');
+
+        return priceUpdateText;
+    } catch (error) {
+        throw new Error('An error occurred while fetching the update text: ' + error.message);
+    }
+}
+
+// Define handleGasoline function to use fetchContent
+module.exports = handleGasoline = async () => {
+    try {
+        const url = 'http://www.qiyoujiage.com'; // The URL to fetch data from
+        const prices = await fetchContent(url);
+        const updateText = await fetchUpdateText(url);
+
+        const provinceArr = gasoline.province;
+        const modelArr = gasoline.model;
+        let content = [];
+        let textContent = ''; // Placeholder textContent, modify as needed
+
+        if (provinceArr.length === 0 || modelArr.length === 0) {
+            console.log('汽油价格模块参数未配置');
+            throw new Error('汽油价格模块参数未配置');
+        } else {
+            content.push('⛽今日油价');
+        }
+
+        for (let i = 0; i < provinceArr.length; i++) {
+            const provinceName = provinceArr[i];
+            const dataArr = prices[provinceName];
+
+            if (dataArr) {
+                content.push(`\n🚘${provinceName}`);
+                for (let j = 0; j < modelArr.length; j++) {
+                    const model = modelArr[j];
+                    if (dataArr[model] !== undefined) {
+                        content.push(`· ${model} : ${dataArr[model]}`);
+                    }
+                }
+            }
+        }
+
+        content.push('\n' + textContent);
+        console.log('获取汽油价格成功：\n', content);
+        content.push('\n' + updateText);
+        console.log('获取汽油调价情况成功：\n', updateText);
+        return content.join('\n');
+
+    } catch (error) {
+        console.log('获取汽油价格失败', error.message || error);
+        throw new Error(error.message || error);
+    }
+};
