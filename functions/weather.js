@@ -23,6 +23,7 @@ const getPublicIPAddress = () => {
 
 
 //获得天气数据
+//中央气象台 http://nmc.cn/publish/forecast/AZJ/yuhang.html
 //IP地址获取天气 https://ip.help.bj.cn/?ip=${IPAddress}
 //中国天气API: http://www.weather.com.cn/data/cityinfo/101210106.html
 //高德天气未来三天API: https://restapi.amap.com/v3/weather/weatherInfo?city=330110&extensions=all&key=d8045d9dd3eb0db5dc3f2a807a6a64e0
