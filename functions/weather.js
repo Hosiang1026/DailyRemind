@@ -110,7 +110,7 @@ const extractDataSK = (dataStr, cityname) => {
                 `预报时间: ${data.date || ""} ${data.time || ""}`
             ].join('\n');
 
-            return `\n实时天气信息:\n${content}`;
+            return `\n${content}`;
         } catch (error) {
             console.error(`JSONDecodeError in dataSK: ${error.message}`);
             return null;
@@ -128,7 +128,7 @@ const extractAlarmDZ = (dataStr) => {
             const alerts = data.w || [];
 
             if(alerts.length > 0){
-                const content = alerts.map(alert => `预警信息: ${alert.w9 || "未知"}`).join('\n\n');
+                const content = alerts.map(alert => `预警信息: ${alert.w9 || "未知"}`).join('\n');
                 return `\n${content}`;
             }
 
@@ -145,8 +145,8 @@ const extractDataZS = (dataStr) => {
         'dy', 'tr', 'gj', 'fs', 'gl',
         'ac', 'co', 'uv', 'gz'
     ];
-    // 正则表达式匹配 `dataZS` 到 `cf` 之间的内容
-    const regex = /var dataZS =({.*?});\s*var cf =/s;
+    // 正则表达式匹配 `dataZS` 到 `fc` 之间的内容
+    const regex = /var dataZS =({.*?});\s*var fc =/s;
     const match = dataStr.match(regex);
     if (match && match[1]) {
         try {
@@ -215,6 +215,7 @@ module.exports = handleWeather = () => {
 
     try {
         let weatherCityContent = []
+         weatherCityContent.push("\n实时天气信息:");
         for(const city of cities) {
             const cityname = city.city_name;
             const url = baseUrl.replace("{city_code}", city.city_code);
@@ -226,10 +227,10 @@ module.exports = handleWeather = () => {
                 if (dataSK != null) {
                     weatherCityContent.push(dataSK);
                 }
-                var dataZS = extractDataZS(dataStr);
-                if (dataZS != null) {
-                    weatherCityContent.push(dataZS);
-                }
+                // var dataZS = extractDataZS(dataStr);
+                // if (dataZS != null) {
+                //     weatherCityContent.push(dataZS);
+                // }
                 var alarmDZ = extractAlarmDZ(dataStr);
                 if (alarmDZ != null){
                     weatherCityContent.push(alarmDZ);
