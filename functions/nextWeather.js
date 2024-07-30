@@ -1,282 +1,207 @@
-const { weather } = require('./input')
-const axios = require('axios')
-const publicIp = require('public-ip');
+const axios = require('axios');
+const cheerio = require('cheerio');
 
-let allBrellaFlag = true;
-let rainDayNum = 0;
-
-//获取外网IP地址
-const getPublicIPAddress = () => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            publicIp.v4(function (err, ipv4) {
-                console.log('获取外网IP地址: ', ipv4);
-                resolve(ipv4)
-            });
-        } catch (error) {
-            console.log('获取外网IP地址失败', error.message || error);
-            reject(error.message || error)
-        }
-    })
-}
-
-const getAllWeather = (weatherKey, weatherCityCode, allAppend) => {
-	return new Promise(async (resolve, reject) => {
+const syncDataWithRetry = async (url, headers, maxRetries = 3) => {
+	let retryCount = 0;
+	while (retryCount <= maxRetries) {
 		try {
-			let weatherContent = []
-			//这是未来四天的天气预报
-			const weatherReq = axios(`https://restapi.amap.com/v3/weather/weatherInfo?key=${weatherKey}&extensions=all&city=${weatherCityCode}`)
-			const weatherRes = await weatherReq
-			if (weatherRes.status == 200) {
-				const dataArr = weatherRes.data.forecasts;
-				let data = {
-					province: dataArr[0].province,//省级
-					city: dataArr[0].city,//区级
-					casts: dataArr[0].casts //天气数据
-				}
-				console.log('获取未来四天的天气成功', data.casts);
-				weatherContent.push(`\n🎈${data.province}${data.city}`);
-				let weatherCastsArr = data.casts;
-				for (let i = 0; i < weatherCastsArr.length; i++) {
-					let weatherData = weatherCastsArr[i];
-					let weatherWeek = weatherData.week;
-					let weatherWeekName = '';
-					switch (weatherWeek) {
-						case "1":
-							weatherWeekName = "周一";
-							break;
-						case "2":
-							weatherWeekName = "周二";
-							break;
-						case "3":
-							weatherWeekName = "周三";
-							break;
-						case "4":
-							weatherWeekName = "周四";
-							break;
-						case "5":
-							weatherWeekName = "周五";
-							break;
-						case "6":
-							weatherWeekName = "周六";
-							break;
-						default:
-							weatherWeekName = "周日";
-					}
+			const response = await axios.get(url, { headers });
+			console.log(`Response status code: ${response.status}`);
 
-					let weathers = weatherData.dayweather;
-					var weatherIcon = '';
-					switch (weathers) {
-						case "晴":
-							weatherIcon = "🌤";
-							break;
-						case "阴":
-							weatherIcon = "☁";
-							break;
-						case "多云":
-							weatherIcon = "🌥";
-							break;
-						case "小雨":
-							weatherIcon = "🌨";
-							rainDayNum = rainDayNum+1;
-							break;
-						case "中雨":
-							weatherIcon = "🌧";
-							rainDayNum = rainDayNum+1;
-							break;
-						case "大雨":
-							weatherIcon = "⛈";
-							rainDayNum = rainDayNum+1;
-							break;
-						default:
-							if (weathers.indexOf('晴') != -1){
-								weatherIcon = "🌤";
-							}
-							if (weathers.indexOf('雨') != -1){
-								weatherIcon = "🌨";
-								rainDayNum = rainDayNum+1;
-							}
+			if (response.status === 200) {
+				const data = response.data;
+
+				// 检查返回数据是否为HTML页面
+				if (data.toLowerCase().includes("<html>")) {
+					const $ = cheerio.load(data);
+					const title = $("title").text();
+
+					// 如果标题包含“无法访问”，则重试
+					if (title.includes("无法访问")) {
+						throw new Error("Page not accessible");
 					}
-					weatherContent.push(`\n${weatherData.date} ${weatherWeekName}`);
-					weatherContent.push(`· 天气: ${weathers}${weatherIcon}`);
-					weatherContent.push(`· 气温: ${weatherData.nighttemp}℃ ~ ${weatherData.daytemp}℃`);
-					weatherContent.push(`· 风况: ${weatherData.daywind}风${weatherData.daypower}级`);
 				}
 
-				if (rainDayNum > 0&&allAppend){
-					weatherContent.push(`\n🌂最近${rainDayNum}天有雨, 记得带伞！`);
-					rainDayNum = 0;
-					allBrellaFlag = false;
-				}
-				resolve(weatherContent.join('\n'))
+				return data;
 			} else {
-				reject(weatherRes.data.info)
+				console.log(`Request failed with status code: ${response.status}`);
+				retryCount++;
 			}
 		} catch (error) {
-			console.log('获取今日天气失败', error.message || error);
-			reject(error.message || error)
+			console.error(`Error occurred: ${error.message}`);
+			retryCount++;
 		}
-	})
-}
+	}
+	return null;
+};
 
-//处理实况天气数据
+const extractCityDZ = (dataStr) => {
+	// 正则表达式匹配 `cityDZ` 到 `alarmDZ` 之间的内容
+	const regex = /var cityDZ =({.*?});\s*var alarmDZ =/s;
+	const match = dataStr.match(regex);
+	if (match && match[1]) {
+		try {
+			const data = JSON.parse(match[1]);
+			const weatherInfo = data.weatherinfo || {};
+
+			const content = [
+				`城市: ${weatherInfo.city || "未知"}`,
+				`城市名称: ${weatherInfo.cityname || "未知"}`,
+				`温度: ${weatherInfo.temp || "未知"}°C`,
+				`天气: ${weatherInfo.weather || "未知"}`,
+				`风况: ${weatherInfo.wd || "未知"}`,
+				`风速: ${weatherInfo.ws || "未知"}`,
+				`预报时间: ${weatherInfo.fctime || "未知"}`
+			].join('\n');
+
+			return `\n城市基本信息:\n${content}`;
+		} catch (error) {
+			console.error(`JSONDecodeError in cityDZ: ${error.message}`);
+			return null;
+		}
+	}
+};
+
+const extractDataSK = (dataStr, cityname) => {
+	// 正则表达式匹配 `dataSK` 到 `dataZS` 之间的内容
+	const regex = /var dataSK =({.*?});\s*var dataZS =/s;
+	const match = dataStr.match(regex);
+	if (match && match[1]) {
+		try {
+			const data = JSON.parse(match[1]);
+
+			const content = [
+				`地区: ${cityname}`,
+				`天气: ${data.weather || "未知"}`,
+				`湿度: ${data.sd || "未知"}`,
+				`温度: ${data.temp || "0"}°C`,
+				`降雨量: ${data.rain || "0"}mm`,
+				`风况: ${data.WD || "未知"} ${data.WS || ""} ${data.wse || ""}`,
+				`预报时间: ${data.date || ""} ${data.time || ""}`
+			].join('\n');
+
+			return `\n实时天气信息:\n${content}`;
+		} catch (error) {
+			console.error(`JSONDecodeError in dataSK: ${error.message}`);
+			return null;
+		}
+	}
+};
+
+const extractAlarmDZ = (dataStr) => {
+	// 正则表达式匹配 `alarmDZ` 到 `dataSK` 之间的内容
+	const regex = /var alarmDZ =({.*?});\s*var dataSK =/s;
+	const match = dataStr.match(regex);
+	if (match && match[1]) {
+		try {
+			const data = JSON.parse(match[1]);
+			const alerts = data.w || [];
+
+			if(alerts.length > 0){
+				const content = alerts.map(alert => `预警信息: ${alert.w9 || "未知"}`).join('\n\n');
+				return `\n气象预警信息:\n${content}`;
+			}
+
+		} catch (error) {
+			console.error(`JSONDecodeError in alarmDZ: ${error.message}`);
+			return null;
+		}
+	}
+};
+
+const extractDataZS = (dataStr) => {
+	const indices = [
+		'ys', 'xc', 'lk',
+		'dy', 'tr', 'gj', 'fs', 'gl',
+		'ac', 'co', 'uv', 'gz'
+	];
+	// 正则表达式匹配 `dataZS` 到 `cf` 之间的内容
+	const regex = /var dataZS =({.*?});\s*var cf =/s;
+	const match = dataStr.match(regex);
+	if (match && match[1]) {
+		try {
+			const data = JSON.parse(match[1]);
+			const zs = data.zs || {};
+
+			const content = indices.map(index => {
+				const name = zs[`${index}_name`] || "未知";
+				const hint = zs[`${index}_hint`] || "未知";
+				const des_s = zs[`${index}_des_s`] || "未知";
+
+				return name !== "未知" ? `${name}: ${hint}, ${des_s}` : null;
+			}).filter(line => line).join('\n');
+
+			return `\n生活指数信息:\n${content}`;
+		} catch (error) {
+			console.error(`JSONDecodeError in dataZS: ${error.message}`);
+			return null;
+		}
+	}
+};
+
+const extractFc = (dataStr, cityname) => {
+	// 正则表达式匹配 `fc` 到结尾之间的内容
+	const regex = /var fc\s*=\s*({[\s\S]*})/;
+	const match = dataStr.match(regex);
+	if (match && match[1]) {
+		try {
+			const data = JSON.parse(match[1]);
+			const forecasts = data.f || [];
+
+			const content = forecasts.map(forecast => {
+				const date = forecast.fi ? forecast.fi.replace(/\//g, '-') : "未知";
+				const day = forecast.fj || "未知";
+				const tempHigh = forecast.fc || "未知";
+				const tempLow = forecast.fd || "未知";
+				const windDirection = forecast.fe || "未知";
+				const windSpeed = forecast.fg || "未知";
+				const humidity = forecast.fm || "未知";
+				const comfortIndex = forecast.fn || "未知";
+
+				return `日期: ${date} (${day})\n气温: ${tempLow}°C ~ ${tempHigh}°C\n湿度: ${humidity}%\n舒适度: ${comfortIndex}\n风向: ${windDirection} ${windSpeed}\n`;
+			}).join('\n');
+
+			return `\n${cityname}未来天气预报信息:\n${content}`;
+		} catch (error) {
+			console.error(`JSONDecodeError in fc: ${error.message}`);
+			return null;
+		}
+	}
+};
+
 module.exports = handleWeather = () => {
-    return new Promise(async (resolve, reject) => {
-        try {
-			let weatherCityContent = []
-			//获取当天是周几、此刻是上午OR下午
-			let nowDate = new Date();
-			let nowDay = nowDate.getDay();
-            let nowHour = nowDate.getHours();
-			let nowTime;
-			if(nowHour < 11) {
-				nowTime = "AM"; //小于就是AM
-			} else if(nowHour <= 13) {
-				nowTime = "MM"; //大于就是PM
-			} else {
-                nowTime = "PM"; //大于就是PM
-            }
-			const baseCityCodeArr = [];
-            let weatherKey = weather.key;
-			let weatherBaseDataArr = weather.base_data;
-			//组装实况天气城市编码参数
-		    for (let i = 0; i < weatherBaseDataArr.length; i++) {
-				const weatherTimeArr = weatherBaseDataArr[i].time;
-				for (let j = 0; j < weatherTimeArr.length; j++) {
-					const weatherTime = weatherTimeArr[j];
-					if(nowTime == weatherTime) {
-						const weatherBaseDayArr = weatherBaseDataArr[i].day;
-						for (let k = 0; k < weatherBaseDayArr.length; k++) {
-							if (nowDay == weatherBaseDayArr[k]) {
-								let weatherCityCode = weatherBaseDataArr[i].city_code;
-								baseCityCodeArr.push(weatherCityCode);
-							}
-						}
-					}
-				}
-		    }
-
-			//城市编码参数为空时，由IP地址获取
-			if(baseCityCodeArr.length == 0){
-				//获取天气数据
-				let IPAddress = await getPublicIPAddress()
-				//let IPAddress = '112.10.223.108'
-			    let weatherCityCode = await getWeatherCityCode(IPAddress)
-				baseCityCodeArr.push(weatherCityCode);
-			}
-
-			//获取实况天气数据
-			let baseAppend = false;
-			if(baseCityCodeArr.length > 0){
-				weatherCityContent.push(`🌍实时天气`);
-				for (let i = 0; i < baseCityCodeArr.length; i++) {
-					//获取天气数据
-					let weatherCityCode = baseCityCodeArr[i]
-					if(i+1 == baseCityCodeArr.length){
-						baseAppend = true;
-					}
-					let cityContent = await getBaseWeather(weatherKey, weatherCityCode, baseAppend)
-					weatherCityContent.push(cityContent);
-				}
-			}
-
-			if(baseCityCodeArr.length > 0) {
-				if (allBrellaFlag){
-					if (nowDay != 6 && nowDay != 0) {
-						if (nowTime == "AM") {
-							weatherCityContent.push(`\n🕘9点上班，记得打卡!`)
-						}
-
-						if (nowTime == "PM") {
-							weatherCityContent.push(`\n🕡18点30分下班，记得打卡!`)
-						}
-					}
-				}
-			}
-
-			resolve(weatherCityContent.join('\n'))
-        } catch (error) {
-            console.log('处理天气数据失败', error.message || error);
-            reject(error.message || error)
-        }
-    })
-}
-
-//处理未来天气数据
-module.exports = handleNextWeather = () => {
 	return new Promise(async (resolve, reject) => {
+		const cities = [
+			{ city_name: "安徽-怀宁", city_code: "101220605" },
+			{ city_name: "浙江-余杭", city_code: "101210106" },
+			{ city_name: "浙江-吴兴", city_code: "101210205" },
+			{ city_name: "福建-福州", city_code: "101230101" }
+		];
+
+		const baseUrl = "https://d1.weather.com.cn/weather_index/{city_code}.html?_=1722309451962";
+		const headers = {
+			"Referer": "http://www.weather.com.cn/"
+		};
+
 		try {
 			let weatherCityContent = []
-			//获取当天是周几、此刻是上午OR下午
-			let nowDate = new Date();
-			let nowDay = nowDate.getDay();
-			let nowHour = nowDate.getHours();
-			let nowTime;
-			if(nowHour < 11) {
-				nowTime = "AM"; //小于就是AM
-			} else if(nowHour <= 13) {
-				nowTime = "MM"; //大于就是PM
-			} else {
-				nowTime = "PM"; //大于就是PM
-			}
-
-			const allCityCodeArr = [];
-			let weatherKey = weather.key;
-			let weatherAllDataArr = weather.all_data;
-
-			//组装未来天气城市编码参数
-			for (let i = 0; i < weatherAllDataArr.length; i++) {
-				const weatherTimeArr = weatherAllDataArr[i].time;
-				for (let j = 0; j < weatherTimeArr.length; j++) {
-					const weatherTime = weatherTimeArr[j];
-					if(nowTime == weatherTime) {
-						const weatherAllDayArr = weatherAllDataArr[i].day;
-						for (let k = 0; k < weatherAllDayArr.length; k++) {
-							if (nowDay == weatherAllDayArr[k]) {
-								let weatherCityCode = weatherAllDataArr[i].city_code;
-								allCityCodeArr.push(weatherCityCode);
-							}
-						}
+			for(const city of cities) {
+				const cityname = city.city_name;
+				const url = baseUrl.replace("{city_code}", city.city_code);
+				const dataStr = await syncDataWithRetry(url, headers);
+				console.log(`正在获取 ${city.city_name} 的数据...`);
+				if (dataStr != null) {
+					var dataFc = extractFc(dataStr, cityname);
+					if (dataFc != null) {
+						weatherCityContent.push(dataFc);
 					}
+					weatherCityContent.join('\n\n');
 				}
 			}
-
-			//获取未来天气数据
-			let allAppend = false;
-			if(allCityCodeArr.length > 0){
-				weatherCityContent.push(`🌍天气预报`);
-				for (let i = 0; i < allCityCodeArr.length; i++) {
-					//获取天气数据
-					let weatherCityCode = allCityCodeArr[i]
-					if(i+1 == allCityCodeArr.length){
-						allAppend = true;
-					}
-					let cityContent = await getAllWeather(weatherKey, weatherCityCode, allAppend)
-					weatherCityContent.push(cityContent);
-				}
-			}
-
+			console.log('获取天气预报成功数据：', weatherCityContent);
 			resolve(weatherCityContent.join('\n'))
 		} catch (error) {
-			console.log('处理天气数据失败', error.message || error);
-			reject(error.message || error)
-		}
-	})
-}
-
-//根据IP地址获得城市代码
-const getWeatherCityCode = (IPAddress) => {
-	return new Promise(async (resolve, reject) => {
-		try {
-			const res = await axios.get(`https://restapi.amap.com/v3/ip?ip=${IPAddress}&key=${weather.key}`)
-			// console.log('城市代码', res.data);
-			if (res.status == 200) {
-				resolve(res.data.adcode)
-			} else {
-				reject(res.data)
-			}
-		} catch (error) {
-			console.log('获取城市代码失败', error.message || error);
+			console.log('处理天气预报数据失败', error.message || error);
 			reject(error.message || error)
 		}
 	})
