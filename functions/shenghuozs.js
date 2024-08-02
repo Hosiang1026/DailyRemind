@@ -1,6 +1,10 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
+const cities = [
+    { city_name: "浙江余杭", city_code: "101210106" }
+	];
+
 const syncDataWithRetry = async (url, headers, maxRetries = 3) => {
     let retryCount = 0;
     while (retryCount <= maxRetries) {
@@ -35,11 +39,15 @@ const syncDataWithRetry = async (url, headers, maxRetries = 3) => {
     return null;
 };
 
-const extractDataZS = (dataStr, cityname) => {
+const extractDataZS = (dataStr) => {
     const indices = [
-        'ys', 'xc', 'lk',
-        'dy', 'tr', 'gj', 'fs', 'gl',
-        'ac', 'co', 'uv', 'gz'
+        'ys', //雨伞
+		'xc', //洗车
+		'lk', //路况
+        'dy', //钓鱼
+		'tr', //旅游
+		'fs', //防晒
+		'co' //舒适度
     ];
     // 正则表达式匹配 `dataZS` 到 `fc` 之间的内容
     const regex = /var dataZS =({.*?});\s*var fc =/s;
@@ -51,13 +59,12 @@ const extractDataZS = (dataStr, cityname) => {
 
             const content = indices.map(index => {
                 const name = zs[`${index}_name`] || "未知";
-                const hint = zs[`${index}_hint`] || "未知";
+                //const hint = zs[`${index}_hint`] || "未知";
                 const des_s = zs[`${index}_des_s`] || "未知";
-
-                return name !== "未知" ? `${name}: ${hint}, ${des_s}` : null;
+                return name !== "未知" ? `【${name}】${des_s}` : null;
             }).filter(line => line).join('\n');
 
-            return `\n${cityname} - 生活指数信息:\n${content}`;
+            return `\n${content}`;
         } catch (error) {
             console.error(`JSONDecodeError in dataZS: ${error.message}`);
             return null;
@@ -67,13 +74,6 @@ const extractDataZS = (dataStr, cityname) => {
 
 module.exports = handleShenghuoZS = () => {
     return new Promise(async (resolve, reject) => {
-	const cities = [
-    { city_name: "安徽-怀宁", city_code: "101220605" },
-    { city_name: "浙江-余杭", city_code: "101210106" },
-    { city_name: "浙江-吴兴", city_code: "101210205" },
-    { city_name: "福建-福州", city_code: "101230101" }
-	];
-
 	const baseUrl = "https://d1.weather.com.cn/weather_index/{city_code}.html?_=1722309451962";
 	const headers = {
 		"Referer": "http://www.weather.com.cn/"
@@ -81,23 +81,23 @@ module.exports = handleShenghuoZS = () => {
 
     try {
         let weatherCityContent = []
+		weatherCityContent.push('🎈浙江余杭生活指数信息');
         for(const city of cities) {
-            const cityname = city.city_name;
             const url = baseUrl.replace("{city_code}", city.city_code);
             const dataStr = await syncDataWithRetry(url, headers);
             console.log(`正在获取 ${city.city_name} 的数据...`);
             if (dataStr != null) {
-                var dataZS = extractDataZS(dataStr, cityname);
+                var dataZS = extractDataZS(dataStr);
                 if (dataZS != null) {
                     weatherCityContent.push(dataZS);
                 }
                 weatherCityContent.join('\n\n');
             }
         }
-        console.log('获取天气预报成功数据：', weatherCityContent);
+        console.log('获取生活指数成功：', weatherCityContent);
         resolve(weatherCityContent.join('\n'))
     } catch (error) {
-        console.log('处理天气预报数据失败', error.message || error);
+        console.log('处理生活指数失败', error.message || error);
         reject(error.message || error)
     }
     })

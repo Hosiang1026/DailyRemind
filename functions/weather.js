@@ -1,6 +1,42 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
+//台风 https://d1.weather.com.cn/typhoon/typhoon_list/list_2024.json?callback=getData&_=1722388563506
+
+
+
+
+//显示天气 https://d1.weather.com.cn/sk_2d/101210106.html?_=1722594965119
+//https://d1.weather.com.cn/sk_2d/101210106.html?_=1722595936375
+//未来降雨： https://d3.weather.com.cn/webgis_rain_new/webgis/minute?lat=30.419&lon=120.299&callback=aa&_=1722594965125
+
+
+
+//iP地址自动位置：https://wgeo.weather.com.cn/ip/?_=1722596281348
+//通过编码获取城市信息 https://d7.weather.com.cn/geong/v1/api/?params={%22method%22:%22stationinfo%22,%22areaid%22:%22101210106%22,%22category%22:%22%22,%22callback%22:%22zs%22}&callback=zs&_=1722594965120
+//城市编码 https://i.tq121.com.cn/j/webgis_v2/city.json?callback=weacity&_=1722595937269
+
+
+// 获取城市天气编码
+const citiesJson = process.env.CITIES;
+
+// 解析 JSON 数据
+let cities = [];
+try {
+    if(citiesJson!=undefined){
+        cities = JSON.parse(citiesJson);
+    }else{
+        cities = [
+        { city_name: "浙江-余杭", city_code: "101210106" },
+        { city_name: "浙江-吴兴", city_code: "101210205" },
+        { city_name: "福建-福州", city_code: "101230101" },
+        { city_name: "安徽-怀宁", city_code: "101220605" }
+        ];
+    }
+} catch (error) {
+    console.error("环境变量-城市天气编码配置错误:", error);
+}
+
 const syncDataWithRetry = async (url, headers, maxRetries = 3) => {
     let retryCount = 0;
     while (retryCount <= maxRetries) {
@@ -35,41 +71,41 @@ const syncDataWithRetry = async (url, headers, maxRetries = 3) => {
     return null;
 };
 
-const extractCityDZ = (dataStr) => {
-    // 正则表达式匹配 `cityDZ` 到 `alarmDZ` 之间的内容
-    const regex = /var cityDZ =({.*?});\s*var alarmDZ =/s;
+//获取城市天气，但不准确
+// const extractCityDZ = (dataStr) => {
+//     // 正则表达式匹配 `cityDZ` 到 `alarmDZ` 之间的内容
+//     const regex = /var cityDZ =({.*?});\s*var alarmDZ =/s;
+//     const match = dataStr.match(regex);
+//     if (match && match[1]) {
+//         try {
+//             const data = JSON.parse(match[1]);
+//             const weatherInfo = data.weatherinfo || {};
+//
+//             const content = [
+//                 `城市: ${weatherInfo.city || "未知"}`,
+//                 `城市名称: ${weatherInfo.cityname || "未知"}`,
+//                 `温度: ${weatherInfo.temp || "未知"}°C`,
+//                 `天气: ${weatherInfo.weather || "未知"}`,
+//                 `风况: ${weatherInfo.wd || "未知"}`,
+//                 `风速: ${weatherInfo.ws || "未知"}`,
+//                 `预报时间: ${weatherInfo.fctime || "未知"}`
+//             ].join('\n');
+//
+//             return `\n城市基本信息:\n${content}`;
+//         } catch (error) {
+//             console.error(`JSONDecodeError in cityDZ: ${error.message}`);
+//             return null;
+//         }
+//     }
+// };
+
+const extractDataSK = (dataStr) => {
+    // 正则表达式匹配 `fc` 到结尾之间的内容
+    const regex = /var dataSK\s*=\s*({[\s\S]*})/;
     const match = dataStr.match(regex);
     if (match && match[1]) {
         try {
             const data = JSON.parse(match[1]);
-            const weatherInfo = data.weatherinfo || {};
-
-            const content = [
-                `城市: ${weatherInfo.city || "未知"}`,
-                `城市名称: ${weatherInfo.cityname || "未知"}`,
-                `温度: ${weatherInfo.temp || "未知"}°C`,
-                `天气: ${weatherInfo.weather || "未知"}`,
-                `风况: ${weatherInfo.wd || "未知"}`,
-                `风速: ${weatherInfo.ws || "未知"}`,
-                `预报时间: ${weatherInfo.fctime || "未知"}`
-            ].join('\n');
-
-            return `\n城市基本信息:\n${content}`;
-        } catch (error) {
-            console.error(`JSONDecodeError in cityDZ: ${error.message}`);
-            return null;
-        }
-    }
-};
-
-const extractDataSK = (dataStr, cityname) => {
-    // 正则表达式匹配 `dataSK` 到 `dataZS` 之间的内容
-    const regex = /var dataSK =({.*?});\s*var dataZS =/s;
-    const match = dataStr.match(regex);
-    if (match && match[1]) {
-        try {
-            const data = JSON.parse(match[1]);
-
             var weatherIcon = '';
             var weathers = data.weather;
             switch (weathers) {
@@ -100,14 +136,14 @@ const extractDataSK = (dataStr, cityname) => {
                     }
             }
 
+            // 使用正则表达式去掉(星期三)
+            const dateWithoutWeekday = data.date.replace(/\(星期[一二三四五六日]\)/, '');
+
             const content = [
-                `地区: ${cityname}`,
-                `天气: ${weathers || "未知"} ${weatherIcon || ""}`,
-                `湿度: ${data.sd || "未知"}`,
-                `温度: ${data.temp || "0"}°C`,
-                `降雨量: ${data.rain || "0"}mm`,
-                `风况: ${data.WD || "未知"} ${data.WS || ""} ${data.wse || ""}`,
-                `预报时间: ${data.date || ""} ${data.time || ""}`
+                `· 天气: ${weathers || "未知"} ${weatherIcon || ""}`,
+                `· 温湿度: ${data.temp || "0"}°C ${data.sd || "未知"} ${data.rain || "0"}mm`,
+                `· 风向情况: ${data.WD || "未知"}${data.WS || ""} ${data.wse || ""} `,
+                `· 预报时间: ${dateWithoutWeekday || ""} ${data.time || ""}`
             ].join('\n');
 
             return `\n${content}`;
@@ -128,7 +164,7 @@ const extractAlarmDZ = (dataStr) => {
             const alerts = data.w || [];
 
             if(alerts.length > 0){
-                const content = alerts.map(alert => `预警信息: ${alert.w9 || "未知"}`).join('\n');
+                const content = alerts.map(alert => `${alert.w9 || "未知"}`).join('\n');
                 return `\n${content}`;
             }
 
@@ -139,108 +175,55 @@ const extractAlarmDZ = (dataStr) => {
     }
 };
 
-const extractDataZS = (dataStr) => {
-    const indices = [
-        'ys', 'xc', 'lk',
-        'dy', 'tr', 'gj', 'fs', 'gl',
-        'ac', 'co', 'uv', 'gz'
-    ];
-    // 正则表达式匹配 `dataZS` 到 `fc` 之间的内容
-    const regex = /var dataZS =({.*?});\s*var fc =/s;
-    const match = dataStr.match(regex);
-    if (match && match[1]) {
-        try {
-            const data = JSON.parse(match[1]);
-            const zs = data.zs || {};
-
-            const content = indices.map(index => {
-                const name = zs[`${index}_name`] || "未知";
-                const hint = zs[`${index}_hint`] || "未知";
-                const des_s = zs[`${index}_des_s`] || "未知";
-
-                return name !== "未知" ? `${name}: ${hint}, ${des_s}` : null;
-            }).filter(line => line).join('\n');
-
-            return `\n生活指数信息:\n${content}`;
-        } catch (error) {
-            console.error(`JSONDecodeError in dataZS: ${error.message}`);
-            return null;
-        }
-    }
-};
-
-const extractFc = (dataStr, cityname) => {
-    // 正则表达式匹配 `fc` 到结尾之间的内容
-    const regex = /var fc\s*=\s*({[\s\S]*})/;
-    const match = dataStr.match(regex);
-    if (match && match[1]) {
-        try {
-            const data = JSON.parse(match[1]);
-            const forecasts = data.f || [];
-
-            const content = forecasts.map(forecast => {
-                const date = forecast.fi ? forecast.fi.replace(/\//g, '-') : "未知";
-                const day = forecast.fj || "未知";
-                const tempHigh = forecast.fc || "未知";
-                const tempLow = forecast.fd || "未知";
-                const windDirection = forecast.fe || "未知";
-                const windSpeed = forecast.fg || "未知";
-                const humidity = forecast.fm || "未知";
-                const comfortIndex = forecast.fn || "未知";
-
-                return `日期: ${date} (${day})\n气温: ${tempLow}°C ~ ${tempHigh}°C\n湿度: ${humidity}%\n舒适度: ${comfortIndex}\n风向: ${windDirection} ${windSpeed}\n`;
-            }).join('\n');
-
-            return `\n${cityname}未来天气预报信息:\n${content}`;
-        } catch (error) {
-            console.error(`JSONDecodeError in fc: ${error.message}`);
-            return null;
-        }
-    }
-};
-
 module.exports = handleWeather = () => {
     return new Promise(async (resolve, reject) => {
-	const cities = [
-    { city_name: "安徽-怀宁", city_code: "101220605" },
-    { city_name: "浙江-余杭", city_code: "101210106" },
-    { city_name: "浙江-吴兴", city_code: "101210205" },
-    { city_name: "福建-福州", city_code: "101230101" }
-	];
 
-	const baseUrl = "https://d1.weather.com.cn/weather_index/{city_code}.html?_=1722309451962";
+    //实况天气
+	const weatherUrl = "https://d1.weather.com.cn/sk_2d/{city_code}.html?_=1722594965119";
+	//预警天气汇总
+    const alarmUrl = "https://d1.weather.com.cn/weather_index/{city_code}.html?_=1722309451962";
 	const headers = {
 		"Referer": "http://www.weather.com.cn/"
 	};
 
     try {
+        let mergedContent = []
         let weatherCityContent = []
-         weatherCityContent.push("\n实时天气信息:");
-        for(const city of cities) {
-            const cityname = city.city_name;
-            const url = baseUrl.replace("{city_code}", city.city_code);
+        weatherCityContent.push("🌈实时天气信息");
+        const dataList = [];
+        for(let city of cities) {
+            console.log(`正在获取 ${city.city_name} 的实时天气数据...`);
+            const url = weatherUrl.replace("{city_code}", city.city_code);
             const dataStr = await syncDataWithRetry(url, headers);
-            console.log(`正在获取 ${city.city_name} 的数据...`);
             if (dataStr != null) {
-                //weatherCityContent.push(extractCityDZ(dataStr));
-                var dataSK = extractDataSK(dataStr, cityname);
-                if (dataSK != null) {
-                    weatherCityContent.push(dataSK);
-                }
-                // var dataZS = extractDataZS(dataStr);
-                // if (dataZS != null) {
-                //     weatherCityContent.push(dataZS);
-                // }
-                var alarmDZ = extractAlarmDZ(dataStr);
-                if (alarmDZ != null){
-                    weatherCityContent.push(alarmDZ);
-                }
-
-                weatherCityContent.join('\n\n');
+                dataList.push(dataStr);
+            var dataSK = extractDataSK(dataStr);
+            if (dataSK != null) {
+                weatherCityContent.push('\n🚩'+ city.city_name);
+                weatherCityContent.push(dataSK);
+            }
             }
         }
-        console.log('获取天气预报成功数据：', weatherCityContent);
-        resolve(weatherCityContent.join('\n'))
+
+        let alarmContent = []
+        for(let city of cities) {
+            console.log(`正在获取 ${city.city_name} 的天气预警数据...`);
+            const url = alarmUrl.replace("{city_code}", city.city_code);
+            const alarmData = await syncDataWithRetry(url, headers);
+            var alarmDZ = extractAlarmDZ(alarmData);
+            if (alarmDZ != null){
+                alarmContent.push(alarmDZ);
+            }
+        }
+        if (alarmContent.length >0){
+            weatherCityContent.push("\n🚨天气预警信息");
+            mergedContent = weatherCityContent.concat(alarmContent);
+        }
+
+        mergedContent.join('\n\n');
+        console.log('获取天气预报成功数据：', mergedContent);
+        resolve(mergedContent.join('\n'))
+
     } catch (error) {
         console.log('处理天气预报数据失败', error.message || error);
         reject(error.message || error)
