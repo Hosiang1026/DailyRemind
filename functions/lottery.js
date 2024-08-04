@@ -63,6 +63,7 @@ function writeLotteryCode(ssqCode, ssqRed, ssqBlue, ssqDate, lotteryContent) {
 			lotteryContent.push(`\n💹预测下期双色球号码\n`);
 			lotteryContent.push(`· 红球号码: ` + prediction.redBalls);
 			lotteryContent.push(`· 蓝球号码: ` + prediction.blueBall);
+			lotteryContent.push(`· 历史彩票: ` + data.lottery.length + `期`);
 			console.log("Predicted Red Balls:", prediction.redBalls);
 			console.log("Predicted Blue Ball:", prediction.blueBall);
 
@@ -265,10 +266,10 @@ module.exports = handleLottery = () => {
 				if (SD.poolmoney != ''&&SD.poolmoney != '_'&&SD.poolmoney != '0'){
 					lotteryContent.push(`· 奖池金额: ` + SD.poolmoney + '元');
 				}
+				lotteryContent.push(`· 中奖号码: ` + SD.red);
 				if (SD.content != ''&&SD.content != '_'){
 					lotteryContent.push(`· 中奖情况: ` + SD.content);
 				}
-				lotteryContent.push(`· 中奖号码: ` + SD.red);
 			}
 		}
 
@@ -284,10 +285,10 @@ module.exports = handleLottery = () => {
 				if (KL8.poolmoney != ''&&KL8.poolmoney != '_'&&KL8.poolmoney != '0'){
 					lotteryContent.push(`· 奖池金额: ` + KL8.poolmoney + '元');
 				}
+				lotteryContent.push(`· 中奖号码: ` + KL8.red);
 				if (KL8.content != ''&&KL8.content != '_'){
 					lotteryContent.push(`· 中奖情况: ` + KL8.content);
 				}
-				lotteryContent.push(`· 中奖号码: ` + KL8.red);
 			}
 		}
 
@@ -303,11 +304,11 @@ module.exports = handleLottery = () => {
 				if (QLC.poolmoney != ''&&QLC.poolmoney != '_'&&QLC.poolmoney != '0'){
 					lotteryContent.push(`· 奖池金额: ` + QLC.poolmoney + '元');
 				}
+				lotteryContent.push(`· 红球号码: ` + QLC.red);
+				lotteryContent.push(`· 蓝球号码: ` + QLC.blue);
 				if (QLC.content != ''&&QLC.content != '_'){
 					lotteryContent.push(`· 中奖情况: ` + QLC.content);
 				}
-				lotteryContent.push(`· 红球号码: ` + QLC.red);
-				lotteryContent.push(`· 蓝球号码: ` + QLC.blue);
 			}
 		}
 
@@ -323,12 +324,11 @@ module.exports = handleLottery = () => {
 				if (SSQ.poolmoney != ''&&SSQ.poolmoney != '_'&&SSQ.poolmoney != '0'){
 					lotteryContent.push(`· 奖池金额: ` + SSQ.poolmoney + '元');
 				}
+				lotteryContent.push(`· 红球号码: ` + SSQ.red);
+				lotteryContent.push(`· 蓝球号码: ` + SSQ.blue);
 				if (SSQ.content != ''&&SSQ.content != '_'){
 					lotteryContent.push(`· 中奖情况: ` + SSQ.content);
 				}
-				lotteryContent.push(`· 红球号码: ` + SSQ.red);
-				lotteryContent.push(`· 蓝球号码: ` + SSQ.blue);
-
 				// 双色球 - 写入彩票号码
 				writeLotteryCode(SSQ.code, SSQ.red, SSQ.blue, SSQ.date, lotteryContent);
 			}
