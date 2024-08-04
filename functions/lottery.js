@@ -63,7 +63,7 @@ function writeLotteryCode(ssqCode, ssqRed, ssqBlue, ssqDate, lotteryContent) {
 			lotteryContent.push(`\n💹预测下期双色球号码\n`);
 			lotteryContent.push(`· 红球号码: ` + prediction.redBalls);
 			lotteryContent.push(`· 蓝球号码: ` + prediction.blueBall);
-			lotteryContent.push(`· 历史彩票: ` + data.lottery.length + `期`);
+			lotteryContent.push(`· 历史彩票: ` + data.lottery.length);
 			console.log("Predicted Red Balls:", prediction.redBalls);
 			console.log("Predicted Blue Ball:", prediction.blueBall);
 
