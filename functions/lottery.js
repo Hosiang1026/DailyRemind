@@ -59,9 +59,10 @@ function writeLotteryCode(ssqCode, ssqRed, ssqBlue, ssqDate, lotteryContent) {
 			});
 
 			//预测下期双色球号码
+			const newPredictId = data.predict.length ? Math.max(...data.predict.map(item => item.id)) + 1 : 1;
 			const prediction = predictNextSSQ(data);
 			lotteryContent.push(`\n💹预测下期双色球号码\n`);
-			lotteryContent.push(`· 预测编号: ` + prediction.id);
+			lotteryContent.push(`· 预测编号: ` + newPredictId);
 			lotteryContent.push(`· 彩票期数: ` + data.lottery.length);
 			lotteryContent.push(`· 红球号码: ` + prediction.redBalls);
 			lotteryContent.push(`· 蓝球号码: ` + prediction.blueBall);
@@ -71,7 +72,6 @@ function writeLotteryCode(ssqCode, ssqRed, ssqBlue, ssqDate, lotteryContent) {
 			//写入预测双色球号码
 			const oldPredict = data.predict.filter(oldItem => oldItem.pre_date === ssqDate);
 			if (oldPredict.length == 0) {
-				const newPredictId = data.predict.length ? Math.max(...data.predict.map(item => item.id)) + 1 : 1;
 				const newPrediction = {
 					id: newPredictId,
 					ssq_red: prediction.redBalls,
