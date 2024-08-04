@@ -209,7 +209,7 @@ function predictNextSSQ(data) {
 	predictedReds.sort((a, b) => a - b);
 
 	return {
-		redBalls: predictedReds,
+		redBalls: predictedReds.join(', '),
 		blueBall: predictedBlue
 	};
 }
