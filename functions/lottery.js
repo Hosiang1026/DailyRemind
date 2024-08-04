@@ -50,19 +50,19 @@ function writeLotteryCode(ssqCode, ssqRed, ssqBlue, ssqDate, lotteryContent) {
 
 			//比较中奖概率
 			const winnings = calculateWinnings(data.lottery, data.predict);
-			lotteryContent.push(`\n🎯本期双色球开奖\n`);
+			lotteryContent.push(`\n🎯本期预测双色球开奖\n`);
 			winnings.forEach(result => {
-				lotteryContent.push(`· 本期预测中奖情况: ${result.matchedPrize}`);
-				lotteryContent.push(`· 本期预测中奖金额: ${result.matchedAmount}`);
-				lotteryContent.push(`· 本期预测匹配红球数: ${result.matchedRedBalls}`);
-				lotteryContent.push(`· 本期预测是否匹配蓝球: ${result.matchedBlueBall}`);
+				lotteryContent.push(`· 本期中奖情况: ${result.matchedPrize}`);
+				lotteryContent.push(`· 本期中奖金额: ${result.matchedAmount}`);
+				lotteryContent.push(`· 本期匹配红球数: ${result.matchedRedBalls}`);
+				lotteryContent.push(`· 本期是否匹配蓝球: ${result.matchedBlueBall}`);
 			});
 
 			//预测下期双色球号码
 			const prediction = predictNextSSQ(data);
-			lotteryContent.push(`\n🎯预测双色球号码\n`);
-			lotteryContent.push(`· 下期红球号码: ` + prediction.redBalls);
-			lotteryContent.push(`· 下期蓝球号码: ` + prediction.blueBall);
+			lotteryContent.push(`\n💹预测下期双色球号码\n`);
+			lotteryContent.push(`· 红球号码: ` + prediction.redBalls);
+			lotteryContent.push(`· 蓝球号码: ` + prediction.blueBall);
 			console.log("Predicted Red Balls:", prediction.redBalls);
 			console.log("Predicted Blue Ball:", prediction.blueBall);
 
