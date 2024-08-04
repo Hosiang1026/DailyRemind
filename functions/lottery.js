@@ -30,19 +30,17 @@ function writeLotteryCode(ssqCode, ssqRed, ssqBlue, ssqDate, lotteryContent) {
 	try{
 		if (fs.existsSync(dataFilePath)) {
 			const data = JSON.parse(fs.readFileSync(dataFilePath, 'utf8'));
-
-			// 自动生成新ID
-			const newId = data.lottery.length ? Math.max(...data.lottery.map(item => item.id)) + 1 : 1;
-
-			const newItem = {
-				id: newId,
-				ssq_code: ssqCode,
-				ssq_red: ssqRed,
-				ssq_blue: ssqBlue,
-				ssq_date: ssqDate
-			};
 			const oldLottery = data.lottery.filter(item => item.ssq_code === ssqCode);
 			if (oldLottery.length == 0){
+				// 自动生成新ID
+				const newId = data.lottery.length ? Math.max(...data.lottery.map(item => item.id)) + 1 : 1;
+				const newItem = {
+					id: newId,
+					ssq_code: ssqCode,
+					ssq_red: ssqRed,
+					ssq_blue: ssqBlue,
+					ssq_date: ssqDate
+				};
 				data.lottery.push(newItem);
 				fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
 				console.log('writeLotteryCode success');
@@ -50,13 +48,40 @@ function writeLotteryCode(ssqCode, ssqRed, ssqBlue, ssqDate, lotteryContent) {
 				console.log('writeLotteryCode exist');
 			}
 
+			//比较中奖概率
+			const winnings = calculateWinnings(data.lottery, data.predict);
+			lotteryContent.push(`\n🎯本期双色球开奖\n`);
+			winnings.forEach(result => {
+				lotteryContent.push(`· 本期预测中奖情况: ${result.matchedPrize}`);
+				lotteryContent.push(`· 本期预测中奖金额: ${result.matchedAmount}`);
+				lotteryContent.push(`· 本期预测匹配红球数: ${result.matchedRedBalls}`);
+				lotteryContent.push(`· 本期预测是否匹配蓝球: ${result.matchedBlueBall}`);
+			});
+
+			//预测下期双色球号码
 			const prediction = predictNextSSQ(data);
-			lotteryContent.push(`\n🎯预测下一期双色球号码\n`);
-			lotteryContent.push(`· 红球号码: ` + prediction.redBalls);
-			lotteryContent.push(`· 蓝球号码: ` + prediction.blueBall);
+			lotteryContent.push(`\n🎯预测双色球号码\n`);
+			lotteryContent.push(`· 下期红球号码: ` + prediction.redBalls);
+			lotteryContent.push(`· 下期蓝球号码: ` + prediction.blueBall);
 			console.log("Predicted Red Balls:", prediction.redBalls);
 			console.log("Predicted Blue Ball:", prediction.blueBall);
 
+			//写入预测双色球号码
+			const oldPredict = data.predict.filter(oldItem => oldItem.pre_date === ssqDate);
+			if (oldPredict.length == 0) {
+				const newPredictId = data.predict.length ? Math.max(...data.predict.map(item => item.id)) + 1 : 1;
+				const newPrediction = {
+					id: newPredictId,
+					ssq_red: prediction.redBalls,
+					ssq_blue: prediction.blueBall,
+					pre_date: ssqDate
+				}
+				data.predict.push(newPrediction);
+				fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
+				console.log('writePredictLotteryCode success');
+			}else{
+				console.log('writePredictLotteryCode exist');
+			}
 		} else {
 			console.log('Data file not found', error.message || error);
 		}
@@ -66,6 +91,74 @@ function writeLotteryCode(ssqCode, ssqRed, ssqBlue, ssqDate, lotteryContent) {
 	}
 })
 }
+
+// 双色球的中奖规则和对应的中奖金额如下：
+// 一等奖：6个红球+1个蓝球，奖金通常是浮动的，一般为数百万元或以上。
+// 二等奖：6个红球，奖金通常也是浮动的，通常为数十万元。
+// 三等奖：5个红球+1个蓝球，固定奖金3000元。
+// 四等奖：5个红球或4个红球+1个蓝球，固定奖金200元。
+// 五等奖：4个红球或3个红球+1个蓝球，固定奖金10元。
+// 六等奖：1个蓝球，固定奖金5元。
+
+// 计算中奖情况
+function calculateWinnings(lottery, predict) {
+	const matchRedBalls = (drawn, predicted) => {
+		const drawnSet = new Set(drawn.split(',').map(Number));
+		const predictedSet = new Set(predicted.split(',').map(Number));
+		let matches = 0;
+		predictedSet.forEach(num => {
+			if (drawnSet.has(num)) matches++;
+		});
+		return matches;
+	};
+
+	const matchBlueBall = (drawn, predicted) => {
+		return drawn === predicted;
+	};
+
+	const results = [];
+
+	const lastLottery = lottery[lottery.length - 1];
+	const lastPrediction = predict[predict.length - 1];
+
+	const redMatches = matchRedBalls(lastLottery.ssq_red, lastPrediction.ssq_red);
+	const blueMatch = matchBlueBall(lastLottery.ssq_blue, lastPrediction.ssq_blue);
+
+	let prize;
+	let prizeAmount;
+	if (redMatches === 6 && blueMatch) {
+		prize = '一等奖';
+		prizeAmount = "100万元以上";
+	} else if (redMatches === 6) {
+		prize = '二等奖';
+		prizeAmount = "10万元";
+	} else if (redMatches === 5 && blueMatch) {
+		prize = '三等奖';
+		prizeAmount = "3000元";
+	} else if (redMatches === 5 || (redMatches === 4 && blueMatch)) {
+		prize = '四等奖';
+		prizeAmount = "200元";
+	} else if (redMatches === 4 || (redMatches === 3 && blueMatch)) {
+		prize = '五等奖';
+		prizeAmount = "10元";
+	} else if (blueMatch) {
+		prize = '六等奖';
+		prizeAmount = "5元";
+	} else {
+		prize = '未中奖';
+		prizeAmount = "0元";
+	}
+
+	results.push({
+		matchedRedBalls: redMatches,
+		matchedBlueBall: blueMatch,
+		matchedPrize: prize,
+		matchedAmount: prizeAmount
+	});
+
+	return results;
+}
+
 
 // 统计出现频率的函数
 function countFrequency(arr) {
