@@ -52,18 +52,19 @@ function writeLotteryCode(ssqCode, ssqRed, ssqBlue, ssqDate, lotteryContent) {
 			const winnings = calculateWinnings(data.lottery, data.predict);
 			lotteryContent.push(`\n🎯本期预测双色球开奖\n`);
 			winnings.forEach(result => {
-				lotteryContent.push(`· 本期中奖情况: ${result.matchedPrize}`);
-				lotteryContent.push(`· 本期中奖金额: ${result.matchedAmount}`);
-				lotteryContent.push(`· 本期匹配红球数: ${result.matchedRedBalls}`);
-				lotteryContent.push(`· 本期是否匹配蓝球: ${result.matchedBlueBall}`);
+				lotteryContent.push(`· 中奖情况: ${result.matchedPrize}`);
+				lotteryContent.push(`· 中奖金额: ${result.matchedAmount}`);
+				lotteryContent.push(`· 匹配红球数: ${result.matchedRedBalls}`);
+				lotteryContent.push(`· 是否匹配蓝球: ${result.matchedBlueBall}`);
 			});
 
 			//预测下期双色球号码
 			const prediction = predictNextSSQ(data);
 			lotteryContent.push(`\n💹预测下期双色球号码\n`);
+			lotteryContent.push(`· 预测编号: ` + prediction.id);
+			lotteryContent.push(`· 彩票期数: ` + data.lottery.length);
 			lotteryContent.push(`· 红球号码: ` + prediction.redBalls);
 			lotteryContent.push(`· 蓝球号码: ` + prediction.blueBall);
-			lotteryContent.push(`· 历史彩票: ` + data.lottery.length);
 			console.log("Predicted Red Balls:", prediction.redBalls);
 			console.log("Predicted Blue Ball:", prediction.blueBall);
 
