@@ -71,7 +71,7 @@ async function fetchUpdateText(url) {
         const $ = cheerio.load(data);
 
         // Extract specific text about oil price changes
-        const priceUpdateText = $('#rightTop').text().trim().split('\n').filter(line => line.includes('下次油价')).join(' ');
+        const priceUpdateText = $('#rightTop').text().trim().split('\n').filter(line => line.includes('相互转告')).join(' ');
 
         return priceUpdateText;
     } catch (error) {
