@@ -48,9 +48,9 @@ def getNew():
         url = list(dict.fromkeys(url))
         for i in range(1, 9):
             if i == 1:
-                _content = str(i)+'.'+ title[i]
+                _content = str(i)+'.'+ title[i] + "\n"
             else:
-                _content = _content + "\n" +str(i)+'.'+ title[i]
+                _content = _content + "\n" +str(i)+'.'+ title[i] + "\n"
         return _content
     except Exception as e:
         return e
@@ -82,6 +82,6 @@ if __name__ == '__main__':
         content = getNew()
         if content != '':
             print('获取今日热搜成功！')
-            send("今日热搜", content + "\n")
+            send("今日热搜", content + "\n\n")
         else:
             print('获取今日热搜失败！')
