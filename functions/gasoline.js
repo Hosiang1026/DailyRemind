@@ -89,7 +89,6 @@ module.exports = handleGasoline = async () => {
         const provinceArr = gasoline.province;
         const modelArr = gasoline.model;
         let content = [];
-        let textContent = ''; // Placeholder textContent, modify as needed
 
         if (provinceArr.length === 0 || modelArr.length === 0) {
             console.log('汽油价格模块参数未配置');
@@ -113,10 +112,9 @@ module.exports = handleGasoline = async () => {
             }
         }
 
-        content.push('\n' + textContent);
         console.log('获取汽油价格成功：\n', content);
-        content.push(updateText);
-        console.log('获取汽油调价情况成功：\n', updateText);
+        content.push('\n'+ updateText);
+        console.log('获取汽油调价情况成功：\n',  updateText);
         return content.join('\n');
 
     } catch (error) {
