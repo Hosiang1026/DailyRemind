@@ -299,7 +299,7 @@ module.exports = handleWeather = () => {
             }
         }
         if (alarmContent.length >0){
-            weatherCityContent.push("\n🚨天气预警信息");
+            mergedContent.push("\n🚨天气预警信息");
             mergedAllContent = mergedContent.concat(alarmContent);
         }else{
             mergedAllContent = mergedContent;
