@@ -223,7 +223,7 @@ const extractTyphoonDZ = (dataStr) => {
                 `· 未来移向: ${lastElement[8] }`,
                 `· 未来移速: ${lastElement[9] + "公里/小时"}`,
                 `· 风速风力: ${lastElement[7] + "米/秒"}`,
-                `· 中心气压: ${lastElement[6] + "(百帕)"}`,
+                `· 中心气压: ${lastElement[6] + "百帕"}`,
                 `· 中心位置: ${lastElement[5] + "N"}/${lastElement[4] + "E"}`,
                 `· 到达时间: ${lastElement[1] }`,
             ].join('\n');
@@ -253,6 +253,7 @@ module.exports = handleWeather = () => {
 
     try {
         let mergedContent = []
+        let mergedAllContent = []
         let weatherCityContent = []
         weatherCityContent.push("🌈实时天气信息");
         const dataList = [];
@@ -270,19 +271,21 @@ module.exports = handleWeather = () => {
             }
         }
 
+        let typhoonContent = []
         console.log(`正在获取台风数据...`);
         const typhoonList = await syncDataWithRetry(typhoonListUrl, headers);
         const typhoonCodeList = extractTyphoonListDZ(typhoonList);
-        if (typhoonCodeList.length >0){
-            mergedContent.push("\n🌪台风实时路径信息");
-        }
         for(let typhoonCode of typhoonCodeList) {
             const url = typhoonUrl.replace("{typhoonCode}", typhoonCode);
             const typhoonData = await syncDataWithRetry(url, headers);
             var typhoonDZ = extractTyphoonDZ(typhoonData);
             if (typhoonDZ != null && typhoonDZ != undefined) {
-                mergedContent.push(typhoonDZ);
+                typhoonContent.push(typhoonDZ);
             }
+        }
+        if (typhoonContent.length >0){
+            weatherCityContent.push("\n🌪台风实时路径信息");
+            mergedContent = weatherCityContent.concat(typhoonContent);
         }
 
         let alarmContent = []
@@ -297,14 +300,14 @@ module.exports = handleWeather = () => {
         }
         if (alarmContent.length >0){
             weatherCityContent.push("\n🚨天气预警信息");
-            mergedContent = weatherCityContent.concat(alarmContent);
+            mergedAllContent = mergedContent.concat(alarmContent);
         }else{
-            mergedContent = weatherCityContent;
+            mergedAllContent = mergedContent;
         }
 
-        mergedContent.join('\n\n');
-        console.log('获取天气预报成功数据：', mergedContent);
-        resolve(mergedContent.join('\n'))
+        mergedAllContent.join('\n\n');
+        console.log('获取天气预报成功数据：', mergedAllContent);
+        resolve(mergedAllContent.join('\n'))
 
     } catch (error) {
         console.log('处理天气预报数据失败', error.message || error);
