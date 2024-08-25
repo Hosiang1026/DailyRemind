@@ -207,7 +207,7 @@ const extractTyphoonDZ = (dataStr) => {
         return null;
     }
 
-    const typhoonName = jsonData.typhoon[3] + jsonData.typhoon[2] + jsonData.typhoon[1];
+    const typhoonName = jsonData.typhoon[3] + jsonData.typhoon[2];
 
     // 访问 typhoon 数组中的第9个元素
     const ninthTyphoon = jsonData.typhoon[8];
@@ -270,6 +270,21 @@ module.exports = handleWeather = () => {
             }
         }
 
+        console.log(`正在获取台风数据...`);
+        const typhoonList = await syncDataWithRetry(typhoonListUrl, headers);
+        const typhoonCodeList = extractTyphoonListDZ(typhoonList);
+        if (typhoonCodeList.length >0){
+            mergedContent.push("\n🌪台风实时路径信息");
+        }
+        for(let typhoonCode of typhoonCodeList) {
+            const url = typhoonUrl.replace("{typhoonCode}", typhoonCode);
+            const typhoonData = await syncDataWithRetry(url, headers);
+            var typhoonDZ = extractTyphoonDZ(typhoonData);
+            if (typhoonDZ != null && typhoonDZ != undefined) {
+                mergedContent.push(typhoonDZ);
+            }
+        }
+
         let alarmContent = []
         for(let city of cities) {
             console.log(`正在获取 ${city.city_name} 的天气预警数据...`);
@@ -285,21 +300,6 @@ module.exports = handleWeather = () => {
             mergedContent = weatherCityContent.concat(alarmContent);
         }else{
             mergedContent = weatherCityContent;
-        }
-
-        console.log(`正在获取台风数据...`);
-        const typhoonList = await syncDataWithRetry(typhoonListUrl, headers);
-        const typhoonCodeList = extractTyphoonListDZ(typhoonList);
-        if (typhoonCodeList.length >0){
-            mergedContent.push("\n🌪台风实时路径信息");
-        }
-        for(let typhoonCode of typhoonCodeList) {
-            const url = typhoonUrl.replace("{typhoonCode}", typhoonCode);
-            const typhoonData = await syncDataWithRetry(url, headers);
-            var typhoonDZ = extractTyphoonDZ(typhoonData);
-            if (typhoonDZ != null && typhoonDZ != undefined) {
-                mergedContent.push(typhoonDZ);
-            }
         }
 
         mergedContent.join('\n\n');
