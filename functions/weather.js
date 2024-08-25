@@ -140,7 +140,7 @@ const extractDataSK = (dataStr) => {
             const content = [
                 `· 天气: ${weathers || "未知"} ${weatherIcon || ""}`,
                 `· 温湿度: ${data.temp || "0"}°C ${data.sd || "未知"} ${data.rain || "0"}mm`,
-                `· 风向情况: ${data.WD || "未知"}${data.WS || ""} ${data.wse || ""} `,
+                `· 风向情况: ${data.WD || "未知"}${data.WS || ""}${data.wse || ""} `,
                 `· 预报时间: ${dateWithoutWeekday || ""} ${data.time || ""}`
             ].join('\n');
 
@@ -201,13 +201,7 @@ const extractTyphoonDZ = (dataStr) => {
     // 将字符串转换为 JSON 对象
     const jsonData = JSON.parse(jsonString);
 
-    const typhoonStatus = jsonData.typhoon[7];
-
-    if (typhoonStatus != "active"){
-        return null;
-    }
-
-    const typhoonName = jsonData.typhoon[3] + jsonData.typhoon[2];
+    const typhoonName = jsonData.typhoon[2];
 
     // 访问 typhoon 数组中的第9个元素
     const ninthTyphoon = jsonData.typhoon[8];
