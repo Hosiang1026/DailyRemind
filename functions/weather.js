@@ -1,9 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-//台风 https://d1.weather.com.cn/typhoon/typhoon_list/list_2024.json?callback=getData&_=1722388563506
-
-
+//台风列表 https://d1.weather.com.cn/typhoon/typhoon_list/list_2024.json?callback=getData&_=1722388563506
 
 
 //显示天气 https://d1.weather.com.cn/sk_2d/101210106.html?_=1722594965119
@@ -175,6 +173,68 @@ const extractAlarmDZ = (dataStr) => {
     }
 };
 
+const extractTyphoonListDZ = (dataStr) => {
+    try {
+        // 提取 JSON 对象部分
+        const jsonString = dataStr.match(/getData\(([\s\S]+)\)/)[1];
+
+        // 将字符串转换为 JSON 对象
+        const jsonData = JSON.parse(jsonString);
+
+        // 遍历 typhoonList 数组，寻找状态为 "active" 的台风数组
+        const activeTyphoon = jsonData.typhoonList.find(typhoon => typhoon.includes("active"));
+
+        // 如果找到 activeTyphoon，返回其第一个元素作为数组；否则返回空数组
+        return activeTyphoon ? [activeTyphoon[0]] : [];
+
+    } catch (error) {
+        console.error(`JSONDecodeError in extractTyphoonListDZ: ${error.message}`);
+        return null;
+    }
+
+};
+
+const extractTyphoonDZ = (dataStr) => {
+    // 提取 JSON 对象部分
+    const jsonString = dataStr.match(/getData\(([\s\S]+)\)/)[1];
+
+    // 将字符串转换为 JSON 对象
+    const jsonData = JSON.parse(jsonString);
+
+    const typhoonStatus = jsonData.typhoon[7];
+
+    if (typhoonStatus != "active"){
+        return null;
+    }
+
+    const typhoonName = jsonData.typhoon[3] + jsonData.typhoon[2] + jsonData.typhoon[1];
+
+    // 访问 typhoon 数组中的第9个元素
+    const ninthTyphoon = jsonData.typhoon[8];
+
+    // 获取第9个元素数组中的最后一个元素
+    const lastElement = ninthTyphoon[ninthTyphoon.length - 1];
+
+    if (lastElement && lastElement[1]) {
+        try {
+            // 遍历最后一个数组中的信息并格式化输出
+            const content = [
+                `· 台风名称: ${typhoonName }`,
+                `· 未来移向: ${lastElement[8] }`,
+                `· 未来移速: ${lastElement[9] + "公里/小时"}`,
+                `· 风速风力: ${lastElement[7] + "米/秒"}`,
+                `· 中心气压: ${lastElement[6] + "(百帕)"}`,
+                `· 中心位置: ${lastElement[5] + "N"}/${lastElement[4] + "E"}`,
+                `· 到达时间: ${lastElement[1] }`,
+            ].join('\n');
+            return `\n${content}`;
+        } catch (error) {
+            console.error(`JSONDecodeError in TyphoonDZ: ${error.message}`);
+            return null;
+        }
+    }
+};
+
 module.exports = handleWeather = () => {
     return new Promise(async (resolve, reject) => {
 
@@ -182,6 +242,11 @@ module.exports = handleWeather = () => {
 	const weatherUrl = "https://d1.weather.com.cn/sk_2d/{city_code}.html?_=1722594965119";
 	//预警天气汇总
     const alarmUrl = "https://d1.weather.com.cn/weather_index/{city_code}.html?_=1722309451962";
+    //台风列表
+    const typhoonListUrl = "https://d1.weather.com.cn/typhoon/typhoon_list/list_2024.json?callback=getData&_=1722388563506";
+    //台风信息
+    const typhoonUrl = "https://d1.weather.com.cn/typhoon/typhoon_data/2024/{typhoonCode}.json?callback=getData&_=1724557325237";
+
 	const headers = {
 		"Referer": "http://www.weather.com.cn/"
 	};
@@ -211,13 +276,30 @@ module.exports = handleWeather = () => {
             const url = alarmUrl.replace("{city_code}", city.city_code);
             const alarmData = await syncDataWithRetry(url, headers);
             var alarmDZ = extractAlarmDZ(alarmData);
-            if (alarmDZ != null){
+            if (alarmDZ != null&&alarmDZ != undefined){
                 alarmContent.push(alarmDZ);
             }
         }
         if (alarmContent.length >0){
             weatherCityContent.push("\n🚨天气预警信息");
             mergedContent = weatherCityContent.concat(alarmContent);
+        }else{
+            mergedContent = weatherCityContent;
+        }
+
+        console.log(`正在获取台风数据...`);
+        const typhoonList = await syncDataWithRetry(typhoonListUrl, headers);
+        const typhoonCodeList = extractTyphoonListDZ(typhoonList);
+        if (typhoonCodeList.length >0){
+            mergedContent.push("\n🌪台风实时路径信息");
+        }
+        for(let typhoonCode of typhoonCodeList) {
+            const url = typhoonUrl.replace("{typhoonCode}", typhoonCode);
+            const typhoonData = await syncDataWithRetry(url, headers);
+            var typhoonDZ = extractTyphoonDZ(typhoonData);
+            if (typhoonDZ != null && typhoonDZ != undefined) {
+                mergedContent.push(typhoonDZ);
+            }
         }
 
         mergedContent.join('\n\n');
