@@ -27,7 +27,6 @@ try {
         cities = [
         { city_name: "浙江-余杭", city_code: "101210106" },
         { city_name: "浙江-吴兴", city_code: "101210205" },
-        { city_name: "福建-福州", city_code: "101230101" },
         { city_name: "安徽-怀宁", city_code: "101220605" }
         ];
     }
@@ -251,6 +250,14 @@ module.exports = handleWeather = () => {
         let weatherCityContent = []
         weatherCityContent.push("🌈实时天气信息");
         const dataList = [];
+        const now = new Date();
+        const startDate = new Date(now.getFullYear(), 9, 1); // 10月1日
+        const endDate = new Date(now.getFullYear(), 9, 7, 23, 59, 59); // 10月7日 23:59:59
+        if(now >= startDate && now <= endDate){
+            const fuzhouData = { city_name: "福建-福州", city_code: "101230101" }
+            cities.push(fuzhouData);
+        }
+
         for(let city of cities) {
             console.log(`正在获取 ${city.city_name} 的实时天气数据...`);
             const url = weatherUrl.replace("{city_code}", city.city_code);

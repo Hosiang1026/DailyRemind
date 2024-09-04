@@ -71,8 +71,12 @@ async function fetchUpdateText(url) {
         const $ = cheerio.load(data);
 
         // Extract specific text about oil price changes
-        const priceUpdateText = $('#rightTop').text().trim().split('\n').filter(line => line.includes('相互转告')).join(' ');
-
+        var priceUpdateText = $('#rightTop').text().trim().split('\n').filter(line => line.includes('相互转告')).join(' ');
+		console.log('priceUpdateText:' ,  priceUpdateText);
+        if(priceUpdateText == ''){
+		   priceUpdateText = $('#rightTop').text().trim().split('\n').filter(line => line.includes('调整')).join(' ');
+		}
+         
         return priceUpdateText;
     } catch (error) {
         throw new Error('An error occurred while fetching the update text: ' + error.message);
@@ -84,7 +88,7 @@ module.exports = handleGasoline = async () => {
     try {
         const url = 'http://www.qiyoujiage.com'; // The URL to fetch data from
         const prices = await fetchContent(url);
-        const updateText = await fetchUpdateText(url);
+        var updateText = await fetchUpdateText(url);
 
         const provinceArr = gasoline.province;
         const modelArr = gasoline.model;
