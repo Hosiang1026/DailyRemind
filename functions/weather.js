@@ -267,7 +267,7 @@ const extractTyphoonDZ = (dataStr) => {
                 `· 未来移速: ${lastElement[9] + "公里/小时"}`,
                 `· 风速风力: ${lastElement[7] + "米/秒"}`,
                 `· 中心气压: ${lastElement[6] + "百帕"}`,
-                `· 中心位置: ${"东经" + lastElement[4]}${", 北纬" + lastElement[5]}`,
+                `· 中心位置: ${lastElement[5] + "N"}/${lastElement[4] + "E"}`,
                 `· 到达时间: ${lastElement[1] }`,
             ].join('\n');
             return `\n${content}`;
