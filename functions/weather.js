@@ -222,47 +222,35 @@ const extractTyphoonDZ = (dataStr) => {
             let typhoonGrade;
 
             if (windSpeedKmh < 62) {
-                typhoonLevel = '热带低压';
                 typhoonGrade = '6级以下';
             } else if (windSpeedKmh >= 62 && windSpeedKmh <= 74) {
-                typhoonLevel = '热带风暴';
                 typhoonGrade = '8级';
             } else if (windSpeedKmh > 74 && windSpeedKmh <= 88) {
-                typhoonLevel = '热带风暴';
                 typhoonGrade = '9级';
             } else if (windSpeedKmh >= 89 && windSpeedKmh <= 102) {
-                typhoonLevel = '强热带风暴';
                 typhoonGrade = '10级';
             } else if (windSpeedKmh > 102 && windSpeedKmh <= 117) {
-                typhoonLevel = '强热带风暴';
                 typhoonGrade = '11级';
             } else if (windSpeedKmh >= 118 && windSpeedKmh <= 133) {
-                typhoonLevel = '台风';
                 typhoonGrade = '12级';
             } else if (windSpeedKmh > 133 && windSpeedKmh <= 149) {
-                typhoonLevel = '台风';
                 typhoonGrade = '13级';
             } else if (windSpeedKmh >= 150 && windSpeedKmh <= 166) {
-                typhoonLevel = '强台风';
                 typhoonGrade = '14级';
             } else if (windSpeedKmh > 166 && windSpeedKmh <= 184) {
-                typhoonLevel = '强台风';
                 typhoonGrade = '15级';
             } else if (windSpeedKmh >= 185 && windSpeedKmh <= 201) {
-                typhoonLevel = '超强台风';
                 typhoonGrade = '16级';
             } else if (windSpeedKmh > 201 && windSpeedKmh <= 220) {
-                typhoonLevel = '超强台风';
                 typhoonGrade = '17级';
             } else if (windSpeedKmh > 220) {
-                typhoonLevel = '超强台风';
                 typhoonGrade = '18级及以上';
             }
 
             // 遍历最后一个数组中的信息并格式化输出
             const content = [
                 `· 台风名称: ${typhoonName}`,
-                `· 台风级别: ${typhoonGrade}${typhoonLevel}`,
+                `· 台风级别: ${typhoonGrade}`,
                 `· 未来移向: ${lastElement[8] }`,
                 `· 未来移速: ${lastElement[9] + "公里/小时"}`,
                 `· 风速风力: ${lastElement[7] + "米/秒"}`,
