@@ -295,6 +295,10 @@ let daily = {
             date: '1970-02-14'
         },
         {
+            name: 'Grandfather生日',
+            date: '1939-08-02'
+        },
+        {
             name: 'Xiang生日',
             date: '1992-09-18'
         },
