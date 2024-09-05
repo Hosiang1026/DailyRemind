@@ -181,10 +181,12 @@ const extractTyphoonListDZ = (dataStr) => {
         const jsonData = JSON.parse(jsonString);
 
         // 遍历 typhoonList 数组，寻找状态为 "active" 的台风数组
-        const activeTyphoon = jsonData.typhoonList.find(typhoon => typhoon.includes("active"));
+        const activeTyphoonCodes = jsonData.typhoonList
+            .filter(typhoon => typhoon.includes("active")) // 筛选出包含 "active" 的台风
+            .map(typhoon => typhoon[0]);
 
         // 如果找到 activeTyphoon，返回其第一个元素作为数组；否则返回空数组
-        return activeTyphoon ? [activeTyphoon[0]] : [];
+        return activeTyphoonCodes ? activeTyphoonCodes : [];
 
     } catch (error) {
         console.error(`JSONDecodeError in extractTyphoonListDZ: ${error.message}`);
@@ -200,7 +202,10 @@ const extractTyphoonDZ = (dataStr) => {
     // 将字符串转换为 JSON 对象
     const jsonData = JSON.parse(jsonString);
 
-    const typhoonName = jsonData.typhoon[2];
+    const typhoonCode = jsonData.typhoon[3];
+    const lastTwoDigits = typhoonCode.slice(-2); // 截取后两位数字
+    const typhoonNameStr = jsonData.typhoon[2];
+    const typhoonName = `${lastTwoDigits}号台风-` + typhoonNameStr; // 拼接成 台风编号格式
 
     // 访问 typhoon 数组中的第9个元素
     const ninthTyphoon = jsonData.typhoon[8];
@@ -249,7 +254,7 @@ const extractTyphoonDZ = (dataStr) => {
 
             // 遍历最后一个数组中的信息并格式化输出
             const content = [
-                `· 台风名称: ${typhoonName}`,
+                `🌀${typhoonName}`,
                 `· 台风级别: ${typhoonGrade}`,
                 `· 未来移向: ${lastElement[8] }`,
                 `· 未来移速: ${lastElement[9] + "公里/小时"}`,
@@ -289,10 +294,17 @@ module.exports = handleWeather = () => {
         weatherCityContent.push("🌈实时天气信息");
         const dataList = [];
         const now = new Date();
-        const startDate = new Date(now.getFullYear(), 9, 1); // 10月1日
+        const startDate = new Date(now.getFullYear(), 9, 1); // 10月1日 00:00:00
         const endDate = new Date(now.getFullYear(), 9, 7, 23, 59, 59); // 10月7日 23:59:59
         if(now >= startDate && now <= endDate){
             const fuzhouData = { city_name: "福建-福州", city_code: "101230101" }
+            cities.push(fuzhouData);
+        }
+
+        const newYearStartDate = new Date(now.getFullYear(), 1, 15); // 1月15日 00:00:00
+        const newYearEndDate = new Date(now.getFullYear(), 2, 15, 23, 59, 59); // 2月15日 23:59:59
+		if(now >= newYearStartDate && now <= newYearEndDate){
+            const fuzhouData = { city_name: "安徽-怀宁", city_code: "101220605" }
             cities.push(fuzhouData);
         }
 
@@ -323,7 +335,7 @@ module.exports = handleWeather = () => {
             }
         }
         if (typhoonContent.length >0){
-            weatherCityContent.push("\n🌪台风实时路径信息");
+            weatherCityContent.push("\n🌪实时台风信息");
             mergedContent = weatherCityContent.concat(typhoonContent);
         }
 
