@@ -203,9 +203,8 @@ const extractTyphoonDZ = (dataStr) => {
     const jsonData = JSON.parse(jsonString);
 
     const typhoonCode = jsonData.typhoon[3];
-    const lastTwoDigits = typhoonCode.slice(-2); // 截取后两位数字
     const typhoonNameStr = jsonData.typhoon[2];
-    const typhoonName = `${lastTwoDigits}号-` + typhoonNameStr + '\n'; // 拼接成 台风编号格式
+    const typhoonName = typhoonCode + `-` + typhoonNameStr + '\n';
 
     // 访问 typhoon 数组中的第9个元素
     const ninthTyphoon = jsonData.typhoon[8];
