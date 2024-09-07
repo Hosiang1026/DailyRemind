@@ -61,10 +61,32 @@ async function fetchUpdateText(url) {
     }
 }
 
+async function fetchRestrictionInfo(url) {
+    try {
+        // 替换为实际的目标URL
+        const { data } = await axios.get(url);
+        const $ = cheerio.load(data);
+
+        // 提取限行时间和限行路段
+        const restrictionText = $('.graphicmodule-box .text p').text().trim();
+
+        // 分割和格式化
+        const [timeInfo, areaInfo] = restrictionText.split('限行路段：');
+        const formattedText = `${timeInfo.trim()}\n\n限行路段：${(areaInfo || '').trim()}`;
+
+        return formattedText;
+    } catch (error) {
+        console.error('Error fetching restriction info:', error);
+        return null;
+    }
+}
+
 // Define handleGasoline function to use fetchContent
 module.exports = handleGasoline = async () => {
     const textUrl = 'http://www.qiyoujiage.com';
     const oilUrl = 'http://www.qiyoujiage.com/{province_code}.shtml';
+    const restricUrl = 'https://m.hz.bendibao.com/news/ztfeizheAhaopaixiaokechexianxing/?area=';
+
     try {
         //内容数组
         let content = [];
@@ -91,10 +113,15 @@ module.exports = handleGasoline = async () => {
             }
         }
 
-        var updateText = await fetchUpdateText(textUrl);
         console.log('获取汽油价格成功：\n', content);
+
+        var updateText = await fetchUpdateText(textUrl);
         content.push('\n'+ updateText);
         console.log('获取汽油调价情况成功：\n',  updateText);
+
+        var restrictionText = await fetchRestrictionInfo(restricUrl);
+        content.push('\n'+ restrictionText);
+        console.log('获取汽车限行规则成功：\n',  restrictionText);
         return content.join('\n');
 
     } catch (error) {
