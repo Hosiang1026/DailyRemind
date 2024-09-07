@@ -112,7 +112,7 @@ module.exports = handleGasoline = async () => {
             const url = oilUrl.replace("{province_code}", province.province_code);
             const oilPriceArr = await fetchContent(url);
             if(oilPriceArr){
-                content.push(`\n🚘${province.province_name}`);
+                content.push(`\n🚘${province.province_name}\n`);
                 for (let i = 0; i < oilPriceArr.length; i++) {
                     const oilPrice = oilPriceArr[i];
                     content.push(`· ${oilPrice.fuelType}: ${oilPrice.price}`);
