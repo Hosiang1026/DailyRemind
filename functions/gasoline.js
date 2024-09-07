@@ -78,13 +78,6 @@ module.exports = handleGasoline = async () => {
             provinces.push(fujianData);
         }
 
-        const newYearStartDate = new Date(now.getFullYear(), 1, 15); // 1月15日 00:00:00
-        const newYearEndDate = new Date(now.getFullYear(), 2, 15, 23, 59, 59); // 2月15日 23:59:59
-        if(now >= newYearStartDate && now <= newYearEndDate){
-            const anhuiData = { province_name: "安徽", province_code: "anhui" }
-            provinces.push(anhuiData);
-        }
-
         for(let province of provinces) {
             console.log(`正在获取 ${province.province_name} 的今日油价数据...`);
             const url = oilUrl.replace("{province_code}", province.province_code);
