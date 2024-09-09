@@ -301,8 +301,7 @@ module.exports = handleWeather = () => {
     try {
         let mergedContent = []
         let mergedAllContent = []
-        let weatherCityContent = []
-        weatherCityContent.push("🌈实时天气信息");
+        mergedAllContent.push("🌈实时天气信息");
         const dataList = [];
         const now = new Date();
         const startDate = new Date(now.getFullYear(), 9, 1); // 10月1日 00:00:00
@@ -327,8 +326,8 @@ module.exports = handleWeather = () => {
                 dataList.push(dataStr);
             var dataSK = extractDataSK(dataStr);
             if (dataSK != null) {
-                weatherCityContent.push('\n🚩'+ city.city_name);
-                weatherCityContent.push(dataSK);
+                mergedAllContent.push('\n🚩'+ city.city_name);
+                mergedAllContent.push(dataSK);
             }
             }
         }
@@ -337,17 +336,20 @@ module.exports = handleWeather = () => {
         console.log(`正在获取台风数据...`);
         const typhoonList = await syncDataWithRetry(typhoonListUrl, headers);
         const typhoonCodeList = extractTyphoonListDZ(typhoonList);
-        for(let typhoonCode of typhoonCodeList) {
-            const url = typhoonUrl.replace("{typhoonCode}", typhoonCode);
-            const typhoonData = await syncDataWithRetry(url, headers);
-            var typhoonDZ = extractTyphoonDZ(typhoonData);
-            if (typhoonDZ != null && typhoonDZ != undefined) {
-                typhoonContent.push(typhoonDZ);
+        if(typhoonCodeList.length > 0){
+            for(let typhoonCode of typhoonCodeList) {
+                const url = typhoonUrl.replace("{typhoonCode}", typhoonCode);
+                const typhoonData = await syncDataWithRetry(url, headers);
+                var typhoonDZ = extractTyphoonDZ(typhoonData);
+                if (typhoonDZ != null && typhoonDZ != undefined) {
+                    typhoonContent.push(typhoonDZ);
+                }
             }
-        }
-        if (typhoonContent.length >0){
-            weatherCityContent.push("\n🌪实时台风信息");
-            mergedContent = weatherCityContent.concat(typhoonContent);
+
+            if (typhoonContent.length > 0){
+                typhoonContent.push("\n🌪实时台风信息");
+                mergedAllContent = mergedAllContent.concat(typhoonContent);
+            }
         }
 
         let alarmContent = []
@@ -362,7 +364,7 @@ module.exports = handleWeather = () => {
         }
         if (alarmContent.length >0){
             mergedContent.push("\n🚨天气预警信息");
-            mergedAllContent = mergedContent.concat(alarmContent);
+            mergedAllContent = mergedAllContent.concat(alarmContent);
         }else{
             mergedAllContent = mergedContent;
         }
