@@ -19,7 +19,7 @@ const cheerio = require('cheerio');
 const citiesJson = process.env.CITIES;
 
 // 解析 JSON 数据
-let cities = [];
+var cities = [];
 try {
     if(citiesJson!=undefined){
         cities = JSON.parse(citiesJson);
@@ -27,7 +27,8 @@ try {
         cities = [
         { city_name: "浙江-余杭", city_code: "101210106" },
         { city_name: "浙江-吴兴", city_code: "101210205" },
-        { city_name: "安徽-怀宁", city_code: "101220605" }
+        { city_name: "安徽-宿松", city_code: "101220606" }
+        //{ city_name: "安徽-怀宁", city_code: "101220605" }
         ];
     }
 } catch (error) {
