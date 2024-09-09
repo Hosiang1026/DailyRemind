@@ -366,8 +366,6 @@ module.exports = handleWeather = () => {
         if (alarmContent.length >0){
             mergedContent.push("\n🚨天气预警信息");
             mergedAllContent = mergedAllContent.concat(alarmContent);
-        }else{
-            mergedAllContent = mergedContent;
         }
 
         mergedAllContent.join('\n\n');
