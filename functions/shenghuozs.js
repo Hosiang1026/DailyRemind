@@ -1,3 +1,5 @@
+const { weather } = require('./input')
+var calendar = require("./calendar");
 const axios = require('axios');
 const cheerio = require('cheerio');
 
@@ -41,13 +43,11 @@ const syncDataWithRetry = async (url, headers, maxRetries = 3) => {
 
 const extractDataZS = (dataStr) => {
     const indices = [
+        'fs', //防晒
+        'dy', //钓鱼
         'ys', //雨伞
 		'xc', //洗车
-		'lk', //路况
-        'dy', //钓鱼
-		'tr', //旅游
-		'fs', //防晒
-		'co' //舒适度
+		'lk' //路况
     ];
     // 正则表达式匹配 `dataZS` 到 `fc` 之间的内容
     const regex = /var dataZS =({.*?});\s*var fc =/s;
@@ -57,14 +57,13 @@ const extractDataZS = (dataStr) => {
             const data = JSON.parse(match[1]);
             const zs = data.zs || {};
 
-            const content = indices.map(index => {
+            const contentArray = indices.map(index => {
                 const name = zs[`${index}_name`] || "未知";
-                //const hint = zs[`${index}_hint`] || "未知";
-                const des_s = zs[`${index}_des_s`] || "未知";
-                return name !== "未知" ? `【${name}】${des_s}` : null;
-            }).filter(line => line).join('\n');
+                const hint = zs[`${index}_hint`] || "未知";
+                return name !== "未知" ? `· ${name}: ${hint}` : null;
+            }).filter(item => item); // 过滤掉 `null` 项
 
-            return `\n${content}`;
+            return contentArray; // 返回数组
         } catch (error) {
             console.error(`JSONDecodeError in dataZS: ${error.message}`);
             return null;
@@ -81,19 +80,81 @@ module.exports = handleShenghuoZS = () => {
 
     try {
         let weatherCityContent = []
-		weatherCityContent.push('🎈浙江余杭生活指数信息');
+        let nowDate = new Date();
+        let currentYear = nowDate.getFullYear();
+        let currentMonth = nowDate.getMonth();
+        let currentDate = nowDate.getDate();
+        let nowDateStr = `${currentYear}-${(currentMonth + 1) < 10 ? '0' + (currentMonth + 1) : (currentMonth + 1)}-${(currentDate) < 10 ? '0' + (currentDate) : (currentDate)}`
+
         for(const city of cities) {
             const url = baseUrl.replace("{city_code}", city.city_code);
             const dataStr = await syncDataWithRetry(url, headers);
             console.log(`正在获取 ${city.city_name} 的数据...`);
             if (dataStr != null) {
                 var dataZS = extractDataZS(dataStr);
-                if (dataZS != null) {
-                    weatherCityContent.push(dataZS);
+                if (dataZS.length > 0) {
+                    weatherCityContent.push('🎈生活指数 \n');
+                    dataZS.sort((a, b) => calendar.getTextLength(a) - calendar.getTextLength(b));
+                    weatherCityContent.push(dataZS.join('\n'));
                 }
                 weatherCityContent.join('\n\n');
             }
         }
+
+        //季节穿衣搭配 - 阴历
+        var endClothesObj;
+        let clothesArr = weather.clothes;
+        if(clothesArr.length > 0){
+            for (let i = 0; i < clothesArr.length; i++) {
+                const element = clothesArr[i];
+                let clothesName = element.name;
+                let clothesDateArr = element.date;
+                let clothesNum = element.num;
+                let clothesNight = element.night;
+                let clothesRemark = element.remark;
+                for (let j = 0; j < clothesDateArr.length; j++) {
+                    const clothesDate = clothesDateArr[j];
+                    let beginDate = currentYear-1 + '-' + clothesDate;
+                    let solarBeginDate = calendar.conversion(beginDate);
+                    if (new Date(solarBeginDate) <= new Date(nowDateStr)) {
+                        let diffNum = calendar.sumTimeToNow(solarBeginDate, nowDateStr);
+                        let keepNum = clothesNum - diffNum;
+                        if (keepNum >= 0) {
+                            endClothesObj = {clothesName: clothesName, clothesNight: clothesNight, clothesRemark: clothesRemark, clothesBeginDate: solarBeginDate, keepNum: keepNum+1};
+                        }
+                    }
+                }
+
+                for (let j = 0; j < clothesDateArr.length; j++) {
+                    const clothesDate = clothesDateArr[j];
+                    let beginDate = currentYear + '-' + clothesDate;
+                    let solarBeginDate = calendar.conversion(beginDate);
+                    if (new Date(solarBeginDate) <= new Date(nowDateStr)) {
+                        let diffNum = calendar.sumTimeToNow(solarBeginDate, nowDateStr);
+                        let keepNum = clothesNum - diffNum;
+                        if (keepNum >= 0) {
+                            endClothesObj = {clothesName: clothesName, clothesNight: clothesNight, clothesRemark: clothesRemark, clothesBeginDate: solarBeginDate, keepNum: keepNum+1};
+                        }
+                    }
+                }
+            }
+        }
+
+        //季节穿衣搭配
+        weatherCityContent.push(`\n👕穿衣推荐 \n`);
+        let clothesName = endClothesObj.clothesName;
+        let clothesNight = endClothesObj.clothesNight;
+        let clothesRemark = endClothesObj.clothesRemark;
+        let clothesBeginDate = endClothesObj.clothesBeginDate;
+        let keepNum = endClothesObj.keepNum;
+        weatherCityContent.push(`· 推荐时间: `+ keepNum + `天`);
+        weatherCityContent.push(`· 夜间睡觉: `+ clothesNight);
+        weatherCityContent.push(`· 白天活动: `+ clothesName);
+        weatherCityContent.push(`· 开始日期: `+ clothesBeginDate);
+        weatherCityContent.push(`· 穿衣搭配: `+ clothesRemark);
+
+
+
         console.log('获取生活指数成功：', weatherCityContent);
         resolve(weatherCityContent.join('\n'))
     } catch (error) {

@@ -33,6 +33,15 @@ const handleWeatherContent = () => {
         }
       }
 
+      // 生活指数
+      if (weather.open) {
+        const handleShenghuoZS = require('./functions/shenghuozs')
+        const shenghuozsContent = await handleShenghuoZS()
+        if ('' != shenghuozsContent) {
+          content.push(`\n\n${shenghuozsContent}`)
+        }
+      }
+
       //课表模块
       if (classTable.open) {
         const handleClassTable = require('./functions/classTable')
@@ -244,6 +253,7 @@ app.listen(port, hostname, function (err) {
 
 app.get('/', async (req, res) => {
   const pushRes = 'push推送服务 - 启动成功： http://192.168.1.2:8096 ';
+  //const appRes = await newsPush()
   const appRes = await weatherPush()
   //const appRes = await gasolinePush()
   console.log(appRes);

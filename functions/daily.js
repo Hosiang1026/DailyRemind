@@ -229,6 +229,7 @@ module.exports = handleTimeList = () => {
                     const element = legalArr[i];
                     let legalName = element.name;
                     let legalDate = element.date;
+                    let legalFreeway = element.freeway;
                     let legalHoliday = element.holiday;
                     let legalRepair = element.repair;
                     var existHoliday = false;
@@ -239,8 +240,12 @@ module.exports = handleTimeList = () => {
                             let holidayFrist =currentYear + '-'+ legalHoliday[0];
                             let holidayDiff = calendar.sumTimeToNow(holidayFrist, nowDate);
                             tipsArr.push(`⛱祝大家假期愉快！`);
-                            tipsArr.push(`* ${legalName}放假: 第${holidayDiff+1}天 \n`)
-
+                            tipsArr.push(`* ${legalName}放假: 第${holidayDiff+1}天 `)
+                            if(legalFreeway == 1){
+                                tipsArr.push(`* 全国高速通行：免费 \n`)
+                            }else{
+                                tipsArr.push(`* 全国高速通行：收费 \n`)
+                            }
                         }
                     }
                     if(legalRepair != 0){
@@ -286,6 +291,12 @@ module.exports = handleTimeList = () => {
                             if (new Date(nowDate) > new Date(startYearLegalDate)) {
                                 startYearLegalDate = currentYear + 1 + '-' + startLegalHoliday;
                             }
+                            if(legalFreeway == 1){
+                                tipsArr.push(`* 高速通行：免费`)
+                            }else{
+                                tipsArr.push(`* 高速通行：收费`)
+                            }
+
                             if (legalRepair != 0) {
                                 let legalRepairNum = legalRepair.length;
                                 tipsArr.push(`* 补班${legalRepairNum}天: ${legalRepair.join('、')}`)
@@ -296,12 +307,19 @@ module.exports = handleTimeList = () => {
                             }else{
                                 tipsArr.push(`* 假期${legalHolidayNum}天: ${legalHoliday.join('、')}\n`)
                             }
+
                         } else if (!existHoliday){
                             startYearLegalDate = currentYearBar + startLegalHoliday;
                             endYearLegalDate = currentYearBar + endLegalHoliday;
                             let startDiffTime = calendar.diffTimeToDaily(nowDate, startYearLegalDate);
                             if (startDiffTime > 0){
                                 tipsArr.push(`⏳距离${legalName}放假还有${startDiffTime}天`)
+                                if(legalFreeway == 1){
+                                    tipsArr.push(`* 高速通行：免费`)
+                                }else{
+                                    tipsArr.push(`* 高速通行：收费`)
+                                }
+
                                 if (legalRepair != 0) {
                                     let legalRepairNum = legalRepair.length;
                                     tipsArr.push(`* 补班${legalRepairNum}天: ${legalRepair.join('、')}`)
