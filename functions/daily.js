@@ -242,9 +242,9 @@ module.exports = handleTimeList = () => {
                             tipsArr.push(`⛱祝大家假期愉快！`);
                             tipsArr.push(`* ${legalName}放假: 第${holidayDiff+1}天 `)
                             if(legalFreeway == 1){
-                                tipsArr.push(`* 全国高速通行：免费 \n`)
+                                tipsArr.push(`* 全国高速通行: 免费 \n`)
                             }else{
-                                tipsArr.push(`* 全国高速通行：收费 \n`)
+                                tipsArr.push(`* 全国高速通行: 收费 \n`)
                             }
                         }
                     }
@@ -292,9 +292,9 @@ module.exports = handleTimeList = () => {
                                 startYearLegalDate = currentYear + 1 + '-' + startLegalHoliday;
                             }
                             if(legalFreeway == 1){
-                                tipsArr.push(`* 高速通行：免费`)
+                                tipsArr.push(`* 高速通行: 免费`)
                             }else{
-                                tipsArr.push(`* 高速通行：收费`)
+                                tipsArr.push(`* 高速通行: 收费`)
                             }
 
                             if (legalRepair != 0) {
@@ -315,9 +315,9 @@ module.exports = handleTimeList = () => {
                             if (startDiffTime > 0){
                                 tipsArr.push(`⏳距离${legalName}放假还有${startDiffTime}天`)
                                 if(legalFreeway == 1){
-                                    tipsArr.push(`* 高速通行：免费`)
+                                    tipsArr.push(`* 高速通行: 免费`)
                                 }else{
-                                    tipsArr.push(`* 高速通行：收费`)
+                                    tipsArr.push(`* 高速通行: 收费`)
                                 }
 
                                 if (legalRepair != 0) {
