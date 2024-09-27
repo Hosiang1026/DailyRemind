@@ -12,6 +12,7 @@ module.exports = handleTimeList = () => {
             let contentArr = []
             let todayArr = []
             let latelyArr = []
+            let intAllArr = []
             let tipsArr = []
             let loveContent;
             let todayLicenseArr = []
@@ -114,7 +115,8 @@ module.exports = handleTimeList = () => {
                         resAnniversaryDate = preAnniversaryDate;
                     }
 
-                    if (nowDate == resAnniversaryDate) {
+                    let diffTime = calendar.diffTimeToDaily(nowDate, resAnniversaryDate);
+                    if (diffTime == 0) {
                         if (anniversaryType == 2) {
                             let anniversarySolarDate = calendar.conversion(anniversaryDate);
                             let targetSolarArr = anniversarySolarDate.split('-');
@@ -139,7 +141,6 @@ module.exports = handleTimeList = () => {
                         todayArr.push(obj);
                     }
 
-                    let diffTime = calendar.diffTimeToDaily(nowDate, resAnniversaryDate);
                     if (tempTime == 0){
                         tempName = anniversaryName;
                         tempTime = diffTime;
@@ -194,7 +195,8 @@ module.exports = handleTimeList = () => {
                         resBirthdayDate = preBirthdaySolarDate;
                     }
 
-                    if (nowDate == resBirthdayDate) {
+                    let diffTime = calendar.diffTimeToDaily(nowDate, resBirthdayDate);
+                    if (diffTime == 0) {
                         //获取生日星座
                         let anniversaryAstro = lunarDate.astro;
                         let todayDate = '<'+birthdayDate.split('-').join('.')+'>';
@@ -204,7 +206,6 @@ module.exports = handleTimeList = () => {
                         todayArr.push(obj);
                     }
 
-                    let diffTime = calendar.diffTimeToDaily(nowDate, resBirthdayDate);
                     if (tempTime == 0){
                         tempName = birthdayName;
                         tempTime = diffTime;
@@ -263,7 +264,6 @@ module.exports = handleTimeList = () => {
                         nextLegalDate = currentYear + 1 + '-' + targetArr[0] + '-' + targetArr[1];
                     }
                     let diffTime = calendar.diffTimeToDaily(nowDate, nextLegalDate);
-
                     if (diffTime == 0) {
                         let todayDate = '<'+nowDate.split('-').join('.')+'>';
                         var obj = {todayName:legalName,todayDate:todayDate, todayContent:''};
@@ -356,7 +356,7 @@ module.exports = handleTimeList = () => {
                     }
                     //计算差值
                     let diffTime = calendar.diffTimeToDaily(nowDate, nextSFtvDate);
-                    if (nowDate == nextSFtvDate) {
+                    if (diffTime == 0) {
                         let todayDate = '<'+nowDate.split('-').join('.')+'>';
                         var obj = {todayName:sFtvName,todayDate:todayDate, todayContent:''};
                         todayArr.push(obj);
@@ -406,7 +406,7 @@ module.exports = handleTimeList = () => {
 
                     //计算差值
                     let diffTime = calendar.diffTimeToDaily(nowDate, reslFtvSolarDate);
-                    if (nowDate == reslFtvSolarDate) {
+                    if (diffTime == 0) {
                         let todayDate = '<'+nowDate.split('-').join('.')+'>';
                         var obj = {todayName:lFtvName,todayDate:todayDate, todayContent:''};
                         todayArr.push(obj);
@@ -460,6 +460,7 @@ module.exports = handleTimeList = () => {
                         resTermSolarDate = preTermSolarDate;
                     }
 
+                    //计算差值
                     let diffTime = calendar.diffTimeToDaily(nowDate, resTermSolarDate);
                     if (diffTime == 0) {
                         let todayDate = '<'+nowDate.split('-').join('.')+'>';
@@ -482,6 +483,7 @@ module.exports = handleTimeList = () => {
                 var obj = {tempName:tempName,tempTime:tempTime};
                 latelyArr.push(obj);
             }
+
             //特殊节日
             let specialArr = daily.special;
             if(specialArr.length > 0){
@@ -502,7 +504,7 @@ module.exports = handleTimeList = () => {
                     }
                     //计算差值
                     let diffTime = calendar.diffTimeToDaily(nowDate, nextSpecialSolarDate);
-                    if (nowDate == nextSpecialSolarDate) {
+                    if (diffTime == 0) {
                         let todayDate = '<'+nowDate.split('-').join('.')+'>';
                         var obj = {todayName:specialName,todayDate:todayDate, todayContent:''};
                         todayArr.push(obj);
@@ -517,7 +519,52 @@ module.exports = handleTimeList = () => {
                     }
                 }
                 var obj = {tempName:tempName,tempTime:tempTime};
-                latelyArr.push(obj);
+                intAllArr.push(obj);
+            }
+
+            //国际节日
+            let internationArr = daily.internation;
+            if(internationArr.length > 0) {
+                let tempName = '';
+                let tempTime = 0;
+                for (let i = 0; i < internationArr.length; i++) {
+                    const element = internationArr[i];
+                    let internationArrName = element.name;
+                    let internationArrDate = element.date;
+                    let targetArr = internationArrDate.split('-');
+                    let nextInternationArrDate = currentYear + '-' + targetArr[0] + '-' + targetArr[1];
+                    if (new Date(nowDate) > new Date(nextInternationArrDate)) {
+                        nextInternationArrDate = currentYear + 1 + '-' + targetArr[0] + '-' + targetArr[1];
+                    }
+                    //计算差值
+                    let diffTime = calendar.diffTimeToDaily(nowDate, nextInternationArrDate);
+                    if (diffTime == 0) {
+                        let todayDate = '<' + nowDate.split('-').join('.') + '>';
+                        var obj = {todayName: internationArrName, todayDate: todayDate, todayContent: ''};
+                        todayArr.push(obj);
+                    } else {
+                        if (tempTime == 0) {
+                            tempName = internationArrName;
+                            tempTime = diffTime;
+                        } else if (diffTime < tempTime) {
+                            tempName = internationArrName;
+                            tempTime = diffTime;
+                        }
+                    }
+                }
+
+                var obj = {tempName: tempName, tempTime: tempTime};
+                intAllArr.push(obj);
+            }
+
+            //特殊节日和国际节日合并
+            if(intAllArr.length > 0) {
+                // 找到tempTime最小的对象并放入新数组
+                const minObj = intAllArr.reduce((prev, curr) => {
+                    return curr.tempTime < prev.tempTime ? curr : prev;
+                });
+
+               latelyArr.push(minObj);
             }
 
             //证件有效期

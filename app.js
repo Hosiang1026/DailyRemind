@@ -16,22 +16,22 @@ const handleWeatherContent = () => {
       }
 
       //福利彩票模块
-      if (lottery.open) {
-        const handleLottery = require('./functions/lottery')
-        const lotteryContent = await handleLottery()
-        if ('' != lotteryContent) {
-          content.push(`\n\n${lotteryContent}`)
-        }
-      }
+      // if (lottery.open) {
+      //   const handleLottery = require('./functions/lottery')
+      //   const lotteryContent = await handleLottery()
+      //   if ('' != lotteryContent) {
+      //     content.push(`\n\n${lotteryContent}`)
+      //   }
+      // }
 
       // 天气模块
-      if (weather.open) {
-        const handleWeather = require('./functions/weather')
-        const weatherContent = await handleWeather()
-        if ('' != weatherContent) {
-          content.push(`\n\n${weatherContent}`)
-        }
-      }
+      // if (weather.open) {
+      //   const handleWeather = require('./functions/weather')
+      //   const weatherContent = await handleWeather()
+      //   if ('' != weatherContent) {
+      //     content.push(`\n\n${weatherContent}`)
+      //   }
+      // }
 
       // 生活指数
       if (weather.open) {
@@ -253,8 +253,8 @@ app.listen(port, hostname, function (err) {
 
 app.get('/', async (req, res) => {
   const pushRes = 'push推送服务 - 启动成功： http://192.168.1.2:8096 ';
-  //const appRes = await newsPush()
-  const appRes = await weatherPush()
+  const appRes = await newsPush()
+  //const appRes = await weatherPush()
   //const appRes = await gasolinePush()
   console.log(appRes);
   res.send(pushRes + appRes + " " + new Date())

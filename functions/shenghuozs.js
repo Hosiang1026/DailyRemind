@@ -147,7 +147,7 @@ module.exports = handleShenghuoZS = () => {
         let clothesRemark = endClothesObj.clothesRemark;
         let clothesBeginDate = endClothesObj.clothesBeginDate;
         let keepNum = endClothesObj.keepNum;
-        weatherCityContent.push(`· 推荐时间: `+ keepNum + `天`);
+        weatherCityContent.push(`· 持续时间: `+ keepNum + `天`);
         weatherCityContent.push(`· 夜间睡觉: `+ clothesNight);
         weatherCityContent.push(`· 白天活动: `+ clothesName);
         weatherCityContent.push(`· 开始日期: `+ clothesBeginDate);
