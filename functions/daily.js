@@ -601,28 +601,29 @@ module.exports = handleTimeList = () => {
                 todayTempArr.sort((a, b) => a.length - b.length);
                 content = content.concat(todayTempArr);
                 //随机笑话
-                const res = await axios.get('https://api.uomg.com/api/comments.163?format=json')
-                content.push(`${res.data.data.content} \n-- 来自@${res.data.data.nickname}「${res.data.data.name}」${res.data.data.artistsname}\n`)
-            }else{
-                let minTempTime = Math.min.apply(Math, latelyArr.map(item => { return item['tempTime'] }));
-                let minTempArr = [];
-                for (var j = 0; j < latelyArr.length; j++) {
-                    let tempName = latelyArr[j].tempName;
-                    let tempTime = latelyArr[j].tempTime;
-                    if (minTempTime == latelyArr[j].tempTime){
-                        minTempArr.push(`* ${tempName}: 还有${tempTime}天`);
-                    }else{
-                        contentArr.push(`· ${tempName}: 还有${tempTime}天`);
-                    }
-                }
+                //const res = await axios.get('https://api.uomg.com/api/comments.163?format=json')
+                //content.push(`${res.data.data.content} \n-- 来自@${res.data.data.nickname}「${res.data.data.name}」${res.data.data.artistsname}\n`)
+            }
 
-                if (minTempArr.length > 0){
-                    content.push(`📌距离下一个节日`);
-                    minTempArr.sort((a, b) => a.length - b.length);
-                    minTempArr[minTempArr.length-1] = minTempArr[minTempArr.length-1] + '\n';
-                    content = content.concat(minTempArr);
+            let minTempTime = Math.min.apply(Math, latelyArr.map(item => { return item['tempTime'] }));
+            let minTempArr = [];
+            for (var j = 0; j < latelyArr.length; j++) {
+                let tempName = latelyArr[j].tempName;
+                let tempTime = latelyArr[j].tempTime;
+                if (minTempTime == latelyArr[j].tempTime){
+                    minTempArr.push(`* ${tempName}: 还有${tempTime}天`);
+                }else{
+                    contentArr.push(`· ${tempName}: 还有${tempTime}天`);
                 }
             }
+
+            if (minTempArr.length > 0){
+                content.push(`📌距离下一个节日`);
+                minTempArr.sort((a, b) => a.length - b.length);
+                minTempArr[minTempArr.length-1] = minTempArr[minTempArr.length-1] + '\n';
+                content = content.concat(minTempArr);
+            }
+
 
             //输出补班/放假温馨提示
             if(tipsArr.length > 0){
@@ -647,16 +648,14 @@ module.exports = handleTimeList = () => {
             }
 
             //证件有效期
-            if(todayArr.length == 0){
-                content.push(`\n 💳证件有效期 \n`);
-                if (todayLicenseArr.length > 0) {
-                    todayLicenseArr.sort((a, b) => calendar.getTextLength(a) - calendar.getTextLength(b));
-                    content = content.concat(todayLicenseArr);
-                }
-                if(endLicenseArr.length > 0) {
-                    endLicenseArr.sort((a, b) => calendar.getTextLength(a) - calendar.getTextLength(b));
-                    content = content.concat(endLicenseArr);
-                }
+            content.push(`\n 💳证件有效期 \n`);
+            if (todayLicenseArr.length > 0) {
+                todayLicenseArr.sort((a, b) => calendar.getTextLength(a) - calendar.getTextLength(b));
+                content = content.concat(todayLicenseArr);
+            }
+            if(endLicenseArr.length > 0) {
+                endLicenseArr.sort((a, b) => calendar.getTextLength(a) - calendar.getTextLength(b));
+                content = content.concat(endLicenseArr);
             }
 
             console.log('获取重要节日成功\n', content.join('\n'));
