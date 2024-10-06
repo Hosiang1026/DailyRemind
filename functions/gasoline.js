@@ -125,20 +125,11 @@ module.exports = handleGasoline = async () => {
         console.log('获取汽油调价情况成功：\n',  updateText);
 
         content.push('\n🚗非浙A号牌小客车');
-
-        content.push('\n🚥限行时间：\n');
-        content.push('07:00—10:00(工作日)');
-        content.push('16:00—19:00(工作日)');
-
-        content.push('\n🚥限行路段：\n');
+        content.push('\n🚥限行规则：\n');
         content.push('1.地面道路不限行');
         content.push('2.高架快速路按规定限行');
         content.push('3.错峰时段内全号段限行\n');
-        content.push('绕城高速公路内所有高架路、快速路(含匝道以及附属桥梁、隧道)，具体包括彩虹快速路、之江大桥、紫之隧道、紫金港路隧道、紫金港路南隧道、留石高架路、东湖快速路、九堡大桥、通城高架路、时代高架、中河高架路、上塘高架路、秋石高架路、西兴大桥、复兴大桥、钱塘快速路、德胜快速路、文一路隧道等');
-
-        content.push('\n🚧处罚规则：\n');
-        content.push('在高架、快速路违反“错峰出行”规定的认定为“机动车违反禁令标志指示的”，处以记1分，罚款100元的处罚');
-        content.push('在地面道路违反“错峰出行”规定的认定为“机动车未按规定在限制的区域或者路段通行的”，处以罚款100元的处罚');
+        content.push('错峰时段为工作日的7:00—10:00和16:00—19:00，绕城高速公路内所有高架路、快速路(含匝道以及附属桥梁、隧道)，具体包括彩虹快速路、之江大桥、紫之隧道、紫金港路隧道、紫金港路南隧道、留石高架路、东湖快速路、九堡大桥、通城高架路、时代高架、中河高架路、上塘高架路、秋石高架路、西兴大桥、复兴大桥、钱塘快速路、德胜快速路、文一路隧道等');
 
         // var restrictionText = await fetchRestrictionInfo(restricUrl);
         // content.push('\n'+ restrictionText);
