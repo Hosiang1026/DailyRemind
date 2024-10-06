@@ -646,7 +646,6 @@ module.exports = handleTimeList = () => {
             let currentMDDate = `${(currentMonth + 1) < 10 ? '0' + (currentMonth + 1) : (currentMonth + 1)}-${(currentDate) < 10 ? '0' + (currentDate) : (currentDate)}`;
             let nowDate = `${currentYear}-${currentMDDate}`;
 
-
             //当天阴历和当前天数
             handleFestivalSolarDate(nowDate, currentYear, content);
 
