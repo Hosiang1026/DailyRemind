@@ -4,7 +4,7 @@ var calendar = require("./calendar");
 //var calendarplus = require("./calendarplus");
 
 //处理当天阴历和当前天数
-const handleFestivalSolarDate = (nowDate, currentYear, content) => {
+const handleFestivalSolarDate = (nowDate, lunarDate, currentYear, content) => {
     let festivalDate = '01-01';
 
     //N-2年
@@ -42,8 +42,6 @@ const handleFestivalSolarDate = (nowDate, currentYear, content) => {
 
     //当前天数
     let yearDiffTime = calendar.diffTimeToDaily(nowDate, newlFtvYearDate)+1;
-
-    let lunarDate = calendar.solar2lunar();
     let lunarDateStr = lunarDate.gzYear + lunarDate.Animal +'年' + lunarDate.IMonthCn + lunarDate.IDayCn + ' 第' + yearDiffTime + '天' ;
     content.push(`${lunarDateStr}\n ${nowDate} ${lunarDate.ncWeek} ${lunarDate.astro} \n`);
 };
@@ -144,7 +142,7 @@ const handleAnniversaryDate = (nowDate, currentYear, todayArr, latelyArr) => {
 };
 
 //处理生日
-const handleBirthdayDate = (nowDate, currentYear, todayArr, latelyArr) => {
+const handleBirthdayDate = (nowDate, lunarDate, currentYear, todayArr, latelyArr) => {
     let birthdayArr = daily.birthday;
     if(birthdayArr.length > 0){
         let tempName = '';
@@ -646,14 +644,16 @@ module.exports = handleTimeList = () => {
             let currentMDDate = `${(currentMonth + 1) < 10 ? '0' + (currentMonth + 1) : (currentMonth + 1)}-${(currentDate) < 10 ? '0' + (currentDate) : (currentDate)}`;
             let nowDate = `${currentYear}-${currentMDDate}`;
 
+            let lunarDate = calendar.solar2lunar();
+
             //当天阴历和当前天数
-            handleFestivalSolarDate(nowDate, currentYear, content);
+            handleFestivalSolarDate(nowDate, lunarDate, currentYear, content);
 
             //纪念日
             handleAnniversaryDate(nowDate, currentYear, todayArr, latelyArr);
 
             //生日
-            handleBirthdayDate(nowDate, currentYear, todayArr, latelyArr);
+            handleBirthdayDate(nowDate, lunarDate, currentYear, todayArr, latelyArr);
 
             //法定节假日
             handleLegalDate(nowDate, currentMDDate, currentYear, todayArr, latelyArr, tipsArr);
@@ -699,9 +699,9 @@ module.exports = handleTimeList = () => {
                     let todayDate = todayArr[i].todayDate;
                     let todayContent = todayArr[i].todayContent;
                     if (todayName != ''&&todayDate != ''&&todayContent != ''){
-                        todayTempArr.push(`今天是${todayName}🎉 \n ${todayContent} ${todayDate} \n`);
+                        todayTempArr.push(`今天是${todayName}🎉 \n${todayContent} ${todayDate} \n`);
                     }else if (todayName != ''&&todayDate != ''){
-                        todayTempArr.push(`今天是${todayName}🎉 \n ${todayContent} \n`);
+                        todayTempArr.push(`今天是${todayName}🎉 \n${todayContent} \n`);
                     }else if (todayName != ''){
                         todayTempArr.push(`今天是${todayName}🎉 \n`);
                     }
@@ -756,7 +756,7 @@ module.exports = handleTimeList = () => {
             }
 
             //证件有效期
-            content.push(`\n 💳证件有效期 \n`);
+            content.push(`💳证件有效期 \n`);
             if (todayLicenseArr.length > 0) {
                 todayLicenseArr.sort((a, b) => calendar.getTextLength(a) - calendar.getTextLength(b));
                 content = content.concat(todayLicenseArr);
