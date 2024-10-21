@@ -756,7 +756,7 @@ module.exports = handleTimeList = () => {
             }
 
             //证件有效期
-            content.push(`💳证件有效期 \n`);
+            content.push(`\n💳证件有效期 \n`);
             if (todayLicenseArr.length > 0) {
                 todayLicenseArr.sort((a, b) => calendar.getTextLength(a) - calendar.getTextLength(b));
                 content = content.concat(todayLicenseArr);
