@@ -3,6 +3,8 @@ var calendar = require("./calendar");
 //const axios = require('axios')
 //var calendarplus = require("./calendarplus");
 
+let loveContent;
+
 //处理当天阴历和当前天数
 const handleFestivalSolarDate = (nowDate, lunarDate, currentYear, content) => {
     let festivalDate = '01-01';
@@ -611,8 +613,12 @@ const handleLicenseDate = (nowDate, currentYear, todayLicenseArr, endLicenseArr)
                 //计算差值
                 let diffTime = calendar.diffTimeToDaily(nowDate, licenseDate);
                 if (diffTime < 31){
-                    let todayDate = '<'+licenseDate.split('-').join('.')+'>';
-                    todayLicenseArr.push(`* ${licenseName} \n ${todayDate} \n ${diffTime}天后到期，请及时处理 🚨\n`);
+                    if(diffTime == 0){
+                        todayLicenseArr.push(`* ${licenseName}  \n 今天到期，请尽快处理 🚨\n`);
+                    }else{
+                        let todayDate = '<'+licenseDate.split('-').join('.')+'>';
+                        todayLicenseArr.push(`* ${licenseName} \n ${todayDate} \n ${diffTime}天后到期，请及时处理 🚨\n`);
+                    }
                 }else{
                     endLicenseArr.push(`· ${licenseName}: 还有${diffTime}天`);
                 }
@@ -632,7 +638,6 @@ module.exports = handleTimeList = () => {
             let latelyArr = []
             let intAllArr = []
             let tipsArr = []
-            let loveContent;
             let todayLicenseArr = []
             let endLicenseArr = []
 
@@ -751,7 +756,7 @@ module.exports = handleTimeList = () => {
             }
 
             //累计恋爱天数
-            if(todayArr.length == 0) {
+            if(loveContent != undefined) {
                 content.push(loveContent);
             }
 
