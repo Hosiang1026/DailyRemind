@@ -139,8 +139,8 @@ const extractDataSK = (dataStr) => {
 
             const content = [
                 `· 天气: ${weathers || "未知"} ${weatherIcon || ""}`,
+                `· 风况: ${data.WD || "未知"}${data.WS || ""}${data.wse || ""} `,
                 `· 温湿度: ${data.temp || "0"}°C ${data.sd || "未知"} ${data.rain || "0"}mm`,
-                `· 风向情况: ${data.WD || "未知"}${data.WS || ""}${data.wse || ""} `,
                 `· 预报时间: ${dateWithoutWeekday || ""} ${data.time || ""}`
             ].join('\n');
 
