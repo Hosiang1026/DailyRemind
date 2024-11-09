@@ -1033,7 +1033,7 @@ let daily = {
         },
         {
             name:'Skoda年检',
-            date: '2024-12-31'
+            date: '2026-12-31'
         },
         {
             name:'Fang身份证',

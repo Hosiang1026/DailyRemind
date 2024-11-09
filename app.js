@@ -25,13 +25,13 @@ const handleWeatherContent = () => {
       // }
 
       // 天气模块
-      // if (weather.open) {
-      //   const handleWeather = require('./functions/weather')
-      //   const weatherContent = await handleWeather()
-      //   if ('' != weatherContent) {
-      //     content.push(`\n\n${weatherContent}`)
-      //   }
-      // }
+      if (weather.open) {
+        const handleWeather = require('./functions/weather')
+        const weatherContent = await handleWeather()
+        if ('' != weatherContent) {
+          content.push(`\n\n${weatherContent}`)
+        }
+      }
 
       // 生活指数
       if (weather.open) {

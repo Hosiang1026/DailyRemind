@@ -348,7 +348,9 @@ module.exports = handleWeather = () => {
             }
 
             if (typhoonContent.length > 0){
-                typhoonContent.push("\n🌪实时台风信息");
+                let typhoonTitle = []
+                typhoonTitle.push("\n🌪实时台风信息");
+                typhoonContent = typhoonTitle.concat(typhoonContent);
                 mergedAllContent = mergedAllContent.concat(typhoonContent);
             }
         }
@@ -364,7 +366,9 @@ module.exports = handleWeather = () => {
             }
         }
         if (alarmContent.length >0){
-            mergedContent.push("\n🚨天气预警信息");
+            let alarmTitle = []
+            alarmTitle.push("\n🚨天气预警信息");
+            alarmContent = alarmTitle.concat(alarmContent);
             mergedAllContent = mergedAllContent.concat(alarmContent);
         }
 
