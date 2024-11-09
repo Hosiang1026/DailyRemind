@@ -57,7 +57,7 @@ const extractFc = (dataStr, cityname) => {
 				return `日期: ${date} (${day})\n气温: ${tempLow}°C ~ ${tempHigh}°C\n湿度: ${humidity}%\n舒适度: ${comfortIndex}\n风向: ${windDirection} ${windSpeed}\n`;
 			}).join('\n');
 
-			return `\n${cityname}未来天气预报信息:\n${content}`;
+			return `\n🚩${cityname}\n${content}`;
 		} catch (error) {
 			console.error(`JSONDecodeError in fc: ${error.message}`);
 			return null;
@@ -68,10 +68,10 @@ const extractFc = (dataStr, cityname) => {
 module.exports = handleWeather = () => {
 	return new Promise(async (resolve, reject) => {
 		const cities = [
-			{ city_name: "安徽-怀宁", city_code: "101220605" },
+			//{ city_name: "安徽-怀宁", city_code: "101220605" },
 			{ city_name: "浙江-余杭", city_code: "101210106" },
-			{ city_name: "浙江-吴兴", city_code: "101210205" },
-			{ city_name: "福建-福州", city_code: "101230101" }
+			//{ city_name: "浙江-吴兴", city_code: "101210205" },
+			//{ city_name: "福建-福州", city_code: "101230101" }
 		];
 
 		const baseUrl = "https://d1.weather.com.cn/weather_index/{city_code}.html?_=1722309451962";
@@ -81,6 +81,7 @@ module.exports = handleWeather = () => {
 
 		try {
 			let weatherCityContent = []
+			weatherCityContent.push("🏳‍🌈未来天气预报信息\n");
 			for(const city of cities) {
 				const cityname = city.city_name;
 				const url = baseUrl.replace("{city_code}", city.city_code);
