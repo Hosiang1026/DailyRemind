@@ -45,7 +45,7 @@ const handleFestivalSolarDate = (nowDate, lunarDate, currentYear, content) => {
     //当前天数
     let yearDiffTime = calendar.diffTimeToDaily(nowDate, newlFtvYearDate)+1;
     let lunarDateStr = lunarDate.gzYear + lunarDate.Animal +'年' + lunarDate.IMonthCn + lunarDate.IDayCn + ' 第' + yearDiffTime + '天' ;
-    content.push(`${lunarDateStr}\n ${nowDate} ${lunarDate.ncWeek} ${lunarDate.astro} \n`);
+    content.push(`${nowDate} ${lunarDate.ncWeek} ${lunarDate.astro} \n ${lunarDateStr}\n`);
 };
 
 //处理纪念日
