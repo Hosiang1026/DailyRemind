@@ -57,7 +57,7 @@ const extractFc = (dataStr, cityname) => {
 				return `日期: ${date} (${day})\n气温: ${tempLow}°C ~ ${tempHigh}°C\n湿度: ${humidity}%\n舒适度: ${comfortIndex}\n风向: ${windDirection} ${windSpeed}\n`;
 			}).join('\n');
 
-			return `\n🚩${cityname}\n${content}`;
+			return `\n🚩${cityname}\n\n${content}`;
 		} catch (error) {
 			console.error(`JSONDecodeError in fc: ${error.message}`);
 			return null;
@@ -81,7 +81,7 @@ module.exports = handleWeather = () => {
 
 		try {
 			let weatherCityContent = []
-			weatherCityContent.push("🏳‍🌈未来天气预报信息\n");
+			weatherCityContent.push("🏳‍🌈未来天气预报信息");
 			for(const city of cities) {
 				const cityname = city.city_name;
 				const url = baseUrl.replace("{city_code}", city.city_code);

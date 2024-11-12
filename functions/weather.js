@@ -110,6 +110,9 @@ const extractDataSK = (dataStr) => {
                 case "晴":
                     weatherIcon = "🌤";
                     break;
+                case "雾":
+                    weatherIcon = "🌫";
+                    break;
                 case "多云":
                     weatherIcon = "🌥";
                     break;
