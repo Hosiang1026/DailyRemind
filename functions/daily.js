@@ -615,10 +615,10 @@ const handleLicenseDate = (nowDate, currentYear, todayLicenseArr, endLicenseArr)
                 let diffTime = calendar.diffTimeToDaily(nowDate, licenseDate);
                 if (diffTime < 31){
                     if(diffTime == 0){
-                        todayLicenseArr.push(`* ${licenseName}  \n 今天到期，请尽快处理 🚨\n`);
+                        todayLicenseArr.push(`* ${licenseName}🚨 \n 今天到期，请尽快处理\n`);
                     }else{
                         let todayDate = '<'+licenseDate.split('-').join('.')+'>';
-                        todayLicenseArr.push(`* ${licenseName} \n ${todayDate} \n ${diffTime}天后到期，请及时处理 🚨\n`);
+                        todayLicenseArr.push(`* ${licenseName}🚨 \n ${todayDate} \n ${diffTime}天后到期，请及时处理\n`);
                     }
                 }else{
                     endLicenseArr.push(`· ${licenseName}: 还有${diffTime}天`);
