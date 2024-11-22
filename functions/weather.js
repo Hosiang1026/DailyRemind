@@ -113,6 +113,9 @@ const extractDataSK = (dataStr) => {
                 case "雾":
                     weatherIcon = "🌫";
                     break;
+                case "霾":
+                    weatherIcon = "🌫";
+                    break;
                 case "多云":
                     weatherIcon = "🌥";
                     break;
