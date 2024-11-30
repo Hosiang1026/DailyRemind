@@ -117,6 +117,7 @@ function writeGasoline(provinceName, oilPrice92, oilPrice95, oilPrice98, oilPric
                 }else{
                     //若当前油价小于最低油价，则更新油价记录
                     const oldGasoline = data.gasoline[index];
+                    let flag = false;
                     let index92 = oldGasoline.oilPrice_92;
                     let index95 = oldGasoline.oilPrice_95;
                     let index98 = oldGasoline.oilPrice_98;
@@ -125,36 +126,40 @@ function writeGasoline(provinceName, oilPrice92, oilPrice95, oilPrice98, oilPric
 
                     if(oldGasoline.oilPrice_92 > oilPrice92){
                         index92 = oilPrice92;
-                        oldUpdateDate = updateDate;
+                        flag = true;
                     }
 
                     if(oldGasoline.oilPrice_95 > oilPrice95){
                         index95 = oilPrice95;
-                        oldUpdateDate = updateDate;
+                        flag = true;
                     }
 
                     if(oldGasoline.oilPrice_98 > oilPrice98){
                         index98 = oilPrice98;
-                        oldUpdateDate = updateDate;
+                        flag = true;
                     }
 
                     if(oldGasoline.oilPrice_0 > oilPrice0){
                         index0 = oilPrice0;
-                        oldUpdateDate = updateDate;
+                        flag = true;
                     }
 
-                    const updatedGasolineItem = {
-                        id: oldGasoline.id,
-                        province_name: provinceName,
-                        oilPrice_92: index92,
-                        oilPrice_95: index95,
-                        oilPrice_98: index98,
-                        oilPrice_0: index0,
-                        update_date: oldUpdateDate
+                    if(flag){
+                        oldUpdateDate = updateDate;
+                        const updatedGasolineItem = {
+                            id: oldGasoline.id,
+                            province_name: provinceName,
+                            oilPrice_92: index92,
+                            oilPrice_95: index95,
+                            oilPrice_98: index98,
+                            oilPrice_0: index0,
+                            update_date: oldUpdateDate
+                        }
+                        data.gasoline[index] = { ...data.gasoline[index], ...updatedGasolineItem };
+                        fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
+                        console.log('writeOilPrice success');
                     }
-                    data.gasoline[index] = { ...data.gasoline[index], ...updatedGasolineItem };
-                    fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
-                    console.log('writeOilPrice success');
+
                 }
 
             } else {
