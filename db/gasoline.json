@@ -1,0 +1,31 @@
+{
+  "gasoline": [
+    {
+      "id": 1,
+      "province_name": "浙江",
+      "oilPrice_92": "7.41",
+      "oilPrice_95": "7.88",
+      "oilPrice_98": "8.64",
+      "oilPrice_0": "7.07",
+      "update_date": "2024-11-30"
+    },
+    {
+      "id": 2,
+      "province_name": "安徽",
+      "oilPrice_92": "7.40",
+      "oilPrice_95": "7.92",
+      "oilPrice_98": "9.12",
+      "oilPrice_0": "7.13",
+      "update_date": "2024-11-30"
+    },
+    {
+      "id": 3,
+      "province_name": "福建",
+      "oilPrice_92": "7.40",
+      "oilPrice_95": "7.91",
+      "oilPrice_98": "9.41",
+      "oilPrice_0": "7.08",
+      "update_date": "2024-11-30"
+    }
+  ]
+}

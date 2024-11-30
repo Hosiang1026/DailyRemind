@@ -1012,12 +1012,8 @@ let daily = {
     ],
     license: [//证件有效期列表
         {
-            name:'Agile-Q2租房',
-            date: '2024-06-01'
-        },
-        {
-            name:'Agile-Q3租房',
-            date: '2024-09-01'
+            name:'Agile租房合同',
+            date: '2025-02-28'
         },
         {
             name:'Agile-Q4租房',

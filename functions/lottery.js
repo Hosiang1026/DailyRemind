@@ -171,11 +171,47 @@ function countFrequency(arr) {
 }
 
 // 获取出现频率最高的号码
+// function getMostFrequentNumbers(counts, count) {
+// 	return Object.entries(counts)
+// 		.sort((a, b) => b[1] - a[1])
+// 		.slice(0, count)
+// 		.map(entry => parseInt(entry[0]));
+// }
+
+// 获取出现频率最高的号码，并随机填充剩余部分
 function getMostFrequentNumbers(counts, count) {
-	return Object.entries(counts)
-		.sort((a, b) => b[1] - a[1])
-		.slice(0, count)
+	const entries = Object.entries(counts);
+
+	// 如果 count 为 1，直接随机选择一个号码
+	if (count === 1) {
+		const randomIndex = Math.floor(Math.random() * entries.length);
+		return [parseInt(entries[randomIndex][0])];
+	}
+
+	// 按频率排序
+	entries.sort((a, b) => b[1] - a[1]);
+
+	// 取一半出现频率最高的号码
+	const halfCount = Math.ceil(count / 2);
+	const mostFrequentNumbers = entries
+		.slice(0, halfCount)
 		.map(entry => parseInt(entry[0]));
+
+	// 剩余号码池
+	const remainingNumbers = entries
+		.slice(halfCount)
+		.map(entry => parseInt(entry[0]));
+
+	// 随机填充剩余部分，确保不重复
+	while (mostFrequentNumbers.length < count) {
+		const randomIndex = Math.floor(Math.random() * remainingNumbers.length);
+		const randomNumber = remainingNumbers[randomIndex];
+		if (!mostFrequentNumbers.includes(randomNumber)) {
+			mostFrequentNumbers.push(randomNumber);
+		}
+	}
+
+	return mostFrequentNumbers;
 }
 
 //预测下一个双色球号码, 基于统计频率的简单预测算法
