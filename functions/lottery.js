@@ -54,14 +54,16 @@ function writeLotteryCode(ssqCode, ssqRed, ssqBlue, ssqDate, lotteryContent) {
 			}
 
 			//比较中奖概率
-			const winnings = calculateWinnings(data.lottery, data.predict);
-			lotteryContent.push(`\n🎯本期预测双色球开奖\n`);
-			winnings.forEach(result => {
-				lotteryContent.push(`· 中奖情况: ${result.matchedPrize}`);
-				lotteryContent.push(`· 中奖金额: ${result.matchedAmount}`);
-				lotteryContent.push(`· 匹配红球数: ${result.matchedRedBalls}`);
-				lotteryContent.push(`· 是否匹配蓝球: ${result.matchedBlueBall}`);
-			});
+			if(data.lottery.length > 0 && data.predict.length > 0){
+				const winnings = calculateWinnings(data.lottery, data.predict);
+				lotteryContent.push(`\n🎯本期预测双色球开奖\n`);
+				winnings.forEach(result => {
+					lotteryContent.push(`· 中奖情况: ${result.matchedPrize}`);
+					lotteryContent.push(`· 中奖金额: ${result.matchedAmount}`);
+					lotteryContent.push(`· 匹配红球数: ${result.matchedRedBalls}`);
+					lotteryContent.push(`· 是否匹配蓝球: ${result.matchedBlueBall}`);
+				});
+			}
 
 			//预测双色球号码数量大于2, 删除最后一条数据
 			if (data.predict.length > 1){
@@ -213,9 +215,9 @@ function getMostFrequentNumbers(counts, count) {
 		.slice(halfCount)
 		.map(entry => parseInt(entry[0]));
 
-	// 随机填充剩余部分，确保不重复
+	// 随机补充剩余号码，确保不重复
 	while (mostFrequentNumbers.length < count) {
-		const randomIndex = Math.floor(Math.random() * remainingNumbers.length);
+		const randomIndex = Math.floor(Math.random() * 33) + 1;
 		const randomNumber = remainingNumbers[randomIndex];
 		if (!mostFrequentNumbers.includes(randomNumber)) {
 			mostFrequentNumbers.push(randomNumber);
@@ -243,14 +245,6 @@ function predictNextSSQ(data) {
 	// 选择出现频率最高的红球号码和蓝球号码
 	let predictedReds = getMostFrequentNumbers(redCounts, 6);
 	let predictedBlue = getMostFrequentNumbers(blueCounts, 1)[0];
-
-	// 如果红球号码少于6个，则随机补充
-	while (predictedReds.length < 6) {
-		const randomRed = Math.floor(Math.random() * 33) + 1;
-		if (!predictedReds.includes(randomRed)) {
-			predictedReds.push(randomRed);
-		}
-	}
 
 	// 确保红球号码排序
 	predictedReds.sort((a, b) => a - b);
