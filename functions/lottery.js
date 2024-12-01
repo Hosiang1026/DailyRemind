@@ -65,7 +65,7 @@ function writeLotteryCode(ssqCode, ssqRed, ssqBlue, ssqDate, lotteryContent) {
 
 			//预测双色球号码数量大于2, 删除最后一条数据
 			if (data.predict.length > 1){
-				const updatedPredict = data.predict.filter(item => item.id !== 1);
+				const updatedPredict = data.predict.filter(item => item.id !== data.predict[0].id);
 				data.predict = updatedPredict;
 				fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
 			}
@@ -126,7 +126,7 @@ function calculateWinnings(lottery, predict) {
 	};
 
 	const matchBlueBall = (drawn, predicted) => {
-		return drawn === predicted;
+		return drawn == predicted;
 	};
 
 	const results = [];
@@ -256,7 +256,7 @@ function predictNextSSQ(data) {
 	predictedReds.sort((a, b) => a - b);
 
 	return {
-		redBalls: predictedReds.join(', '),
+		redBalls: predictedReds.join(','),
 		blueBall: predictedBlue
 	};
 }
