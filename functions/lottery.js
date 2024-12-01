@@ -30,6 +30,11 @@ function writeLotteryCode(ssqCode, ssqRed, ssqBlue, ssqDate, lotteryContent) {
 	try{
 		if (fs.existsSync(dataFilePath)) {
 			const data = JSON.parse(fs.readFileSync(dataFilePath, 'utf8'));
+			//实际双色球号码数量大于200, 清空数据
+			if (data.lottery.length > 200){
+				data.lottery = [];
+				fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
+			}
 			const oldLottery = data.lottery.filter(item => item.ssq_code === ssqCode);
 			if (oldLottery.length == 0){
 				// 自动生成新ID
@@ -57,6 +62,13 @@ function writeLotteryCode(ssqCode, ssqRed, ssqBlue, ssqDate, lotteryContent) {
 				lotteryContent.push(`· 匹配红球数: ${result.matchedRedBalls}`);
 				lotteryContent.push(`· 是否匹配蓝球: ${result.matchedBlueBall}`);
 			});
+
+			//预测双色球号码数量大于2, 删除最后一条数据
+			if (data.predict.length > 1){
+				const updatedPredict = data.predict.filter(item => item.id !== 1);
+				data.predict = updatedPredict;
+				fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
+			}
 
 			//预测下期双色球号码
 			const newPredictId = data.predict.length ? Math.max(...data.predict.map(item => item.id)) + 1 : 1;
