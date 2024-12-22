@@ -253,8 +253,8 @@ app.listen(port, hostname, function (err) {
 
 app.get('/', async (req, res) => {
   const pushRes = 'push推送服务 - 启动成功： http://192.168.1.2:8096 ';
-  //const appRes = await newsPush()
-  const appRes = await weatherPush()
+  const appRes = await newsPush()
+  //const appRes = await weatherPush()
   //const appRes = await gasolinePush()
   console.log(appRes);
   res.send(pushRes + appRes + " " + new Date())
