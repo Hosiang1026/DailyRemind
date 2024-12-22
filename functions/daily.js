@@ -271,6 +271,7 @@ const handleLegalDate = (nowDate, currentMDDate, currentYear, todayArr, latelyAr
             if (diffTime+legalHolidayNum < 15) {
                 let legalHolidayNum = legalHoliday.length;
                 if (legalHolidayNum == 1) {
+                    tipsArr.push(`⏳距离${legalName}放假还有${diffTime}天 `);
                     startYearLegalDate = currentYearBar + startLegalHoliday;
                     if (new Date(nowDate) > new Date(startYearLegalDate)) {
                         startYearLegalDate = currentYear + 1 + '-' + startLegalHoliday;
