@@ -131,7 +131,7 @@ const handleAnniversaryDate = (nowDate, currentYear, todayArr, latelyArr) => {
                 let sumTime = calendar.sumTimeToNow(anniversaryDate, nowDate);
                 loveContent = `\n💘我们在一起恋爱: ${sumTime}天`;
             }else{
-                if (diffTime < tempTime) {
+                if (diffTime > 0&&diffTime < tempTime) {
                     tempName = anniversaryName;
                     tempTime = diffTime;
                 }
@@ -194,7 +194,7 @@ const handleBirthdayDate = (nowDate, lunarDate, currentYear, todayArr, latelyArr
                 tempTime = diffTime;
             }
 
-            if (diffTime < tempTime) {
+            if (diffTime > 0&&diffTime < tempTime) {
                 tempName = birthdayName;
                 tempTime = diffTime;
             }
@@ -256,7 +256,7 @@ const handleLegalDate = (nowDate, currentMDDate, currentYear, todayArr, latelyAr
                 if (tempTime == 0) {
                     tempName = legalName;
                     tempTime = diffTime;
-                } else if (diffTime < tempTime&&diffTime > 0) {
+                } else if (diffTime > 0&&diffTime < tempTime) {
                     tempName = legalName;
                     tempTime = diffTime;
                 }
@@ -365,7 +365,7 @@ const handleLFtvDate = (nowDate, currentYear, todayArr, latelyArr) => {
                 if (tempTime == 0){
                     tempName = lFtvName;
                     tempTime = diffTime;
-                }else if (diffTime < tempTime){
+                }else if (diffTime > 0&&diffTime < tempTime){
                     tempName = lFtvName;
                     tempTime = diffTime;
                 }
@@ -423,7 +423,7 @@ const handleTermDate = (nowDate, currentYear, todayArr, latelyArr) => {
                     tempSort = termSort;
                     tempName = termName;
                     tempTime = diffTime;
-                }else if (diffTime < tempTime){
+                }else if (diffTime > 0&&diffTime < tempTime){
                     tempSort = termSort;
                     tempName = termName;
                     tempTime = diffTime;
@@ -461,7 +461,7 @@ const handleInternationDate = (nowDate, currentYear, todayArr, latelyArr) => {
                 if (tempTime == 0) {
                     tempName = internationArrName;
                     tempTime = diffTime;
-                } else if (diffTime < tempTime) {
+                } else if (diffTime > 0&&diffTime < tempTime) {
                     tempName = internationArrName;
                     tempTime = diffTime;
                 }
@@ -497,7 +497,7 @@ const handleSFtvDate = (nowDate, currentYear, todayArr, intAllArr) => {
                 if (tempTime == 0){
                     tempName = sFtvName;
                     tempTime = diffTime;
-                }else if (diffTime < tempTime){
+                }else if (diffTime > 0&&diffTime < tempTime){
                     tempName = sFtvName;
                     tempTime = diffTime;
                 }
@@ -537,7 +537,7 @@ const handleSpecialDate = (nowDate, currentYear, todayArr, intAllArr) => {
                 if (tempTime == 0){
                     tempName = specialName;
                     tempTime = diffTime;
-                }else if (diffTime < tempTime){
+                }else if (diffTime > 0&&diffTime < tempTime){
                     tempName = specialName;
                     tempTime = diffTime;
                 }
@@ -621,7 +621,7 @@ const handleLicenseDate = (nowDate, currentYear, todayLicenseArr, endLicenseArr)
                         todayLicenseArr.push(`* ${licenseName}🚨 \n ${todayDate} \n ${diffTime}天后到期，请及时处理\n`);
                     }
                 }else{
-                    endLicenseArr.push(`· ${licenseName}: 还有${diffTime}天`);
+                    endLicenseArr.push(`· ${licenseName}: ${diffTime}天`);
                 }
             }
         }
@@ -719,15 +719,17 @@ module.exports = handleTimeList = () => {
                 //content.push(`${res.data.data.content} \n-- 来自@${res.data.data.nickname}「${res.data.data.name}」${res.data.data.artistsname}\n`)
             }
 
+            //let filteredArr = latelyArr.filter(item => item['tempTime'] !== 0);
             let minTempTime = Math.min.apply(Math, latelyArr.map(item => { return item['tempTime'] }));
+
             let minTempArr = [];
             for (var j = 0; j < latelyArr.length; j++) {
                 let tempName = latelyArr[j].tempName;
                 let tempTime = latelyArr[j].tempTime;
                 if (minTempTime == latelyArr[j].tempTime){
-                    minTempArr.push(`* ${tempName}: 还有${tempTime}天`);
+                    minTempArr.push(`* ${tempName}: ${tempTime}天`);
                 }else{
-                    contentArr.push(`· ${tempName}: 还有${tempTime}天`);
+                    contentArr.push(`· ${tempName}: ${tempTime}天`);
                 }
             }
 
