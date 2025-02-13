@@ -185,15 +185,15 @@ module.exports = handleGasoline = async () => {
         content.push('⛽今日油价');
 
         const now = new Date();
-        const startDate = new Date(now.getFullYear(), 9, 1); // 10月1日 00:00:00
-        const endDate = new Date(now.getFullYear(), 9, 7, 23, 59, 59); // 10月7日 23:59:59
+        const startDate = new Date(now.getFullYear(), 4, 1); // 5月1日 00:00:00
+        const endDate = new Date(now.getFullYear(), 4, 7, 23, 59, 59); // 5月7日 23:59:59
         if(now >= startDate && now <= endDate){
             const fujianData = { province_name: "福建", province_code: "fujian" }
             provinces.push(fujianData);
         }
 
-        const newYearStartDate = new Date(now.getFullYear(), 1, 15); // 1月15日 00:00:00
-        const newYearEndDate = new Date(now.getFullYear(), 2, 25, 23, 59, 59); // 2月25日 23:59:59
+        const newYearStartDate = new Date(now.getFullYear(), 1, 1); // 1月15日 00:00:00
+        const newYearEndDate = new Date(now.getFullYear(), 1, 30, 23, 59, 59); // 2月25日 23:59:59
         if(now >= newYearStartDate && now <= newYearEndDate){
             const anhuiData = { province_name: "安徽", province_code: "anhui" }
             provinces.push(anhuiData);
@@ -230,13 +230,13 @@ module.exports = handleGasoline = async () => {
         }
 
         //近期最低油价
-        content.push(`\n🎯最低油价\n`);
+        content.push(`\n🎯最低油价`);
         if (fs.existsSync(dataFilePath)) {
             data = JSON.parse(fs.readFileSync(dataFilePath, 'utf8'));
             for(let province of provinces) {
                 data.gasoline.forEach(result => {
                     if(result.province_name == province.province_name){
-                        content.push(`🚘${result.province_name}\n`);
+                        content.push(`\n🚘${result.province_name}\n`);
                         content.push(`· 92号汽油: ${result.oilPrice_92}`);
                         content.push(`· 95号汽油: ${result.oilPrice_95}`);
                         content.push(`· 98号汽油: ${result.oilPrice_98}`);
