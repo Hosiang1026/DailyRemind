@@ -55,6 +55,7 @@ function writeLotteryCode(ssqCode, ssqRed, ssqBlue, ssqDate, lotteryContent) {
 
 			//比较中奖概率
 			if(data.lottery.length > 0 && data.predict.length > 0){
+				const lastPrediction = data.predict[data.predict.length - 1];
 				const winnings = calculateWinnings(data.lottery, data.predict);
 				lotteryContent.push(`\n🎯本期预测双色球开奖\n`);
 				winnings.forEach(result => {
@@ -62,6 +63,8 @@ function writeLotteryCode(ssqCode, ssqRed, ssqBlue, ssqDate, lotteryContent) {
 					lotteryContent.push(`· 中奖金额: ${result.matchedAmount}`);
 					lotteryContent.push(`· 匹配红球数: ${result.matchedRedBalls}`);
 					lotteryContent.push(`· 是否匹配蓝球: ${result.matchedBlueBall}`);
+					lotteryContent.push(`· 预测红球号码: ` + lastPrediction.ssq_red);
+					lotteryContent.push(`· 预测蓝球号码: ` + lastPrediction.ssq_blue);
 				});
 			}
 
@@ -174,132 +177,6 @@ function calculateWinnings(lottery, predict) {
 	return results;
 }
 
-
-// 统计出现频率的函数
-// function countFrequency(arr) {
-// 	return arr.reduce((acc, num) => {
-// 		acc[num] = (acc[num] || 0) + 1;
-// 		return acc;
-// 	}, {});
-// }
-
-// 获取出现频率最高的号码
-// function getMostFrequentNumbers(counts, count) {
-// 	return Object.entries(counts)
-// 		.sort((a, b) => b[1] - a[1])
-// 		.slice(0, count)
-// 		.map(entry => parseInt(entry[0]));
-// }
-
-// 获取出现频率最高的号码，并随机填充剩余部分
-// function getMostFrequentNumbers(counts, count) {
-// 	const entries = Object.entries(counts);
-//
-// 	// 如果 count 为 1，直接随机选择一个号码
-// 	if (count === 1) {
-// 		const randomIndex = Math.floor(Math.random() * entries.length);
-// 		return [parseInt(entries[randomIndex][0])];
-// 	}
-//
-// 	// 按频率排序
-// 	entries.sort((a, b) => b[1] - a[1]);
-//
-// 	// 取一半出现频率最高的号码
-// 	const halfCount = Math.ceil(count / 2);
-// 	const mostFrequentNumbers = entries
-// 		.slice(0, halfCount)
-// 		.map(entry => parseInt(entry[0]));
-//
-// 	// 剩余号码池
-// 	const remainingNumbers = entries
-// 		.slice(halfCount)
-// 		.map(entry => parseInt(entry[0]));
-//
-// 	// 随机补充剩余号码，确保不重复
-// 	while (mostFrequentNumbers.length < count) {
-// 		const randomIndex = Math.floor(Math.random() * 33) + 1;
-// 		const randomNumber = remainingNumbers[randomIndex];
-// 		if (!mostFrequentNumbers.includes(randomNumber)) {
-// 			mostFrequentNumbers.push(randomNumber);
-// 		}
-// 	}
-//
-// 	return mostFrequentNumbers;
-// }
-
-// 统计频率的函数
-// function countFrequency(numbers) {
-// 	const counts = {};
-// 	numbers.forEach(number => {
-// 		counts[number] = (counts[number] || 0) + 1;
-// 	});
-// 	return counts;
-// }
-//
-// // 获取出现频率最高的数字
-// function getMostFrequentNumbers(counts, num) {
-// 	return Object.keys(counts)
-// 		.sort((a, b) => counts[b] - counts[a])
-// 		.slice(0, num)
-// 		.map(Number);
-// }
-//
-// //预测下一个双色球号码, 基于统计频率的简单预测算法
-// function predictNextSSQ(data) {
-// 	const redBalls = [];
-// 	const blueBalls = [];
-//
-// 	// 将所有的红球号码和蓝球号码加入列表
-// 	data.lottery.forEach(entry => {
-// 		redBalls.push(...entry.ssq_red.split(','));
-// 		blueBalls.push(entry.ssq_blue);
-// 	});
-//
-// 	// 统计每个红球号码和蓝球号码的出现频率
-// 	const redCounts = countFrequency(redBalls);
-// 	const blueCounts = countFrequency(blueBalls);
-//
-// 	// 选择出现频率最高的6个红球号码和1个蓝球号码
-// 	let predictedReds = getMostFrequentNumbers(redCounts, 6);
-// 	let predictedBlue = getMostFrequentNumbers(blueCounts, 1)[0];
-//
-// 	// 确保红球号码排序
-// 	predictedReds.sort((a, b) => a - b);
-//
-// 	return {
-// 		redBalls: predictedReds.join(','),
-// 		blueBall: predictedBlue
-// 	};
-// }
-
-// function predictNextSSQ(data) {
-// 	const redBalls = [];
-// 	const blueBalls = [];
-//
-// 	// 将所有的红球号码和蓝球号码加入列表
-// 	data.lottery.forEach(entry => {
-// 		redBalls.push(...entry.ssq_red.split(','));
-// 		blueBalls.push(entry.ssq_blue);
-// 	});
-//
-// 	// 统计每个红球号码和蓝球号码的出现频率
-// 	const redCounts = countFrequency(redBalls);
-// 	const blueCounts = countFrequency(blueBalls);
-//
-// 	// 选择出现频率最高的红球号码和蓝球号码
-// 	let predictedReds = getMostFrequentNumbers(redCounts, 6);
-// 	let predictedBlue = getMostFrequentNumbers(blueCounts, 1)[0];
-//
-// 	// 确保红球号码排序
-// 	predictedReds.sort((a, b) => a - b);
-//
-// 	return {
-// 		redBalls: predictedReds.join(','),
-// 		blueBall: predictedBlue
-// 	};
-// }
-
-
 // 统计频率的函数
 function countFrequency(numbers) {
 	const counts = {};
@@ -348,6 +225,11 @@ function selectBlueNumber(hotBlues, coldBlues) {
 	return pool[randomIndex];
 }
 
+// 格式化号码：个位数补零
+function formatNumber(num) {
+	return num < 10 ? `0${num}` : `${num}`;
+}
+
 //预测下一个双色球号码, 基于统计频率的简单预测算法
 function predictNextSSQ(data) {
 	const redBalls = [];
@@ -378,14 +260,15 @@ function predictNextSSQ(data) {
 	// 确保红球号码排序
 	predictedReds.sort((a, b) => a - b);
 
+	// 格式化号码：个位数补零
+	const formattedReds = predictedReds.map(num => formatNumber(num));
+	const formattedBlue = formatNumber(predictedBlue);
+
 	return {
-		redBalls: predictedReds.join(','),
-		blueBall: predictedBlue
+		redBalls: formattedReds.join(','),
+		blueBall: formattedBlue
 	};
 }
-
-
-
 
 function getLotteryCookie() {
 	return new Promise(async (resolve, reject) => {
@@ -425,7 +308,7 @@ module.exports = handleLottery = () => {
 
 		lotteryContent.push(`📈福利彩票`);
 
-		let nowDate = new Date();
+		let nowDate = new Date("2025-02-13");
 		let nowDay = nowDate.getDay();
 
 		let SDArr = lottery.SD;
