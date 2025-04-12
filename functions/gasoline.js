@@ -199,6 +199,7 @@ module.exports = handleGasoline = async () => {
             provinces.push(anhuiData);
         }
 
+        let curr_price = 0;
         for(let province of provinces) {
             console.log(`正在获取 ${province.province_name} 的今日油价数据...`);
             const url = oilUrl.replace("{province_code}", province.province_code);
@@ -217,6 +218,12 @@ module.exports = handleGasoline = async () => {
                     }
                     if(oilPrice.fuelType == '95号汽油'){
                         oilPrice_95 = oilPrice.price;
+
+                        // 只在找到浙江时计算一次
+                        if (province.province_name === "浙江" && curr_price === 0) {
+                            curr_price = parseFloat(oilPrice_95);
+                        }
+
                     }
                     if(oilPrice.fuelType == '98号汽油'){
                         oilPrice_98 = oilPrice.price;
@@ -224,12 +231,16 @@ module.exports = handleGasoline = async () => {
                     if(oilPrice.fuelType == '0号柴油'){
                         oilPrice_0 = oilPrice.price;
                     }
+
+
                 }
+
                 writeGasoline(province.province_name, oilPrice_92, oilPrice_95, oilPrice_98, oilPrice_0);
             }
         }
 
         //近期最低油价
+        let low_price = 0;
         content.push(`\n🎯最低油价`);
         if (fs.existsSync(dataFilePath)) {
             data = JSON.parse(fs.readFileSync(dataFilePath, 'utf8'));
@@ -242,6 +253,11 @@ module.exports = handleGasoline = async () => {
                         content.push(`· 98号汽油: ${result.oilPrice_98}`);
                         content.push(`· 0号柴油: ${result.oilPrice_0}`);
                         content.push(`· 更新时间: ${result.update_date}`);
+                    }
+
+                    // 只在找到浙江时计算一次
+                    if (result.province_name === "浙江" && low_price === 0) {
+                        low_price = parseFloat(result.oilPrice_95);
                     }
                 });
             }
@@ -264,6 +280,23 @@ module.exports = handleGasoline = async () => {
         // var restrictionText = await fetchRestrictionInfo(restricUrl);
         // content.push('\n'+ restrictionText);
         // console.log('获取汽车限行规则成功：\n',  restrictionText);
+
+        //汽油换算
+        const curr_cost_30 = curr_price * 30;
+        const curr_cost_50 = curr_price * 50;
+
+        const low_cost_30 = low_price * 30;
+        const low_cost_50 = low_price * 50;
+
+        const diff_cost_30 = curr_cost_30 - low_cost_30;
+        const diff_cost_50 = curr_cost_50 - low_cost_50;
+
+        content.push(`\n🚖浙江95号汽油换算\n`);
+        content.push(`· 油箱容积: 60升`);
+        content.push(`· 30L油费: ${curr_cost_30.toFixed(2)}元`);
+        content.push(`· 30L差价: ${diff_cost_30.toFixed(2)}元`);
+        content.push(`· 50L油费: ${curr_cost_50.toFixed(2)}元`);
+        content.push(`· 50L差价: ${diff_cost_50.toFixed(2)}元`);
 
         console.log('获取汽油价格成功：\n', content);
 
