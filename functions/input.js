@@ -1012,16 +1012,24 @@ let daily = {
     ],
     license: [//证件有效期列表
         {
-            name:'Agile租房合同',
-            date: '2025-02-28'
+            name:'TYSS租房合同',
+            date: '2026-02-18'
         },
         {
-            name:'Agile-Q4租房',
-            date: '2024-12-01'
+            name:'TYSS-Q2租房',
+            date: '2025-05-11'
+        },
+		{
+            name:'TYSS-Q3租房',
+            date: '2025-08-11'
+        },
+		{
+            name:'TYSS-Q4租房',
+            date: '2025-11-11'
         },
         {
             name:'CMCC宽带',
-            date: '2025-03-01'
+            date: '2026-03-31'
         },
         {
             name:'Skoda车险',
