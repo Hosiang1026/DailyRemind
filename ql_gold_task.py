@@ -104,11 +104,13 @@ def getGold():
         store_content = store_content + "· " + zghj_brand + "：" + zghj_gold + "元/克\n\n";
 
         #金价换算
-        usdcny_url = "https://www.exchange-rates.org/zh/converter/usd-cny"
-        usdcny_r = requests.get(usdcny_url, headers=headers)
-        usdcny_r.encoding = usdcny_r.apparent_encoding
-        usdcny_soup = BeautifulSoup(usdcny_r.text, 'html.parser')
-        usdcny_price = usdcny_soup.select('.rate-to')[0].text.replace("CNY", "").strip()
+        #usdcny_url = "https://www.exchange-rates.org/zh/converter/usd-cny"
+        #usdcny_r = requests.get(usdcny_url, headers=headers)
+        #usdcny_r.encoding = usdcny_r.apparent_encoding
+        #usdcny_soup = BeautifulSoup(usdcny_r.text, 'html.parser')
+        #usdcny_price = usdcny_soup.select('.rate-to')[0].text.replace("CNY", "").strip()
+
+        usdcny_price = 7.1329;
         conver_gold = float(international_gold) / 31.1035 * float(usdcny_price);
         difference_gold = float(domestic_gold) - conver_gold;
 
@@ -116,7 +118,7 @@ def getGold():
         conver_content = conver_content + "· 1克差价：" + str(round(difference_gold, 2)) + "元\n";
         conver_content = conver_content + "· 50克价格：" + str(round(float(domestic_gold) * 50, 2)) + "元\n";
         conver_content = conver_content + "· 金衡盎司：" + "1盎司 = 31.1035克\n";
-        conver_content = conver_content + "· 兑换汇率：" + "1美元 ≈ " + usdcny_price +"人民币\n\n";
+        #conver_content = conver_content + "· 兑换汇率：" + "1美元 ≈ " + usdcny_price +"人民币\n\n";
 
         #拼接所有价格信息
         _content = _content + domestic_content + international_content + store_content + conver_content;
