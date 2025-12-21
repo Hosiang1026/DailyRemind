@@ -945,6 +945,126 @@ function diffTimeToDaily(nowTime, targetTime){
   return formatTimeDiff
 }
 
+//计算各年度夏三伏的入伏日期
+function calculateSanFuDates(currentYear) {
+    var date1 = 0, date2 = 0, date3 = 0, date4 = 0, date5 = 0, date6 = 0;
+  
+    if (currentYear < 2100 && currentYear > 1999) {
+        // 取后2位
+        var objvalue = currentYear - 2000;
+        // objvalue2尾数
+        var objvalue2 = objvalue;
+        // 大于80减80
+        if (objvalue > 80) objvalue -= 80;
+        // 大于40减40
+        if (objvalue > 40) objvalue -= 40;
+        // 除以4结果取整数
+        objvalue = parseInt(objvalue / 4);
+        // 后2位为奇数,加5.
+        if (objvalue2 % 2 == 1)
+            objvalue += 5;
+        // 求庚日
+        var num = 11 - objvalue;
+        if (num > 1)
+            date6 = 10;
+        else
+            date6 = 20;
+        // 初伏庚日
+        date1 = date6 + num;
+        // 中伏庚日
+        date2 = date1 + 10;
+  
+        // 求中伏天数
+        if (date1 > 18) {
+            date3 = 10;
+        } else {
+            date3 = 20;
+        }
+  
+        // 末伏庚日
+        date4 = date2 + date3 - 31;
+        // 出伏日期
+        date5 = date4 + 10;
+  
+        // 返回结果数组
+        return [
+            { name: "初伏", startDate: new Date(currentYear, 6, date1), endDate: new Date(currentYear, 6, date1 + date3 - 1), days: date3 },
+            { name: "中伏", startDate: new Date(currentYear, 6, date2), endDate: new Date(currentYear, 6, date2 + date3 - 1), days: date3 },
+            { name: "末伏", startDate: new Date(currentYear, 7, date4), endDate: new Date(currentYear, 7, date4 + 9), days: 10 }
+        ];
+    } else {
+        console.log("计算各年度夏三伏的入伏日期-传入年份超出2000年-2099年范围");
+        return null;
+    }
+  }
+  
+  //计算各年度夏季梅雨期的日期
+  function calculateMeiYuSeason(currentYear, mangZhongDate, xiaoshuDate) {
+    var startDay, endDay, duration;
+  
+    if (currentYear < 2100 && currentYear > 1999 && mangZhongDate instanceof Date && xiaoshuDate instanceof Date) {
+      // 根据推算逻辑，梅雨季开始日期为庚子日后的第一个丙午日
+      var meiyuStartDay = mangZhongDate.getDate() + 6; // 芒种日后的第7天
+      startDay = new Date(mangZhongDate.getFullYear(), mangZhongDate.getMonth(), meiyuStartDay);
+  
+      // 根据推算逻辑，梅雨季结束日期在小暑后的第一个辛未日结束
+      var dayOfWeek = xiaoshuDate.getDay();
+      if (dayOfWeek === 6) { // 如果小暑日是周六
+         endDay = xiaoshuDate; // 梅雨季结束日期就是小暑日期
+      } else {
+          // 找到小暑日后的第一个周六
+          var daysToAdd = 6 - dayOfWeek;
+          endDay = new Date(xiaoshuDate.getFullYear(), xiaoshuDate.getMonth(), xiaoshuDate.getDate() + daysToAdd);
+      }
+  
+      duration = Math.ceil((endDay - startDay) / (1000 * 60 * 60 * 24)) + 1; // 持续天数
+        return {
+          startDate: startDay,
+          endDate: endDay,
+          duration: duration
+        };
+    } else {
+        console.log("计算各年度梅雨期的日期-传入年份超出2000年-2099年范围");
+        return null;
+    }
+  }
+  
+  //计算各年度冬季四九天的日期
+  function calculateSanjiuSeason(currentYear, dongzhiDate) {
+    var sanjiuDays = []; // 存储四九天的信息
+    var startDay, endDay, name;
+    
+    if (currentYear < 2100 && currentYear > 1999 && dongzhiDate instanceof Date) {
+        for (var i = 1; i <= 4; i++) {
+            startDay = new Date(dongzhiDate);
+            startDay.setDate(startDay.getDate() + (i - 1) * 9); // 计算三九天的开始日期
+            endDay = new Date(dongzhiDate);
+            endDay.setDate(endDay.getDate() + i * 9 - 1); // 计算三九天的结束日期
+            
+            if (i === 1) {
+                name = "一九";
+            } else if (i === 2) {
+                name = "二九";
+            }  else if (i === 3) {
+                name = "三九";
+            }else {
+                name = "四九";
+            }
+  
+            sanjiuDays.push({
+                name: name,
+                startDate: startDay,
+                endDate: endDay
+            });
+        }
+        
+        return sanjiuDays;
+    } else {
+        console.log("计算各年度冬季四九天的日期-传入年份超出2000年-2099年范围");
+        return null;
+    }
+  }
+
 //获取包含中文的字符串字节长度
 function getTextLength(str){
   var length = 0;
@@ -967,5 +1087,9 @@ module.exports = {
   diffTimeToDaily,
   conversionTerm,
   getTextLength,
-  conversionParentDate
+  conversionParentDate,
+  lYearDays,   //农历year年的总天数
+  calculateSanFuDates,   //返回三伏天
+  calculateMeiYuSeason, //返回梅雨期
+  calculateSanjiuSeason //返回三九天
 }

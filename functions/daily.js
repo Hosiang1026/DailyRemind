@@ -284,7 +284,7 @@ const handleBirthdayDate = (nowDate, lunarDate, currentYear, todayArr, latelyArr
     }
 };
 
-//处理法定节假日
+// 处理法定节假日 - 修复版
 const handleLegalDate = (nowDate, currentMDDate, currentYear, todayArr, latelyArr, tipsArr) => {
     let legalArr = daily.legal;
     if(legalArr.length > 0){
@@ -298,11 +298,12 @@ const handleLegalDate = (nowDate, currentMDDate, currentYear, todayArr, latelyAr
             let legalHoliday = element.holiday;
             let legalRepair = element.repair;
             var existHoliday = false;
-            //补班或放假提示
+
+            // 补班或放假提示
             if(legalHoliday != 0){
                 existHoliday = legalHoliday.includes(currentMDDate);
                 if(existHoliday){
-                    let holidayFrist =currentYear + '-'+ legalHoliday[0];
+                    let holidayFrist = currentYear + '-'+ legalHoliday[0];
                     let holidayDiff = calendar.sumTimeToNow(holidayFrist, nowDate);
                     tipsArr.push(`⛱祝大家假期愉快！`);
                     tipsArr.push(`* ${legalName}放假: 第${holidayDiff+1}天 `)
@@ -313,6 +314,7 @@ const handleLegalDate = (nowDate, currentMDDate, currentYear, todayArr, latelyAr
                     }
                 }
             }
+
             if(legalRepair != 0){
                 let existRepair = legalRepair.includes(currentMDDate);
                 if(existRepair){
@@ -320,14 +322,31 @@ const handleLegalDate = (nowDate, currentMDDate, currentYear, todayArr, latelyAr
                 }
             }
 
-            //计算差值
+            // 计算差值 - 修复跨年问题
             let targetArr = legalDate.split('-');
-            let currentYearBar = currentYear + '-';
-            let nextLegalDate = currentYearBar + targetArr[0] + '-' + targetArr[1];
-            if (new Date(nowDate) > new Date(nextLegalDate)) {
-                nextLegalDate = currentYear + 1 + '-' + targetArr[0] + '-' + targetArr[1];
+            let month = targetArr[0];
+            let day = targetArr[1];
+
+            // 创建一个当前年份的日期
+            let curYearDate = new Date(currentYear, parseInt(month) - 1, parseInt(day));
+            let now = new Date(nowDate);
+
+            // 计算下一个节假日日期
+            let nextLegalDate;
+            if (curYearDate >= now) {
+                // 如果今年的节假日还没过，就是今年的
+                nextLegalDate = `${currentYear}-${month}-${day}`;
+            } else {
+                // 如果今年的节假日已经过了，就是明年的
+                nextLegalDate = `${currentYear + 1}-${month}-${day}`;
             }
+
+            // 计算天数差
             let diffTime = calendar.diffTimeToDaily(nowDate, nextLegalDate);
+
+            // 确保diffTime是非负数
+            diffTime = Math.max(0, diffTime);
+
             if (diffTime == 0) {
                 var obj = {todayName:legalName,todayDate:'', todayContent:''};
                 todayArr.push(obj);
@@ -335,26 +354,31 @@ const handleLegalDate = (nowDate, currentMDDate, currentYear, todayArr, latelyAr
                 if (tempTime == 0) {
                     tempName = legalName;
                     tempTime = diffTime;
-                } else if (diffTime > 0&&diffTime < tempTime) {
+                } else if (diffTime > 0 && diffTime < tempTime) {
                     tempName = legalName;
                     tempTime = diffTime;
                 }
             }
 
+            // 假期提示逻辑保持不变
             let startYearLegalDate = nowDate;
             let endYearLegalDate = nowDate;
             let startLegalHoliday = legalHoliday[0];
             let endLegalHoliday = legalHoliday[legalHoliday.length - 1];
 
             let legalHolidayNum = legalHoliday.length;
-            if (diffTime+legalHolidayNum < 15) {
+            if (diffTime + legalHolidayNum < 15) {
                 let legalHolidayNum = legalHoliday.length;
                 if (legalHolidayNum == 1) {
                     tipsArr.push(`⏳距离${legalName}放假还有${diffTime}天 `);
-                    startYearLegalDate = currentYearBar + startLegalHoliday;
-                    if (new Date(nowDate) > new Date(startYearLegalDate)) {
-                        startYearLegalDate = currentYear + 1 + '-' + startLegalHoliday;
+                    let startYearLegalDate = currentYear + '-' + startLegalHoliday;
+                    let startDate = new Date(startYearLegalDate);
+
+                    // 如果开始日期已经过去，使用下一年的
+                    if (startDate < now) {
+                        startYearLegalDate = (currentYear + 1) + '-' + startLegalHoliday;
                     }
+
                     if(legalFreeway == 1){
                         tipsArr.push(`* 高速通行: 免费`)
                     }else{
@@ -373,9 +397,17 @@ const handleLegalDate = (nowDate, currentMDDate, currentYear, todayArr, latelyAr
                     }
 
                 } else if (!existHoliday){
-                    startYearLegalDate = currentYearBar + startLegalHoliday;
-                    endYearLegalDate = currentYearBar + endLegalHoliday;
+                    let startYearLegalDate = currentYear + '-' + startLegalHoliday;
+                    let startDate = new Date(startYearLegalDate);
+
+                    // 如果开始日期已经过去，使用下一年的
+                    if (startDate < now) {
+                        startYearLegalDate = (currentYear + 1) + '-' + startLegalHoliday;
+                    }
+
                     let startDiffTime = calendar.diffTimeToDaily(nowDate, startYearLegalDate);
+                    startDiffTime = Math.max(0, startDiffTime);
+
                     if (startDiffTime > 0){
                         tipsArr.push(`⏳距离${legalName}放假还有${startDiffTime}天`)
                         if(legalFreeway == 1){
@@ -404,6 +436,127 @@ const handleLegalDate = (nowDate, currentMDDate, currentYear, todayArr, latelyAr
         latelyArr.push(obj);
     }
 };
+
+//处理法定节假日
+// const handleLegalDate = (nowDate, currentMDDate, currentYear, todayArr, latelyArr, tipsArr) => {
+//     let legalArr = daily.legal;
+//     if(legalArr.length > 0){
+//         let tempName = '';
+//         let tempTime = 0;
+//         for (let i = 0; i < legalArr.length; i++) {
+//             const element = legalArr[i];
+//             let legalName = element.name;
+//             let legalDate = element.date;
+//             let legalFreeway = element.freeway;
+//             let legalHoliday = element.holiday;
+//             let legalRepair = element.repair;
+//             var existHoliday = false;
+//             //补班或放假提示
+//             if(legalHoliday != 0){
+//                 existHoliday = legalHoliday.includes(currentMDDate);
+//                 if(existHoliday){
+//                     let holidayFrist =currentYear + '-'+ legalHoliday[0];
+//                     let holidayDiff = calendar.sumTimeToNow(holidayFrist, nowDate);
+//                     tipsArr.push(`⛱祝大家假期愉快！`);
+//                     tipsArr.push(`* ${legalName}放假: 第${holidayDiff+1}天 `)
+//                     if(legalFreeway == 1){
+//                         tipsArr.push(`* 全国高速通行: 免费 \n`)
+//                     }else{
+//                         tipsArr.push(`* 全国高速通行: 收费 \n`)
+//                     }
+//                 }
+//             }
+//             if(legalRepair != 0){
+//                 let existRepair = legalRepair.includes(currentMDDate);
+//                 if(existRepair){
+//                     tipsArr.push(`📟今天${legalName}补班，努力工作！\n `);
+//                 }
+//             }
+
+//             //计算差值
+//             let targetArr = legalDate.split('-');
+//             let currentYearBar = currentYear + '-';
+//             let nextLegalDate = currentYearBar + targetArr[0] + '-' + targetArr[1];
+//             if (new Date(nowDate) > new Date(nextLegalDate)) {
+//                 nextLegalDate = currentYear + 1 + '-' + targetArr[0] + '-' + targetArr[1];
+//             }
+//             let diffTime = calendar.diffTimeToDaily(nowDate, nextLegalDate);
+//             if (diffTime == 0) {
+//                 var obj = {todayName:legalName,todayDate:'', todayContent:''};
+//                 todayArr.push(obj);
+//             } else {
+//                 if (tempTime == 0) {
+//                     tempName = legalName;
+//                     tempTime = diffTime;
+//                 } else if (diffTime > 0&&diffTime < tempTime) {
+//                     tempName = legalName;
+//                     tempTime = diffTime;
+//                 }
+//             }
+
+//             let startYearLegalDate = nowDate;
+//             let endYearLegalDate = nowDate;
+//             let startLegalHoliday = legalHoliday[0];
+//             let endLegalHoliday = legalHoliday[legalHoliday.length - 1];
+
+//             let legalHolidayNum = legalHoliday.length;
+//             if (diffTime+legalHolidayNum < 15) {
+//                 let legalHolidayNum = legalHoliday.length;
+//                 if (legalHolidayNum == 1) {
+//                     tipsArr.push(`⏳距离${legalName}放假还有${diffTime}天 `);
+//                     startYearLegalDate = currentYearBar + startLegalHoliday;
+//                     if (new Date(nowDate) > new Date(startYearLegalDate)) {
+//                         startYearLegalDate = currentYear + 1 + '-' + startLegalHoliday;
+//                     }
+//                     if(legalFreeway == 1){
+//                         tipsArr.push(`* 高速通行: 免费`)
+//                     }else{
+//                         tipsArr.push(`* 高速通行: 收费`)
+//                     }
+
+//                     if (legalRepair != 0) {
+//                         let legalRepairNum = legalRepair.length;
+//                         tipsArr.push(`* 补班${legalRepairNum}天: ${legalRepair.join('、')}`)
+//                     }
+
+//                     if (legalHolidayNum > 2){
+//                         tipsArr.push(`* 假期${legalHolidayNum}天: ${startLegalHoliday} ~ ${endLegalHoliday}\n`)
+//                     }else{
+//                         tipsArr.push(`* 假期${legalHolidayNum}天: ${legalHoliday.join('、')}\n`)
+//                     }
+
+//                 } else if (!existHoliday){
+//                     startYearLegalDate = currentYearBar + startLegalHoliday;
+//                     endYearLegalDate = currentYearBar + endLegalHoliday;
+//                     let startDiffTime = calendar.diffTimeToDaily(nowDate, startYearLegalDate);
+//                     if (startDiffTime > 0){
+//                         tipsArr.push(`⏳距离${legalName}放假还有${startDiffTime}天`)
+//                         if(legalFreeway == 1){
+//                             tipsArr.push(`* 高速通行: 免费`)
+//                         }else{
+//                             tipsArr.push(`* 高速通行: 收费`)
+//                         }
+
+//                         if (legalRepair != 0) {
+//                             let legalRepairNum = legalRepair.length;
+//                             tipsArr.push(`* 补班${legalRepairNum}天: ${legalRepair.join('、')}`)
+//                         }
+
+//                         if (legalHolidayNum > 2){
+//                             tipsArr.push(`* 假期${legalHolidayNum}天: ${startLegalHoliday} ~ ${endLegalHoliday}\n`)
+//                         }else{
+//                             tipsArr.push(`* 假期${legalHolidayNum}天: ${legalHoliday.join('、')}\n`)
+//                         }
+//                     }
+//                 }
+//             }
+
+//         }
+
+//         var obj = {tempName:tempName,tempTime:tempTime};
+//         latelyArr.push(obj);
+//     }
+// };
 
 //处理阴历节日
 const handleLFtvDate = (nowDate, currentYear, todayArr, latelyArr) => {
@@ -681,6 +834,128 @@ const handleEasterDate = (nowDate, currentYear, todayArr, intAllArr) => {
     }
 };
 
+// 在 handleLegalDate 函数后添加以下函数
+
+// 处理三伏天
+const handleSanFuDate = (nowDate, currentYear, tipsArr) => {
+    let date = new Date(nowDate);
+
+    // 计算夏季三伏天的开始日期、结束日期和持续天数
+    let sanFuDates = calendar.calculateSanFuDates(currentYear);
+    if (sanFuDates) {
+        let tipContentStr = "";
+        sanFuDates.forEach(function (sanFuDate) {
+            let sanFuStartDateStr = formatDate(sanFuDate.startDate);
+            let diffTime = calendar.diffTimeToDaily(nowDate, sanFuStartDateStr);
+
+            // 接近三伏天
+            date.setHours(0, 0, 0, 0);
+            if (date >= sanFuDate.startDate && date <= sanFuDate.endDate) {
+                let sanFudays = calendar.sumTimeToNow(sanFuStartDateStr, nowDate);
+                tipContentStr = `🔅夏季三伏天-${sanFuDate.name}第${sanFudays+1}天，请大家注意避暑。\n`;
+            } else if (tipContentStr === "" && diffTime > 0 && diffTime < 8) {
+                tipContentStr = `⏳距离夏季三伏天-${sanFuDate.name}还有${diffTime}天（持续${sanFuDate.days}天：${formatMMDate(sanFuDate.startDate)} ~ ${formatMMDate(sanFuDate.endDate)}）\n`;
+            }
+        });
+
+        if (tipContentStr.length > 0) {
+            tipsArr.push(tipContentStr);
+        }
+    }
+};
+
+// 处理四九天
+const handleSiJiuDate = (nowDate, currentYear, tipsArr) => {
+    let date = new Date(nowDate);
+
+    // 获取今年和去年的冬至日期
+    let dongzhiDateThisYear = calendar.conversionTerm(currentYear, "12", 24);
+    let dongzhiDateLastYear = calendar.conversionTerm(currentYear - 1, "12", 24);
+
+    // 计算今年和去年的冬季四九天的开始日期、结束日期
+    let sijiuDatesThisYear = calendar.calculateSanjiuSeason(currentYear, new Date(dongzhiDateThisYear));
+    let sijiuDatesLastYear = calendar.calculateSanjiuSeason(currentYear - 1, new Date(dongzhiDateLastYear));
+
+    let allSijiuDates = sijiuDatesLastYear.concat(sijiuDatesThisYear);
+
+    if (allSijiuDates) {
+        let tipContentStr = "";
+        allSijiuDates.forEach(function (sijiuDate) {
+            let sijiuStartDate = formatMMDate(sijiuDate.startDate);
+            let sijiuEndDate = formatMMDate(sijiuDate.endDate);
+
+            // 跨年处理
+            let sijiuStartDateStr = sijiuDate.startDate.getFullYear() + '-' + sijiuStartDate;
+            let sijiuEndDateStr = sijiuDate.endDate.getFullYear() + '-' + sijiuEndDate;
+
+            let diffTime = calendar.diffTimeToDaily(nowDate, sijiuStartDateStr);
+
+            // 接近四九天
+            date.setHours(0, 0, 0, 0);
+            let sijiuStartDateObj = new Date(sijiuStartDateStr).setHours(0, 0, 0, 0);
+            let sijiuEndDateObj = new Date(sijiuEndDateStr).setHours(0, 0, 0, 0);
+
+            if (date >= sijiuStartDateObj && date <= sijiuEndDateObj) {
+                let sijiudays = calendar.sumTimeToNow(sijiuStartDateStr, nowDate);
+                tipContentStr = `❄冬季四九天-${sijiuDate.name}第${sijiudays + 1}天，一九二九不出手，三九四九冰上走，请大家注意保暖。\n`;
+            } else if (tipContentStr === "" && diffTime > 0 && diffTime < 8) {
+                tipContentStr = `⏳距离冬季四九天-${sijiuDate.name}还有${diffTime}天（持续9天：${sijiuStartDateStr} ~ ${sijiuEndDateStr}）\n`;
+            }
+        });
+
+        if (tipContentStr.length > 0) {
+            tipsArr.push(tipContentStr);
+        }
+    }
+};
+
+// 处理梅雨季
+const handleMeiYuDate = (nowDate, currentYear, tipsArr) => {
+    let date = new Date(nowDate);
+
+    // 芒种日期
+    let mangZhongDate = calendar.conversionTerm(currentYear, "06", 11);
+    // 小暑日期
+    let xiaoshuDate = calendar.conversionTerm(currentYear, "07", 13);
+
+    // 计算梅雨季的开始日期、结束日期和持续天数
+    let meiYuSeason = calendar.calculateMeiYuSeason(currentYear, new Date(mangZhongDate), new Date(xiaoshuDate));
+
+    if (meiYuSeason) {
+        let tipContentStr = "";
+        let meiYuStartDateStr = formatDate(meiYuSeason.startDate);
+        let meiYuEndDateStr = formatDate(meiYuSeason.endDate);
+        let diffTime = calendar.diffTimeToDaily(nowDate, meiYuStartDateStr);
+
+        date.setHours(0, 0, 0, 0);
+        if (date >= meiYuSeason.startDate && date <= meiYuSeason.endDate) {
+            let meiYudays = calendar.sumTimeToNow(meiYuStartDateStr, nowDate);
+            let meiYuEndDays = calendar.sumTimeToNow(meiYuEndDateStr, nowDate);
+            tipContentStr = `🌧梅雨季第${meiYudays+1}天，阴雨持续连绵，高温高湿，距离出梅还有${meiYuEndDays+1}天。\n`;
+        } else if (diffTime > 0 && diffTime < 8) {
+            tipContentStr = `⏳距离梅雨季还有${diffTime}天（持续${meiYuSeason.duration}天：${formatMMDate(meiYuSeason.startDate)} ~ ${formatMMDate(meiYuSeason.endDate)}）\n`;
+        }
+
+        if (tipContentStr.length > 0) {
+            tipsArr.push(tipContentStr);
+        }
+    }
+};
+
+// 添加日期格式化辅助函数
+const formatDate = (date) => {
+    let year = date.getFullYear();
+    let month = String(date.getMonth() + 1).padStart(2, '0');
+    let day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
+const formatMMDate = (date) => {
+    let month = String(date.getMonth() + 1).padStart(2, '0');
+    let day = String(date.getDate()).padStart(2, '0');
+    return `${month}-${day}`;
+};
+
 //处理证件有效期
 const handleLicenseDate = (nowDate, currentYear, todayLicenseArr, endLicenseArr) => {
     let licenseArr = daily.license;
@@ -770,6 +1045,15 @@ module.exports = handleTimeList = () => {
 
                 latelyArr.push(minObj);
             }
+
+            // 梅雨季
+            handleMeiYuDate(nowDate, currentYear, tipsArr);
+
+            // 夏季三伏天
+            handleSanFuDate(nowDate, currentYear, tipsArr);
+
+            // 冬季四九天
+            handleSiJiuDate(nowDate, currentYear, tipsArr);
 
             //证件有效期
             handleLicenseDate(nowDate, currentYear, todayLicenseArr, endLicenseArr);
