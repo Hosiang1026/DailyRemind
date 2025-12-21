@@ -852,9 +852,9 @@ const handleSanFuDate = (nowDate, currentYear, tipsArr) => {
             date.setHours(0, 0, 0, 0);
             if (date >= sanFuDate.startDate && date <= sanFuDate.endDate) {
                 let sanFudays = calendar.sumTimeToNow(sanFuStartDateStr, nowDate);
-                tipContentStr = `🔅夏季三伏天-${sanFuDate.name}第${sanFudays+1}天，请大家注意避暑。\n`;
+                tipContentStr = `🔅夏季三伏天-【${sanFuDate.name}】第${sanFudays+1}天，请大家注意避暑。\n`;
             } else if (tipContentStr === "" && diffTime > 0 && diffTime < 8) {
-                tipContentStr = `⏳距离夏季三伏天-${sanFuDate.name}还有${diffTime}天（持续${sanFuDate.days}天：${formatMMDate(sanFuDate.startDate)} ~ ${formatMMDate(sanFuDate.endDate)}）\n`;
+                tipContentStr = `⏳距离夏季三伏天-【${sanFuDate.name}】还有${diffTime}天（持续${sanFuDate.days}天：${formatMMDate(sanFuDate.startDate)} ~ ${formatMMDate(sanFuDate.endDate)}）\n`;
             }
         });
 
@@ -897,9 +897,9 @@ const handleSiJiuDate = (nowDate, currentYear, tipsArr) => {
 
             if (date >= sijiuStartDateObj && date <= sijiuEndDateObj) {
                 let sijiudays = calendar.sumTimeToNow(sijiuStartDateStr, nowDate);
-                tipContentStr = `❄冬季四九天-${sijiuDate.name}第${sijiudays + 1}天，一九二九不出手，三九四九冰上走，请大家注意保暖。\n`;
+                tipContentStr = `❄冬季四九天-【${sijiuDate.name}】第${sijiudays + 1}天，一九二九不出手，三九四九冰上走，请大家注意保暖。\n`;
             } else if (tipContentStr === "" && diffTime > 0 && diffTime < 8) {
-                tipContentStr = `⏳距离冬季四九天-${sijiuDate.name}还有${diffTime}天（持续9天：${sijiuStartDateStr} ~ ${sijiuEndDateStr}）\n`;
+                tipContentStr = `⏳距离冬季四九天-【${sijiuDate.name}】还有${diffTime}天（持续9天：${sijiuStartDateStr} ~ ${sijiuEndDateStr}）\n`;
             }
         });
 
