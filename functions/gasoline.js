@@ -6,6 +6,8 @@ const fs = require('fs');
 const path = require('path');
 const dataFilePath = path.join(__dirname, '..', 'db', 'gasoline.json');
 
+require("dotenv").config();
+
 // 获取省份汽油编码
 const provincesJson = process.env.OIL_PROVINCES;
 
@@ -173,6 +175,76 @@ function writeGasoline(provinceName, oilPrice92, oilPrice95, oilPrice98, oilPric
     })
 }
 
+async function sendMqttMsg(gasolineContent) {
+	const mqtt_host = process.env.mqtt_host || '';
+	const mqtt_port = process.env.mqtt_port || '';
+	const mqtt_username = process.env.mqtt_username || '';
+	const mqtt_password = process.env.mqtt_password || '';
+
+	if (!mqtt_host || !mqtt_port) {
+		return;
+	}
+
+	const mqtt = require('mqtt');
+	const clientId = 'mqtt_gasoline';
+	const connectUrl = `mqtt://${mqtt_host}:${mqtt_port}`;
+	const client = mqtt.connect(connectUrl, {
+		clientId,
+		clean: true,
+		connectTimeout: 2000,
+		username: mqtt_username,
+		password: mqtt_password,
+		reconnectPeriod: 1000,
+	});
+
+	const topic = 'qinglong/gasoline';
+	const now = new Date();
+	const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+	const data = {
+		content: gasolineContent,
+		timestamp: timestamp
+	};
+
+	return new Promise((resolve, reject) => {
+		client.on('connect', async () => {
+			console.log('mqtt:Connected');
+			try {
+				const result = await new Promise((pubResolve, pubReject) => {
+					client.publish(topic, JSON.stringify(data), { qos: 0, retain: true }, (error) => {
+						if (error) {
+							pubReject(error);
+						} else {
+							pubResolve();
+						}
+					});
+				});
+				console.log('mqtt:Published');
+				setTimeout(() => {
+					client.end();
+					resolve();
+				}, 500);
+			} catch (error) {
+				console.error('mqtt:Publish error', error);
+				client.end();
+				reject(error);
+			}
+		});
+
+		client.on('error', (error) => {
+			console.error('mqtt:Connection error', error);
+			client.end();
+			reject(error);
+		});
+
+		setTimeout(() => {
+			if (client.connected === false) {
+				client.end();
+				reject(new Error('mqtt:Connection timeout'));
+			}
+		}, 2000);
+	});
+}
+
 // Define handleGasoline function to use fetchContent
 module.exports = handleGasoline = async () => {
     const textUrl = 'http://www.qiyoujiage.com';
@@ -298,6 +370,9 @@ module.exports = handleGasoline = async () => {
         content.push(`· 50L油费: ${curr_cost_50.toFixed(2)}元`);
         content.push(`· 50L差价: ${diff_cost_50.toFixed(2)}元`);
 
+        const mqttContent = content.filter(line => !line.includes('⛽今日油价')).join('\n');
+        await sendMqttMsg(mqttContent);
+        
         console.log('获取汽油价格成功：\n', content);
 
         return content.join('\n');

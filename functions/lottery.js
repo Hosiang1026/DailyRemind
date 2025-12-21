@@ -6,6 +6,76 @@ const dataFilePath = path.join(__dirname, '..', 'db', 'lottery.json');
 
 require("dotenv").config();
 
+async function sendMqttMsg(lotteryContent) {
+	const mqtt_host = process.env.mqtt_host || '';
+	const mqtt_port = process.env.mqtt_port || '';
+	const mqtt_username = process.env.mqtt_username || '';
+	const mqtt_password = process.env.mqtt_password || '';
+
+	if (!mqtt_host || !mqtt_port) {
+		return;
+	}
+
+	const mqtt = require('mqtt');
+	const clientId = 'mqtt_lottery';
+	const connectUrl = `mqtt://${mqtt_host}:${mqtt_port}`;
+	const client = mqtt.connect(connectUrl, {
+		clientId,
+		clean: true,
+		connectTimeout: 2000,
+		username: mqtt_username,
+		password: mqtt_password,
+		reconnectPeriod: 1000,
+	});
+
+	const topic = 'qinglong/lottery';
+	const now = new Date();
+	const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+	const data = {
+		content: lotteryContent,
+		timestamp: timestamp
+	};
+
+	return new Promise((resolve, reject) => {
+		client.on('connect', async () => {
+			console.log('mqtt:Connected');
+			try {
+				const result = await new Promise((pubResolve, pubReject) => {
+					client.publish(topic, JSON.stringify(data), { qos: 0, retain: true }, (error) => {
+						if (error) {
+							pubReject(error);
+						} else {
+							pubResolve();
+						}
+					});
+				});
+				console.log('mqtt:Published');
+				setTimeout(() => {
+					client.end();
+					resolve();
+				}, 500);
+			} catch (error) {
+				console.error('mqtt:Publish error', error);
+				client.end();
+				reject(error);
+			}
+		});
+
+		client.on('error', (error) => {
+			console.error('mqtt:Connection error', error);
+			client.end();
+			reject(error);
+		});
+
+		setTimeout(() => {
+			if (client.connected === false) {
+				client.end();
+				reject(new Error('mqtt:Connection timeout'));
+			}
+		}, 2000);
+	});
+}
+
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.57";
 const options = { headers: { "User-Agent": UA }, rejectUnauthorized: false };
 const lotteryURLs = [
@@ -202,27 +272,76 @@ function getColdNumbers(counts, num) {
 		.map(Number);
 }
 
-// 选择红球号码：结合热号和冷号，随机选择6个号码
-function selectRedNumbers(hotReds, coldReds, num) {
-	const pool = [...hotReds, ...coldReds]; // 合并热号和冷号
-	const selected = [];
+function selectRedNumbers(hotReds, coldReds, num, recentLottery) {
+	const allNumbers = Array.from({ length: 33 }, (_, i) => i + 1);
+	const pool = [...new Set([...hotReds, ...coldReds, ...allNumbers])];
+	
+	const weights = {};
+	pool.forEach(num => {
+		let weight = 1;
+		if (hotReds.includes(num)) weight += 3;
+		if (coldReds.includes(num)) weight += 1;
+		if (recentLottery && recentLottery.some(entry => entry.ssq_red.split(',').map(Number).includes(num))) {
+			weight += 2;
+		}
+		weights[num] = weight;
+	});
 
-	while (selected.length < num) {
-		const randomIndex = Math.floor(Math.random() * pool.length);
-		const number = pool[randomIndex];
-		if (!selected.includes(number)) {
-			selected.push(number);
+	const selected = [];
+	const maxAttempts = 1000;
+	let attempts = 0;
+
+	while (selected.length < num && attempts < maxAttempts) {
+		const totalWeight = pool.reduce((sum, num) => sum + (selected.includes(num) ? 0 : weights[num]), 0);
+		let random = Math.random() * totalWeight;
+		
+		for (const number of pool) {
+			if (selected.includes(number)) continue;
+			random -= weights[number];
+			if (random <= 0) {
+				selected.push(number);
+				break;
+			}
+		}
+		attempts++;
+	}
+
+	if (selected.length < num) {
+		const remaining = pool.filter(n => !selected.includes(n));
+		while (selected.length < num && remaining.length > 0) {
+			const randomIndex = Math.floor(Math.random() * remaining.length);
+			selected.push(remaining.splice(randomIndex, 1)[0]);
 		}
 	}
 
 	return selected;
 }
 
-// 选择蓝球号码：结合热号和冷号，随机选择1个号码
-function selectBlueNumber(hotBlues, coldBlues) {
-	const pool = [...hotBlues, ...coldBlues]; // 合并热号和冷号
-	const randomIndex = Math.floor(Math.random() * pool.length);
-	return pool[randomIndex];
+function selectBlueNumber(hotBlues, coldBlues, recentLottery) {
+	const allNumbers = Array.from({ length: 16 }, (_, i) => i + 1);
+	const pool = [...new Set([...hotBlues, ...coldBlues, ...allNumbers])];
+	
+	const weights = {};
+	pool.forEach(num => {
+		let weight = 1;
+		if (hotBlues.includes(num)) weight += 3;
+		if (coldBlues.includes(num)) weight += 1;
+		if (recentLottery && recentLottery.some(entry => Number(entry.ssq_blue) === num)) {
+			weight += 2;
+		}
+		weights[num] = weight;
+	});
+
+	const totalWeight = pool.reduce((sum, num) => sum + weights[num], 0);
+	let random = Math.random() * totalWeight;
+	
+	for (const number of pool) {
+		random -= weights[number];
+		if (random <= 0) {
+			return number;
+		}
+	}
+	return pool[0];
 }
 
 // 格式化号码：个位数补零
@@ -230,37 +349,64 @@ function formatNumber(num) {
 	return num < 10 ? `0${num}` : `${num}`;
 }
 
-//预测下一个双色球号码, 基于统计频率的简单预测算法
 function predictNextSSQ(data) {
 	const redBalls = [];
 	const blueBalls = [];
+	const recentLottery = data.lottery.slice(-20);
 
-	// 将所有的红球号码和蓝球号码加入列表
 	data.lottery.forEach(entry => {
 		redBalls.push(...entry.ssq_red.split(',').map(Number));
 		blueBalls.push(Number(entry.ssq_blue));
 	});
 
-	// 统计每个红球号码和蓝球号码的出现频率
 	const redCounts = countFrequency(redBalls);
 	const blueCounts = countFrequency(blueBalls);
 
-	// 获取热号（高频号码）和冷号（低频号码）
-	const hotReds = getHotNumbers(redCounts, 10); // 取前10个热号
-	const coldReds = getColdNumbers(redCounts, 10); // 取前10个冷号
-	const hotBlues = getHotNumbers(blueCounts, 5); // 取前5个热号
-	const coldBlues = getColdNumbers(blueCounts, 5); // 取前5个冷号
+	const hotReds = getHotNumbers(redCounts, 15);
+	const coldReds = getColdNumbers(redCounts, 15);
+	const hotBlues = getHotNumbers(blueCounts, 8);
+	const coldBlues = getColdNumbers(blueCounts, 8);
 
-	// 预测红球：结合热号和冷号，随机选择6个号码
-	const predictedReds = selectRedNumbers(hotReds, coldReds, 6);
+	const historicalSums = data.lottery.map(entry => {
+		const reds = entry.ssq_red.split(',').map(Number);
+		return reds.reduce((a, b) => a + b, 0);
+	});
+	const avgSum = historicalSums.reduce((a, b) => a + b, 0) / historicalSums.length;
+	const sumRange = [avgSum - 30, avgSum + 30];
 
-	// 预测蓝球：结合热号和冷号，随机选择1个号码
-	const predictedBlue = selectBlueNumber(hotBlues, coldBlues);
+	const maxAttempts = 50;
+	let bestReds = null;
+	let bestScore = -1;
 
-	// 确保红球号码排序
-	predictedReds.sort((a, b) => a - b);
+	for (let attempt = 0; attempt < maxAttempts; attempt++) {
+		const candidateReds = selectRedNumbers(hotReds, coldReds, 6, recentLottery);
+		candidateReds.sort((a, b) => a - b);
 
-	// 格式化号码：个位数补零
+		const sum = candidateReds.reduce((a, b) => a + b, 0);
+		const oddCount = candidateReds.filter(n => n % 2 === 1).length;
+		const bigCount = candidateReds.filter(n => n > 16).length;
+		const span = candidateReds[candidateReds.length - 1] - candidateReds[0];
+
+		let score = 0;
+		if (sum >= sumRange[0] && sum <= sumRange[1]) score += 3;
+		if (oddCount >= 2 && oddCount <= 4) score += 2;
+		if (bigCount >= 2 && bigCount <= 4) score += 2;
+		if (span >= 20 && span <= 28) score += 2;
+
+		const consecutiveCount = candidateReds.filter((n, i) => i > 0 && n === candidateReds[i - 1] + 1).length;
+		if (consecutiveCount >= 1 && consecutiveCount <= 2) score += 1;
+
+		if (score > bestScore) {
+			bestScore = score;
+			bestReds = candidateReds;
+		}
+
+		if (score >= 7) break;
+	}
+
+	const predictedReds = bestReds || selectRedNumbers(hotReds, coldReds, 6, recentLottery).sort((a, b) => a - b);
+	const predictedBlue = selectBlueNumber(hotBlues, coldBlues, recentLottery);
+
 	const formattedReds = predictedReds.map(num => formatNumber(num));
 	const formattedBlue = formatNumber(predictedBlue);
 
@@ -396,8 +542,11 @@ module.exports = handleLottery = () => {
 		//lotteryContent.push(`· 七乐彩: 每周一、三、五开奖`);
 		//lotteryContent.push(`· 双色球: 每周二、四、日开奖`);
 
-		resolve(lotteryContent.join('\n'))
-		console.log("获取福利彩票结果" + lotteryContent.join('\n'));
+		const content = lotteryContent.join('\n');
+		const mqttContent = lotteryContent.filter(line => !line.includes('📈福利彩票')).join('\n');
+		await sendMqttMsg(mqttContent);
+		resolve(content);
+		console.log("获取福利彩票结果" + content);
 	} catch (error) {
 		console.log('处理福利彩票数据失败', error.message || error);
 		reject(error.message || error)

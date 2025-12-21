@@ -3,7 +3,86 @@ var calendar = require("./calendar");
 //const axios = require('axios')
 //var calendarplus = require("./calendarplus");
 
+require("dotenv").config();
+
 let loveContent;
+
+async function sendMqttMsg(content, licenseContent) {
+	const mqtt_host = process.env.mqtt_host || '';
+	const mqtt_port = process.env.mqtt_port || '';
+	const mqtt_username = process.env.mqtt_username || '';
+	const mqtt_password = process.env.mqtt_password || '';
+
+	if (!mqtt_host || !mqtt_port) {
+		return;
+	}
+
+	const mqtt = require('mqtt');
+	const clientId = 'mqtt_daily';
+	const connectUrl = `mqtt://${mqtt_host}:${mqtt_port}`;
+	const client = mqtt.connect(connectUrl, {
+		clientId,
+		clean: true,
+		connectTimeout: 2000,
+		username: mqtt_username,
+		password: mqtt_password,
+		reconnectPeriod: 1000,
+	});
+
+	const topic = 'qinglong/daily';
+	const now = new Date();
+	const year = now.getFullYear();
+	const month = String(now.getMonth() + 1).padStart(2, '0');
+	const day = String(now.getDate()).padStart(2, '0');
+	const hours = String(now.getHours()).padStart(2, '0');
+	const minutes = String(now.getMinutes()).padStart(2, '0');
+	const seconds = String(now.getSeconds()).padStart(2, '0');
+	const timestamp = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+	const data = {
+		content: `\n${content}`,
+		license: licenseContent || '',
+		timestamp: timestamp
+	};
+
+	return new Promise((resolve, reject) => {
+		client.on('connect', async () => {
+			console.log('mqtt:Connected');
+			try {
+				const result = await new Promise((pubResolve, pubReject) => {
+					client.publish(topic, JSON.stringify(data), { qos: 0, retain: true }, (error) => {
+						if (error) {
+							pubReject(error);
+						} else {
+							pubResolve();
+						}
+					});
+				});
+				console.log('mqtt:Published');
+				setTimeout(() => {
+					client.end();
+					resolve();
+				}, 500);
+			} catch (error) {
+				console.error('mqtt:Publish error', error);
+				client.end();
+				reject(error);
+			}
+		});
+
+		client.on('error', (error) => {
+			console.error('mqtt:Connection error', error);
+			client.end();
+			reject(error);
+		});
+
+		setTimeout(() => {
+			if (client.connected === false) {
+				client.end();
+				reject(new Error('mqtt:Connection timeout'));
+			}
+		}, 2000);
+	});
+}
 
 //处理当天阴历和当前天数
 const handleFestivalSolarDate = (nowDate, lunarDate, currentYear, content) => {
@@ -763,19 +842,24 @@ module.exports = handleTimeList = () => {
                 content.push(loveContent);
             }
 
-            //证件有效期
-            content.push(`\n💳证件有效期 \n`);
+            let licenseContentArr = [];
+            licenseContentArr.push(`\n💳证件有效期 \n`);
             if (todayLicenseArr.length > 0) {
                 todayLicenseArr.sort((a, b) => calendar.getTextLength(a) - calendar.getTextLength(b));
-                content = content.concat(todayLicenseArr);
+                licenseContentArr = licenseContentArr.concat(todayLicenseArr);
             }
             if(endLicenseArr.length > 0) {
                 endLicenseArr.sort((a, b) => calendar.getTextLength(a) - calendar.getTextLength(b));
-                content = content.concat(endLicenseArr);
+                licenseContentArr = licenseContentArr.concat(endLicenseArr);
             }
+            const licenseContent = licenseContentArr.join('\n');
 
-            console.log('获取重要节日成功\n', content.join('\n'));
-            resolve(content.join('\n'))
+            const contentForMqtt = content.join('\n');
+            const contentStr = contentForMqtt + '\n' + licenseContent;
+
+            console.log('获取重要节日成功\n', contentStr);
+            await sendMqttMsg(contentForMqtt, licenseContent);
+            resolve(contentStr)
         } catch (error) {
             reject(error.message || error)
         }
