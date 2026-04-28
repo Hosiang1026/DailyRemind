@@ -272,17 +272,32 @@ function getColdNumbers(counts, num) {
 		.map(Number);
 }
 
-function selectRedNumbers(hotReds, coldReds, num, recentLottery) {
+function sortedNumericPercentile(arr, p) {
+	const s = [...arr].sort((a, b) => a - b);
+	if (s.length === 0) return 0;
+	const x = (s.length - 1) * p;
+	const i = Math.floor(x);
+	const j = Math.ceil(x);
+	if (i === j) return s[i];
+	return s[i] + (s[j] - s[i]) * (x - i);
+}
+
+function selectRedNumbers(hotReds, coldReds, num, recentLottery, redCounts) {
 	const allNumbers = Array.from({ length: 33 }, (_, i) => i + 1);
 	const pool = [...new Set([...hotReds, ...coldReds, ...allNumbers])];
-	
+	const draws = recentLottery && recentLottery.length ? recentLottery.length : 1;
+	const maxFreq = Math.max(1, ...Object.values(redCounts || {}));
+
 	const weights = {};
 	pool.forEach(num => {
 		let weight = 1;
+		if (redCounts && redCounts[num]) {
+			weight += (redCounts[num] / maxFreq) * 2.5;
+		}
 		if (hotReds.includes(num)) weight += 3;
 		if (coldReds.includes(num)) weight += 1;
 		if (recentLottery && recentLottery.some(entry => entry.ssq_red.split(',').map(Number).includes(num))) {
-			weight += 2;
+			weight += 2 + (1 / draws) * 3;
 		}
 		weights[num] = weight;
 	});
@@ -317,17 +332,22 @@ function selectRedNumbers(hotReds, coldReds, num, recentLottery) {
 	return selected;
 }
 
-function selectBlueNumber(hotBlues, coldBlues, recentLottery) {
+function selectBlueNumber(hotBlues, coldBlues, recentLottery, blueCounts) {
 	const allNumbers = Array.from({ length: 16 }, (_, i) => i + 1);
 	const pool = [...new Set([...hotBlues, ...coldBlues, ...allNumbers])];
-	
+	const draws = recentLottery && recentLottery.length ? recentLottery.length : 1;
+	const maxFreq = Math.max(1, ...Object.values(blueCounts || {}));
+
 	const weights = {};
 	pool.forEach(num => {
 		let weight = 1;
+		if (blueCounts && blueCounts[num]) {
+			weight += (blueCounts[num] / maxFreq) * 3;
+		}
 		if (hotBlues.includes(num)) weight += 3;
 		if (coldBlues.includes(num)) weight += 1;
 		if (recentLottery && recentLottery.some(entry => Number(entry.ssq_blue) === num)) {
-			weight += 2;
+			weight += 2 + (1 / draws) * 2;
 		}
 		weights[num] = weight;
 	});
@@ -352,7 +372,9 @@ function formatNumber(num) {
 function predictNextSSQ(data) {
 	const redBalls = [];
 	const blueBalls = [];
-	const recentLottery = data.lottery.slice(-20);
+	const histLen = data.lottery.length;
+	const recentN = Math.min(30, Math.max(12, Math.floor(histLen * 0.15) || 20));
+	const recentLottery = data.lottery.slice(-recentN);
 
 	data.lottery.forEach(entry => {
 		redBalls.push(...entry.ssq_red.split(',').map(Number));
@@ -367,45 +389,74 @@ function predictNextSSQ(data) {
 	const hotBlues = getHotNumbers(blueCounts, 8);
 	const coldBlues = getColdNumbers(blueCounts, 8);
 
-	const historicalSums = data.lottery.map(entry => {
-		const reds = entry.ssq_red.split(',').map(Number);
-		return reds.reduce((a, b) => a + b, 0);
+	const historicalSums = [];
+	const historicalOdds = [];
+	const historicalBigs = [];
+	const historicalSpans = [];
+	const historicalConsec = [];
+	data.lottery.forEach(entry => {
+		const reds = entry.ssq_red.split(',').map(Number).sort((a, b) => a - b);
+		historicalSums.push(reds.reduce((a, b) => a + b, 0));
+		historicalOdds.push(reds.filter(n => n % 2 === 1).length);
+		historicalBigs.push(reds.filter(n => n > 16).length);
+		historicalSpans.push(reds[reds.length - 1] - reds[0]);
+		historicalConsec.push(reds.filter((n, i) => i > 0 && n === reds[i - 1] + 1).length);
 	});
-	const avgSum = historicalSums.reduce((a, b) => a + b, 0) / historicalSums.length;
-	const sumRange = [avgSum - 30, avgSum + 30];
 
-	const maxAttempts = 50;
+	const lo = 0.12;
+	const hi = 0.88;
+	let sumRange = [sortedNumericPercentile(historicalSums, lo), sortedNumericPercentile(historicalSums, hi)];
+	let oddRange = [sortedNumericPercentile(historicalOdds, lo), sortedNumericPercentile(historicalOdds, hi)];
+	let bigRange = [sortedNumericPercentile(historicalBigs, lo), sortedNumericPercentile(historicalBigs, hi)];
+	let spanRange = [sortedNumericPercentile(historicalSpans, lo), sortedNumericPercentile(historicalSpans, hi)];
+	let consecRange = [sortedNumericPercentile(historicalConsec, lo), sortedNumericPercentile(historicalConsec, hi)];
+	if (historicalSums.length < 8) {
+		const avgSum = historicalSums.reduce((a, b) => a + b, 0) / Math.max(1, historicalSums.length);
+		sumRange = [avgSum - 30, avgSum + 30];
+		oddRange = [2, 4];
+		bigRange = [2, 4];
+		spanRange = [20, 28];
+		consecRange = [0, 2];
+	}
+
+	const maxAttempts = 120;
 	let bestReds = null;
 	let bestScore = -1;
 
 	for (let attempt = 0; attempt < maxAttempts; attempt++) {
-		const candidateReds = selectRedNumbers(hotReds, coldReds, 6, recentLottery);
+		const candidateReds = selectRedNumbers(hotReds, coldReds, 6, recentLottery, redCounts);
 		candidateReds.sort((a, b) => a - b);
 
 		const sum = candidateReds.reduce((a, b) => a + b, 0);
 		const oddCount = candidateReds.filter(n => n % 2 === 1).length;
 		const bigCount = candidateReds.filter(n => n > 16).length;
 		const span = candidateReds[candidateReds.length - 1] - candidateReds[0];
+		const z1 = candidateReds.filter(n => n <= 11).length;
+		const z2 = candidateReds.filter(n => n > 11 && n <= 22).length;
+		const z3 = candidateReds.filter(n => n > 22).length;
+		const zoneMin = Math.min(z1, z2, z3);
+		const zoneMax = Math.max(z1, z2, z3);
 
 		let score = 0;
 		if (sum >= sumRange[0] && sum <= sumRange[1]) score += 3;
-		if (oddCount >= 2 && oddCount <= 4) score += 2;
-		if (bigCount >= 2 && bigCount <= 4) score += 2;
-		if (span >= 20 && span <= 28) score += 2;
+		if (oddCount >= oddRange[0] && oddCount <= oddRange[1]) score += 2;
+		if (bigCount >= bigRange[0] && bigCount <= bigRange[1]) score += 2;
+		if (span >= spanRange[0] && span <= spanRange[1]) score += 2;
 
 		const consecutiveCount = candidateReds.filter((n, i) => i > 0 && n === candidateReds[i - 1] + 1).length;
-		if (consecutiveCount >= 1 && consecutiveCount <= 2) score += 1;
+		if (consecutiveCount >= consecRange[0] && consecutiveCount <= consecRange[1]) score += 1;
+		if (zoneMin >= 1 && zoneMax <= 4) score += 2;
 
 		if (score > bestScore) {
 			bestScore = score;
 			bestReds = candidateReds;
 		}
 
-		if (score >= 7) break;
+		if (score >= 10) break;
 	}
 
-	const predictedReds = bestReds || selectRedNumbers(hotReds, coldReds, 6, recentLottery).sort((a, b) => a - b);
-	const predictedBlue = selectBlueNumber(hotBlues, coldBlues, recentLottery);
+	const predictedReds = bestReds || selectRedNumbers(hotReds, coldReds, 6, recentLottery, redCounts).sort((a, b) => a - b);
+	const predictedBlue = selectBlueNumber(hotBlues, coldBlues, recentLottery, blueCounts);
 
 	const formattedReds = predictedReds.map(num => formatNumber(num));
 	const formattedBlue = formatNumber(predictedBlue);

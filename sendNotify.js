@@ -20,7 +20,7 @@ export CKNOWARNERROR="true"
 ## 屏蔽青龙登陆成功通知，登陆失败不屏蔽
 export NOTIFY_NOLOGINSUCCESS="true"
 ## 通知底部显示
-export NOTIFY_AUTHOR="来源于：https://github.com/KingRan/KR"
+export NOTIFY_AUTHOR="本通知 By https://仓库地址"
 ## 增加NOTIFY_AUTHOR_BLANK 环境变量，控制不显示底部信息
 export NOTIFY_AUTHOR_BLANK="true"
 ## 增加NOTIFY_AUTOCHECKCK为true才开启通知脚本内置的自动禁用过期ck
@@ -145,6 +145,16 @@ const {
     getEnvByPtPin
 } = require('./ql');
 const fs = require('fs');
+const path = require('path');
+function getDefaultNotifyAuthor() {
+    try {
+        const pkg = require(path.join(__dirname, 'package.json'));
+        let u = (pkg.repository && pkg.repository.url) || '';
+        u = String(u).replace(/^git\+/, '').replace(/\.git\s*$/i, '').trim();
+        if (u) return '\n\n本通知 By ' + u;
+    } catch (e) {}
+    return '\n\n本通知 By DailyRemind';
+}
 let isnewql = fs.existsSync('/ql/data/config/auth.json');
 let strCKFile = "";
 let strUidFile = "";
@@ -196,7 +206,7 @@ if (process.env.NOTIFY_SHOWNAMETYPE) {
     if (ShowRemarkType == "4")
         console.log("检测到显示备注名称，格式为: 备注");
 }
-async function sendNotify(text, desp, params = {}, author = '\n\n本通知 By https://github.com/KingRan/KR',strsummary="") {
+async function sendNotify(text, desp, params = {}, author = getDefaultNotifyAuthor(), strsummary = "") {
     console.log(`开始发送通知...`);
 
     if (process.env.NOTIFY_FILTERBYFILE) {
@@ -2019,7 +2029,7 @@ function GetnickName2() {
                 "Connection": "keep-alive",
                 "Cookie": cookie,
                 "Referer": "https://wqs.jd.com/my/jingdou/my.shtml?sceneval=2",
-                "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")
+                "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT || "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1") : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")
             }
         };
         $.post(options, (err, resp, data) => {

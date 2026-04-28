@@ -8,6 +8,23 @@ const dataFilePath = path.join(__dirname, '..', 'db', 'gasoline.json');
 
 require("dotenv").config();
 
+const oilDbg = (...a) => {
+  const v = (process.env.OIL_DEBUG || '').toLowerCase()
+  if (v === '0' || v === 'false') return
+  console.log('[油价]', ...a)
+}
+
+function normOilPrice(v) {
+  const n = parseFloat(String(v ?? '').replace(/\s*\(元\)\s*/g, '').trim())
+  return Number.isFinite(n) && n > 0 ? n : 0
+}
+
+const httpGetOpts = {
+    headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    },
+};
+
 // 获取省份汽油编码
 const provincesJson = process.env.OIL_PROVINCES;
 
@@ -31,15 +48,20 @@ try {
 //抓取各个城市的汽油价格
 async function fetchContent(url) {
     try {
-        const { data } = await axios.get(url);
+        oilDbg('GET', url)
+        const { data } = await axios.get(url, httpGetOpts);
+        oilDbg('省份页字节', typeof data === 'string' ? data.length : 0)
         const $ = cheerio.load(data);
 
         const oilPrices = [];
-        $('#youjia dl').each((index, element) => {
+        let $rows = $('.content_youjia dl');
+        if (!$rows.length) {
+            $rows = $('#youjia dl');
+        }
+        $rows.each((index, element) => {
             let fuelType = $(element).find('dt').text();
-            // 去掉前两个字并替换 # 为 号
-            fuelType = fuelType.substring(2).replace('#', '号').trim();
-            const price = $(element).find('dd').text();
+            fuelType = fuelType.replace(/^[\u4e00-\u9fa5]+/, '').replace('#', '号').trim();
+            const price = $(element).find('dd').text().replace(/\s*\(元\)\s*/g, '').trim();
             oilPrices.push({ fuelType, price });
         });
         return oilPrices;
@@ -51,7 +73,9 @@ async function fetchContent(url) {
 //抓取汽油调价情况
 async function fetchUpdateText(url) {
     try {
-        const { data } = await axios.get(url);
+        oilDbg('调价页', url)
+        const { data } = await axios.get(url, httpGetOpts);
+        oilDbg('调价页字节', typeof data === 'string' ? data.length : 0)
         const $ = cheerio.load(data);
 
         // Extract specific text about oil price changes
@@ -61,6 +85,13 @@ async function fetchUpdateText(url) {
 		   priceUpdateText = $('#rightTop').text().trim().split('\n').filter(line => line.includes('调整')).join(' ');
 		}
 
+        const $tishi = $('.tishi').first().clone();
+        $tishi.find('script, style').remove();
+        let tishiText = $tishi.text().replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').replace(/当前微信公众号油价已更新。?/g, '').replace(/\s+/g, ' ').trim();
+        if (tishiText) {
+            const parts = [priceUpdateText, tishiText].filter(Boolean);
+            return parts.join('\n');
+        }
         return priceUpdateText;
     } catch (error) {
         throw new Error('An error occurred while fetching the update text: ' + error.message);
@@ -70,7 +101,7 @@ async function fetchUpdateText(url) {
 async function fetchRestrictionInfo(url) {
     try {
         // 替换为实际的目标URL
-        const { data } = await axios.get(url);
+        const { data } = await axios.get(url, httpGetOpts);
         const $ = cheerio.load(data);
 
         // 提取限行时间和限行路段
@@ -98,26 +129,30 @@ let data = [];
 function writeGasoline(provinceName, oilPrice92, oilPrice95, oilPrice98, oilPrice0) {
     return new Promise(async (resolve, reject) => {
         try{
+            const p92 = normOilPrice(oilPrice92);
+            const p95 = normOilPrice(oilPrice95);
+            const p98 = normOilPrice(oilPrice98);
+            const p0 = normOilPrice(oilPrice0);
             if (fs.existsSync(dataFilePath)) {
                 data = JSON.parse(fs.readFileSync(dataFilePath, 'utf8'));
                 const index = data.gasoline.findIndex(item => item.province_name === provinceName);
-                //不存在这个省份，就生成新记录
                 if (data.gasoline.length == 0 || index == -1){
-                    // 自动生成新ID
+                    if (!(p92 || p95 || p98 || p0)) {
+                        return;
+                    }
                     const newId = data.gasoline.length ? Math.max(...data.gasoline.map(item => item.id)) + 1 : 1;
                     const newItem = {
                         id: newId,
                         province_name: provinceName,
-                        oilPrice_92: oilPrice92,
-                        oilPrice_95: oilPrice95,
-                        oilPrice_98: oilPrice98,
-                        oilPrice_0: oilPrice0,
+                        oilPrice_92: p92,
+                        oilPrice_95: p95,
+                        oilPrice_98: p98,
+                        oilPrice_0: p0,
                         update_date: updateDate
                     }
                     data.gasoline.push(newItem);
                     fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
                 }else{
-                    //若当前油价小于最低油价，则更新油价记录
                     const oldGasoline = data.gasoline[index];
                     let flag = false;
                     let index92 = oldGasoline.oilPrice_92;
@@ -126,23 +161,23 @@ function writeGasoline(provinceName, oilPrice92, oilPrice95, oilPrice98, oilPric
                     let index0 = oldGasoline.oilPrice_0;
                     let oldUpdateDate = oldGasoline.update_date;
 
-                    if(oldGasoline.oilPrice_92 > oilPrice92){
-                        index92 = oilPrice92;
+                    if (p92 > 0 && Number(oldGasoline.oilPrice_92) > p92) {
+                        index92 = p92;
                         flag = true;
                     }
 
-                    if(oldGasoline.oilPrice_95 > oilPrice95){
-                        index95 = oilPrice95;
+                    if (p95 > 0 && Number(oldGasoline.oilPrice_95) > p95) {
+                        index95 = p95;
                         flag = true;
                     }
 
-                    if(oldGasoline.oilPrice_98 > oilPrice98){
-                        index98 = oilPrice98;
+                    if (p98 > 0 && Number(oldGasoline.oilPrice_98) > p98) {
+                        index98 = p98;
                         flag = true;
                     }
 
-                    if(oldGasoline.oilPrice_0 > oilPrice0){
-                        index0 = oilPrice0;
+                    if (p0 > 0 && Number(oldGasoline.oilPrice_0) > p0) {
+                        index0 = p0;
                         flag = true;
                     }
 
@@ -165,7 +200,7 @@ function writeGasoline(provinceName, oilPrice92, oilPrice95, oilPrice98, oilPric
                 }
 
             } else {
-                console.log('Data file not found', error.message || error);
+                console.warn('[油价] 数据文件不存在', dataFilePath)
             }
 
         } catch (error) {
@@ -182,9 +217,11 @@ async function sendMqttMsg(gasolineContent) {
 	const mqtt_password = process.env.mqtt_password || '';
 
 	if (!mqtt_host || !mqtt_port) {
+		oilDbg('未配置 mqtt_host/mqtt_port, 跳过 MQTT')
 		return;
 	}
 
+	oilDbg('MQTT', `mqtt://${mqtt_host}:${mqtt_port}`)
 	const mqtt = require('mqtt');
 	const clientId = 'mqtt_gasoline';
 	const connectUrl = `mqtt://${mqtt_host}:${mqtt_port}`;
@@ -207,7 +244,7 @@ async function sendMqttMsg(gasolineContent) {
 
 	return new Promise((resolve, reject) => {
 		client.on('connect', async () => {
-			console.log('mqtt:Connected');
+			oilDbg('mqtt 已连接')
 			try {
 				const result = await new Promise((pubResolve, pubReject) => {
 					client.publish(topic, JSON.stringify(data), { qos: 0, retain: true }, (error) => {
@@ -218,7 +255,7 @@ async function sendMqttMsg(gasolineContent) {
 						}
 					});
 				});
-				console.log('mqtt:Published');
+				oilDbg('mqtt 已发布')
 				setTimeout(() => {
 					client.end();
 					resolve();
@@ -247,11 +284,12 @@ async function sendMqttMsg(gasolineContent) {
 
 // Define handleGasoline function to use fetchContent
 module.exports = handleGasoline = async () => {
-    const textUrl = 'http://www.qiyoujiage.com';
-    const oilUrl = 'http://www.qiyoujiage.com/{province_code}.shtml';
+    const textUrl = 'http://m.qiyoujiage.com';
+    const oilUrl = 'http://m.qiyoujiage.com/{province_code}.shtml';
     const restricUrl = 'https://m.hz.bendibao.com/news/ztfeizheAhaopaixiaokechexianxing/?area=';
 
     try {
+        oilDbg('开始, 省份数', provinces.length)
         //内容数组
         let content = [];
         content.push('⛽今日油价');
@@ -272,11 +310,13 @@ module.exports = handleGasoline = async () => {
         }
 
         let curr_price = 0;
+        const scrapedByProvince = {};
         for(let province of provinces) {
             console.log(`正在获取 ${province.province_name} 的今日油价数据...`);
             const url = oilUrl.replace("{province_code}", province.province_code);
             const oilPriceArr = await fetchContent(url);
             if(oilPriceArr){
+                oilDbg(province.province_name, '条数', oilPriceArr.length)
                 content.push(`\n🚘${province.province_name}\n`);
                 let oilPrice_92 = 0;
                 let oilPrice_95 = 0;
@@ -293,7 +333,7 @@ module.exports = handleGasoline = async () => {
 
                         // 只在找到浙江时计算一次
                         if (province.province_name === "浙江" && curr_price === 0) {
-                            curr_price = parseFloat(oilPrice_95);
+                            curr_price = normOilPrice(oilPrice_95);
                         }
 
                     }
@@ -307,39 +347,60 @@ module.exports = handleGasoline = async () => {
 
                 }
 
+                scrapedByProvince[province.province_name] = {
+                    oilPrice_92: normOilPrice(oilPrice_92),
+                    oilPrice_95: normOilPrice(oilPrice_95),
+                    oilPrice_98: normOilPrice(oilPrice_98),
+                    oilPrice_0: normOilPrice(oilPrice_0),
+                };
+                oilDbg(province.province_name, 'writeGasoline')
                 writeGasoline(province.province_name, oilPrice_92, oilPrice_95, oilPrice_98, oilPrice_0);
+            } else {
+                console.warn('[油价]', province.province_name, '未解析到油价')
             }
         }
+        oilDbg('省份循环结束')
 
-        //近期最低油价
-        let low_price = 0;
         content.push(`\n🎯最低油价`);
+        oilDbg('db', fs.existsSync(dataFilePath) ? '有' : '无')
+        let low_price = 0;
         if (fs.existsSync(dataFilePath)) {
             data = JSON.parse(fs.readFileSync(dataFilePath, 'utf8'));
-            for(let province of provinces) {
-                data.gasoline.forEach(result => {
-                    if(result.province_name == province.province_name){
+            const list = Array.isArray(data.gasoline) ? data.gasoline : [];
+            const zjDb = list.find((r) => r.province_name === '浙江');
+            if (zjDb) {
+                const raw = String(zjDb.oilPrice_95 ?? '').replace(/\s*\(元\)\s*/g, '').trim();
+                const n = parseFloat(raw);
+                if (Number.isFinite(n) && n > 0) low_price = n;
+            }
+            const zjSc = scrapedByProvince['浙江'];
+            if (!low_price && zjSc && zjSc.oilPrice_95) low_price = zjSc.oilPrice_95;
+            const mix = (dbVal, alt) => {
+                const d = Number(dbVal);
+                if (Number.isFinite(d) && d > 0) return String(dbVal).replace(/\s*\(元\)\s*/g, '').trim();
+                if (alt > 0) return String(alt);
+                return String(dbVal ?? 0).replace(/\s*\(元\)\s*/g, '').trim();
+            };
+            for (let province of provinces) {
+                list.forEach((result) => {
+                    if (result.province_name == province.province_name) {
+                        const sc = scrapedByProvince[result.province_name] || {};
                         content.push(`\n🚘${result.province_name}\n`);
-                        content.push(`· 92号汽油: ${result.oilPrice_92}`);
-                        content.push(`· 95号汽油: ${result.oilPrice_95}`);
-                        content.push(`· 98号汽油: ${result.oilPrice_98}`);
-                        content.push(`· 0号柴油: ${result.oilPrice_0}`);
+                        content.push(`· 92号汽油: ${mix(result.oilPrice_92, sc.oilPrice_92)}`);
+                        content.push(`· 95号汽油: ${mix(result.oilPrice_95, sc.oilPrice_95)}`);
+                        content.push(`· 98号汽油: ${mix(result.oilPrice_98, sc.oilPrice_98)}`);
+                        content.push(`· 0号柴油: ${mix(result.oilPrice_0, sc.oilPrice_0)}`);
                         content.push(`· 更新时间: ${result.update_date}`);
-                    }
-
-                    // 只在找到浙江时计算一次
-                    if (result.province_name === "浙江" && low_price === 0) {
-                        low_price = parseFloat(result.oilPrice_95);
                     }
                 });
             }
         }
-
+        if (!curr_price && low_price) curr_price = low_price;
         var updateText = await fetchUpdateText(textUrl);
-        content.push('\n'+ updateText);
-        console.log('获取汽油调价情况成功：\n',  updateText);
+        oilDbg('调价摘要', (updateText || '').slice(0, 80))
 
         let lunarDate = calendar.solar2lunar();
+        oilDbg('农历', lunarDate.ncWeek)
         if(lunarDate.ncWeek == '星期一'){
             content.push('\n🚗非浙A号牌小客车');
             content.push('\n🚥限行规则：\n');
@@ -369,16 +430,17 @@ module.exports = handleGasoline = async () => {
         content.push(`· 30L差价: ${diff_cost_30.toFixed(2)}元`);
         content.push(`· 50L油费: ${curr_cost_50.toFixed(2)}元`);
         content.push(`· 50L差价: ${diff_cost_50.toFixed(2)}元`);
+        const ut = (updateText || '').trim();
+        if (ut) content.push('\n' + ut);
 
-        const mqttContent = content.filter(line => !line.includes('⛽今日油价')).join('\n');
-        await sendMqttMsg(mqttContent);
-        
-        console.log('获取汽油价格成功：\n', content);
+        await sendMqttMsg(content.join('\n'));
+
+        console.log('[油价] 完成, 行数', content.length)
 
         return content.join('\n');
 
     } catch (error) {
-        console.log('获取汽油价格失败', error.message || error);
+        console.error('[油价] 失败', error.message || error);
         throw new Error(error.message || error);
     }
 };

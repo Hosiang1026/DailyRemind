@@ -3,29 +3,29 @@
     {
       "id": 1,
       "province_name": "浙江",
-      "oilPrice_92": "7.09",
-      "oilPrice_95": "7.54",
-      "oilPrice_98": "8.64",
-      "oilPrice_0": "6.74",
-      "update_date": "2025-09-06"
+      "oilPrice_92": 8.42,
+      "oilPrice_95": 8.96,
+      "oilPrice_98": 10.46,
+      "oilPrice_0": 8.12,
+      "update_date": "2026-04-28"
     },
     {
       "id": 2,
       "province_name": "安徽",
-      "oilPrice_92": "7.08",
-      "oilPrice_95": "7.58",
-      "oilPrice_98": "9.08",
-      "oilPrice_0": "6.79",
-      "update_date": "2025-09-06"
+      "oilPrice_92": 8.4,
+      "oilPrice_95": 8.98,
+      "oilPrice_98": 10.48,
+      "oilPrice_0": 8.18,
+      "update_date": "2026-04-28"
     },
     {
       "id": 3,
       "province_name": "福建",
-      "oilPrice_92": "7.08",
-      "oilPrice_95": "7.56",
-      "oilPrice_98": "9.06",
-      "oilPrice_0": "6.75",
-      "update_date": "2025-09-06"
+      "oilPrice_92": 8.42,
+      "oilPrice_95": 8.99,
+      "oilPrice_98": 10.49,
+      "oilPrice_0": 8.13,
+      "update_date": "2026-04-28"
     }
   ]
 }
