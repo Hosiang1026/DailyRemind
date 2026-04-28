@@ -3,7 +3,7 @@
 #### ql repo命令拉取脚本
 
 ```
-ql repo https://gitee.com/hosiang1026/DailyRemind.git "ql_" "" "^jd[^_]|USER|utils|sign|sendNotify|ql|JDJR|qlApi"
+ql repo https://gitee.com/hosiang1026/DailyRemind.git "qinglong/js/ql_|qinglong/py/ql_" "app.js|sendNotify.js|qlApi.js|/functions/|/docker/|ql.js|notify_docker|setup.py" "functions|sendNotify.js|qlApi.js" "master"
 ```
 
 #### 依赖库
