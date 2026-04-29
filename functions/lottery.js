@@ -95,7 +95,7 @@ function sleep(ms) {
 }
 
 // 写入彩票号码
-function writeLotteryCode(ssqCode, ssqRed, ssqBlue, ssqDate, lotteryContent) {
+function writeLotteryCode(ssqCode, ssqRed, ssqBlue, ssqDate, lotteryContent, nowDay) {
 	return new Promise(async (resolve, reject) => {
 	try{
 		if (!fs.existsSync(dataFilePath)) {
@@ -128,8 +128,9 @@ function writeLotteryCode(ssqCode, ssqRed, ssqBlue, ssqDate, lotteryContent) {
 				console.log('writeLotteryCode exist');
 			}
 
+			const showSsqPredict = Array.isArray(lottery.SSQ) && lottery.SSQ.includes(nowDay);
 			//比较中奖概率
-			if(data.lottery.length > 0 && data.predict.length > 0){
+			if(showSsqPredict && data.lottery.length > 0 && data.predict.length > 0){
 				const lastPrediction = data.predict[data.predict.length - 1];
 				const winnings = calculateWinnings(data.lottery, data.predict);
 				lotteryContent.push(`\n🎯本期预测双色球开奖\n`);
@@ -153,10 +154,12 @@ function writeLotteryCode(ssqCode, ssqRed, ssqBlue, ssqDate, lotteryContent) {
 			//预测下期双色球号码
 			const newPredictId = data.predict.length ? Math.max(...data.predict.map(item => item.id)) + 1 : 1;
 			const prediction = predictNextSSQ(data);
-			lotteryContent.push(`\n💹预测下期双色球号码\n`);
-			lotteryContent.push(`· 彩票期数: ` + data.lottery.length);
-			lotteryContent.push(`· 红球号码: ` + prediction.redBalls);
-			lotteryContent.push(`· 蓝球号码: ` + prediction.blueBall);
+			if (showSsqPredict) {
+				lotteryContent.push(`\n💹预测下期双色球号码\n`);
+				lotteryContent.push(`· 彩票期数: ` + data.lottery.length);
+				lotteryContent.push(`· 红球号码: ` + prediction.redBalls);
+				lotteryContent.push(`· 蓝球号码: ` + prediction.blueBall);
+			}
 			console.log("Predicted Red Balls:", prediction.redBalls);
 			console.log("Predicted Blue Ball:", prediction.blueBall);
 
@@ -586,7 +589,7 @@ module.exports = handleLottery = () => {
 					lotteryContent.push(`· 中奖情况: ` + SSQ.content);
 				}
 				// 双色球 - 写入彩票号码
-				writeLotteryCode(SSQ.code, SSQ.red, SSQ.blue, SSQ.date, lotteryContent);
+				writeLotteryCode(SSQ.code, SSQ.red, SSQ.blue, SSQ.date, lotteryContent, nowDay);
 			}
 		}
 
