@@ -40,7 +40,7 @@ export TELECOM_FLUX_PACKAGE='true'
 export TELECOM_ONLY_WARN='true'
 export TELECOM_CONFIG_JSON='db/telecom_bills.json'
 
-## 网上国网
+## 国家电网
 export WSGW_USERNAME=''
 export WSGW_PASSWORD=''
 # 多登录账号 JSON，设置后优先于上两项循环执行

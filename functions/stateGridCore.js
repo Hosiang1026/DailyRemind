@@ -1,11 +1,11 @@
 /******************************************
- * 多电表版-网上国网🌏 
+ * 多电表版-国家电网🌏 
  *****************************************
  修改适配homeassistant，通过mqtt发送消息至homeassistant
  *****************************************
  环境变量设置
- export WSGW_USERNAME="" #网上国网账号
- export WSGW_PASSWORD="" #网上国网密码
+ export WSGW_USERNAME="" #国家电网账号
+ export WSGW_PASSWORD="" #国家电网密码
  export WSGW_RECENT_ELC_FEE="true" #是否获取最近电费
  export mqtt_host="" # 与同仓库 exports.sh、其它任务一致
  export mqtt_port=""
@@ -1125,7 +1125,7 @@ const notify = (e = '', o = '', r = '', s = {}) => {
     infoPublic: { serviceCode: '2545454', source: 'app' },
   },
   Notify = '',
-  SCRIPTNAME = '网上国网',
+  SCRIPTNAME = '国家电网',
   NAMESPACE =
     'ONZ3V_' +
     require('crypto')

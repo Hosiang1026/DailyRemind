@@ -1,11 +1,11 @@
 /******************************************
- * 网上国网🌏
+ * 国家电网🌏
  *****************************************
  修改适配homeassistant，通过mqtt发送消息至homeassistant
  *****************************************
  环境变量设置
- export WSGW_USERNAME="" #网上国网账号
- export WSGW_PASSWORD="" #网上国网密码
+ export WSGW_USERNAME="" #国家电网账号
+ export WSGW_PASSWORD="" #国家电网密码
  export WSGW_RECENT_ELC_FEE="true" #是否获取最近电费
  export WSGW_mqtt_host="" #mqtt服务器地址 192.168.1.7
  export WSGW_mqtt_port="" #mqtt服务器端口 1883
@@ -1249,7 +1249,7 @@ const notify = (e = '', o = '', r = '', s = {}) => {
     infoPublic: { serviceCode: '2545454', source: 'app' },
   },
   Notify = isNode() ? require('../utils/sendNotify') : '',
-  SCRIPTNAME = '网上国网',
+  SCRIPTNAME = '国家电网',
   NAMESPACE = 'ONZ3V',
   store = new Store(NAMESPACE),
   Global =
@@ -1714,7 +1714,7 @@ async function sendMsg(e, eleBill, dayList, monthElecQuantity) {
   if ((await showNotice(), !USERNAME || !PASSWORD))
     return sendMsg(
       SCRIPTNAME,
-      '请先配置网上国网账号密码!',
+      '请先配置国家电网账号密码!',
       '点击前往BoxJs配置',
       {
         'open-url':
