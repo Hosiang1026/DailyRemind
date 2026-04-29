@@ -3,7 +3,7 @@
 #### ql repo命令拉取脚本
 
 ```
-ql repo https://github.com/Hosiang1026/DailyRemind.git "_task.js" "app.js|sendNotify.js|qlApi.js|/functions/|ql.js" "functions|sendNotify.js|qlApi.js" "master"
+ql repo https://github.com/Hosiang1026/DailyRemind.git "_task.js" "app.js|sendNotify.js|qlApi.js|/functions/|ql.js" "functions|sendNotify.js|qlApi.js|ql_table_task.js" "master"
 ```
 
 #### 依赖库

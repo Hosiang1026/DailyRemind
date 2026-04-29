@@ -1,6 +1,5 @@
 /*
-cron "0 0 31 2 *" ql_ensure_deps_task.js, tag=安装Node依赖
-* 默认不跑：青龙里手动「运行」；要定时可自行改 cron
+cron "0 0 1 1 *" ql_ensure_deps_task.js, tag=安装Node依赖
 */
 
 const ensureNodeDeps = require('../../../functions/ensureNodeDeps')
