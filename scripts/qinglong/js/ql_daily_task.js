@@ -4,10 +4,11 @@ cron "0 8 * * *" ql_daily_task.js, tag=节日提醒
 * 配置参数 input.js
 */
 
-require('../../../functions/ensureNodeDeps')()
-require('../../../functions/qlTaskEnv').assertInputExports('ql_daily_task.js')
+const { req } = require('./repoRoot')
+req('functions', 'ensureNodeDeps')()
+req('functions', 'qlTaskEnv').assertInputExports('ql_daily_task.js')
 const axios = require('axios')
-const qlCheckUpdate = require('../../../utils/qlCheckUpdate')
+const qlCheckUpdate = req('utils', 'qlCheckUpdate')
 axios.defaults.timeout = 40 * 1000
 
 const SCRIPT_VERSION = 1.0
@@ -26,7 +27,7 @@ const handleDailyContent = () => {
 
       //纪念日模块
       if (daily.open) {
-        const handleTimeList = require('../../../functions/daily')
+        const handleTimeList = req('functions', 'daily')
         const handleTimeContent = await handleTimeList()
         if (handleTimeContent.length > 0) {
           content.push(`${handleTimeContent}`)
@@ -64,7 +65,7 @@ const handleDailyContent = () => {
 function requireConfig() {
   return new Promise(resolve => {
     console.log('开始获取配置文件\n')
-    notify = $.isNode() ? require('../../../utils/sendNotify') : '';
+    notify = $.isNode() ? req('utils', 'sendNotify') : '';
     resolve()
   })
 }

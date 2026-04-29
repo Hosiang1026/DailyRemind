@@ -2,7 +2,8 @@
 cron "0 0 1 1 *" ql_ensure_deps_task.js, tag=安装Node依赖
 */
 
-const ensureNodeDeps = require('../../../functions/ensureNodeDeps')
+const { req } = require('./repoRoot')
+const ensureNodeDeps = req('functions', 'ensureNodeDeps')
 const $ = new Env('安装Node依赖')
 
 !(async () => {

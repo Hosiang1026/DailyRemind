@@ -3,11 +3,12 @@ cron "11 8 * * *" ql_gold_task.js, tag=金银价格
 * 金银价格: scripts/qinglong/js/ql_gold_task.js
 */
 
-require('../../../functions/ensureNodeDeps')()
+const { req } = require('./repoRoot')
+req('functions', 'ensureNodeDeps')()
 const axios = require('axios')
 const cheerio = require('cheerio')
 const iconv = require('iconv-lite')
-const qlCheckUpdate = require('../../../utils/qlCheckUpdate')
+const qlCheckUpdate = req('utils', 'qlCheckUpdate')
 
 axios.defaults.timeout = 40 * 1000
 
@@ -119,7 +120,7 @@ function getGold() {
 
 function requireConfig() {
   return new Promise((resolve) => {
-    notify = $.isNode() ? require('../../../utils/sendNotify') : ''
+    notify = $.isNode() ? req('utils', 'sendNotify') : ''
     resolve()
   })
 }

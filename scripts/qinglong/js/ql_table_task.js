@@ -4,10 +4,11 @@ cron "40 7 * * 1-5" ql_table_task.js, tag=网课提醒
   配置参数 input.js
 */
 
-require('../../../functions/ensureNodeDeps')()
-require('../../../functions/qlTaskEnv').assertInputExports('ql_table_task.js')
+const { req } = require('./repoRoot')
+req('functions', 'ensureNodeDeps')()
+req('functions', 'qlTaskEnv').assertInputExports('ql_table_task.js')
 const axios = require('axios')
-const qlCheckUpdate = require('../../../utils/qlCheckUpdate')
+const qlCheckUpdate = req('utils', 'qlCheckUpdate')
 axios.defaults.timeout = 40 * 1000
 
 const SCRIPT_VERSION = 1.0
@@ -24,7 +25,7 @@ const handleWeatherContent = () => {
 
       //课表模块
       if (classTable.open) {
-        const handleClassTable = require('../../../functions/classTable')
+        const handleClassTable = req('functions', 'classTable')
         const classTableContent = await handleClassTable()
         if ('' != classTableContent) {
           content.push(`${classTableContent}`)
@@ -61,7 +62,7 @@ const handleWeatherContent = () => {
 function requireConfig() {
   return new Promise(resolve => {
     console.log('开始获取配置文件\n')
-    notify = $.isNode() ? require('../../../utils/sendNotify') : '';
+    notify = $.isNode() ? req('utils', 'sendNotify') : '';
     resolve()
   })
 }

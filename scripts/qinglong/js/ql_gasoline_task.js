@@ -4,10 +4,11 @@ cron "25 10 * * 0,6" ql_gasoline_task.js, tag=汽油价格
   配置参数 input.js
 */
 
-require('../../../functions/ensureNodeDeps')()
-require('../../../functions/qlTaskEnv').assertInputExports('ql_gasoline_task.js')
+const { req } = require('./repoRoot')
+req('functions', 'ensureNodeDeps')()
+req('functions', 'qlTaskEnv').assertInputExports('ql_gasoline_task.js')
 const axios = require('axios')
-const qlCheckUpdate = require('../../../utils/qlCheckUpdate')
+const qlCheckUpdate = req('utils', 'qlCheckUpdate')
 axios.defaults.timeout = 40 * 1000
 
 const SCRIPT_VERSION = 1.0
@@ -22,7 +23,7 @@ const handleGasolineContent = () => {
       const { gasoline } = require('../sh/input')
 
       if (gasoline.open) {
-        const handleGasoline = require('../../../functions/gasoline')
+        const handleGasoline = req('functions', 'gasoline')
         const gasolineContent = await handleGasoline()
         if (gasolineContent.length > 0) {
           content.push(`${gasolineContent}`)
@@ -56,7 +57,7 @@ const handleGasolineContent = () => {
 
 function requireConfig() {
   return new Promise(resolve => {
-    notify = $.isNode() ? require('../../../utils/sendNotify') : '';
+    notify = $.isNode() ? req('utils', 'sendNotify') : '';
     resolve()
   })
 }

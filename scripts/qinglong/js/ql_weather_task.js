@@ -4,10 +4,11 @@ cron "5 7 * * *" ql_weather_task.js, tag=实况天气
   配置参数 input.js
 */
 
-require('../../../functions/ensureNodeDeps')()
-require('../../../functions/qlTaskEnv').assertInputExports('ql_weather_task.js', ['CITIES'])
+const { req } = require('./repoRoot')
+req('functions', 'ensureNodeDeps')()
+req('functions', 'qlTaskEnv').assertInputExports('ql_weather_task.js', ['CITIES'])
 const axios = require('axios')
-const qlCheckUpdate = require('../../../utils/qlCheckUpdate')
+const qlCheckUpdate = req('utils', 'qlCheckUpdate')
 axios.defaults.timeout = 40 * 1000
 
 const SCRIPT_VERSION = 1.0
@@ -25,7 +26,7 @@ const handleWeatherContent = () => {
       //根据不同的配置，增加不同的内容
       // 天气模块
       if (weather.open) {
-        const handleWeather = require('../../../functions/weather')
+        const handleWeather = req('functions', 'weather')
         const weatherContent = await handleWeather()
         if ('' != weatherContent) {
           content.push(`${weatherContent}`)
@@ -62,7 +63,7 @@ const handleWeatherContent = () => {
 function requireConfig() {
   return new Promise(resolve => {
     console.log('开始获取配置文件\n')
-    notify = $.isNode() ? require('../../../utils/sendNotify') : '';
+    notify = $.isNode() ? req('utils', 'sendNotify') : '';
     resolve()
   })
 }
