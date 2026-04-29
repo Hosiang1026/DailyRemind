@@ -128,10 +128,14 @@ function writeGasoline(provinceName, oilPrice92, oilPrice95, oilPrice98, oilPric
             const p95 = normOilPrice(oilPrice95);
             const p98 = normOilPrice(oilPrice98);
             const p0 = normOilPrice(oilPrice0);
-            if (fs.existsSync(dataFilePath)) {
-                data = JSON.parse(fs.readFileSync(dataFilePath, 'utf8'));
-                const index = data.gasoline.findIndex(item => item.province_name === provinceName);
-                if (data.gasoline.length == 0 || index == -1){
+            if (!fs.existsSync(dataFilePath)) {
+                fs.mkdirSync(path.dirname(dataFilePath), { recursive: true });
+                fs.writeFileSync(dataFilePath, JSON.stringify({ gasoline: [] }, null, 2));
+            }
+            data = JSON.parse(fs.readFileSync(dataFilePath, 'utf8'));
+            if (!Array.isArray(data.gasoline)) data.gasoline = [];
+            const index = data.gasoline.findIndex(item => item.province_name === provinceName);
+            if (data.gasoline.length == 0 || index == -1){
                     if (!(p92 || p95 || p98 || p0)) {
                         return;
                     }
@@ -193,10 +197,6 @@ function writeGasoline(provinceName, oilPrice92, oilPrice95, oilPrice98, oilPric
                     }
 
                 }
-
-            } else {
-                console.warn('[油价] 数据文件不存在', dataFilePath)
-            }
 
         } catch (error) {
             console.error('写入汽油价格失败', error.message || error);
@@ -348,6 +348,8 @@ module.exports = handleGasoline = async () => {
                     oilPrice_98: normOilPrice(oilPrice_98),
                     oilPrice_0: normOilPrice(oilPrice_0),
                 };
+                const g = scrapedByProvince[province.province_name];
+                console.log('[油价]', province.province_name, `92=${g.oilPrice_92} 95=${g.oilPrice_95} 98=${g.oilPrice_98} 0#=${g.oilPrice_0}`);
                 oilDbg(province.province_name, 'writeGasoline')
                 writeGasoline(province.province_name, oilPrice_92, oilPrice_95, oilPrice_98, oilPrice_0);
             } else {
