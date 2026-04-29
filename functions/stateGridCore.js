@@ -1516,32 +1516,51 @@ async function getMonthElecQuantity(e) {
 }
 async function doLoginQr() {
   console.log('⏳ 获取登录二维码...');
+  let qrGet =
+    (isNode() && String(process.env.WSGW_QR_GET_PATH || '').trim()) ||
+    $api.getQCodeNew;
+  if (!qrGet.startsWith('/')) qrGet = '/' + qrGet;
+  let qrCheck =
+    (isNode() && String(process.env.WSGW_QR_CHECK_PATH || '').trim()) ||
+    $api.checkQCode;
+  if (!qrCheck.startsWith('/')) qrCheck = '/' + qrCheck;
+  const quInfo = {
+    optSys: 'android',
+    pushId: '000000',
+    addressProvince: '110100',
+    addressRegion: '110101',
+    addressCity: '330100',
+  };
+  if (USERNAME) quInfo.account = USERNAME;
+  const qrDataBase = {
+    params: {
+      uscInfo: {
+        devciceIp: '',
+        tenant: 'state_grid',
+        member: '0902',
+        devciceId: '',
+      },
+      quInfo,
+    },
+    Channels: 'web',
+  };
+  const qrGetData = USERNAME
+    ? { account: USERNAME, ...qrDataBase }
+    : { ...qrDataBase };
   let r;
   try {
     r = await request({
-      url: `/api${$api.getQCodeNew}`,
+      url: `/api${qrGet}`,
       method: 'post',
       headers: { ...requestKey },
-      data: {
-        params: {
-          uscInfo: {
-            devciceIp: '',
-            tenant: 'state_grid',
-            member: '0902',
-            devciceId: '',
-          },
-          quInfo: {
-            optSys: 'android',
-            pushId: '000000',
-            addressProvince: '110100',
-            addressRegion: '110101',
-            addressCity: '330100',
-          },
-        },
-        Channels: 'web',
-      },
+      data: qrGetData,
     });
   } catch (e) {
+    const es = String(e);
+    if (/\b444\b/.test(es))
+      return Promise.reject(
+        '扫码接口返回 HTTP444（加密中台常直接断开未放行的路径）。请改用账号密码登录（去掉 WSGW_LOGIN_MODE=qr），或抓包填 WSGW_BIZRT；也可试设 WSGW_QR_GET_PATH 为抓包得到的二维码请求路径。'
+      );
     return Promise.reject(`获取二维码失败: ${e}`);
   }
   const loginKey =
@@ -1563,28 +1582,37 @@ async function doLoginQr() {
     let chk;
     try {
       chk = await request({
-        url: `/api${$api.checkQCode}`,
+        url: `/api${qrCheck}`,
         method: 'post',
         headers: { ...requestKey },
-        data: {
-          loginKey,
-          params: {
-            uscInfo: {
-              devciceIp: '',
-              tenant: 'state_grid',
-              member: '0902',
-              devciceId: '',
+        data: USERNAME
+          ? {
+              account: USERNAME,
+              loginKey,
+              params: {
+                uscInfo: {
+                  devciceIp: '',
+                  tenant: 'state_grid',
+                  member: '0902',
+                  devciceId: '',
+                },
+                quInfo,
+              },
+              Channels: 'web',
+            }
+          : {
+              loginKey,
+              params: {
+                uscInfo: {
+                  devciceIp: '',
+                  tenant: 'state_grid',
+                  member: '0902',
+                  devciceId: '',
+                },
+                quInfo,
+              },
+              Channels: 'web',
             },
-            quInfo: {
-              optSys: 'android',
-              pushId: '000000',
-              addressProvince: '110100',
-              addressRegion: '110101',
-              addressCity: '330100',
-            },
-          },
-          Channels: 'web',
-        },
       });
     } catch (e) {
       if (i % 15 === 0) log.info(`等待扫码… (${i * 2}s)`);
