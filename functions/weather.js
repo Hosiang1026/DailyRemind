@@ -18,19 +18,13 @@ const cheerio = require('cheerio');
 // 获取城市天气编码
 const citiesJson = process.env.CITIES;
 
-// 解析 JSON 数据
 var cities = [];
+if (!citiesJson || String(citiesJson).trim() === "") {
+    console.error("请配置环境变量 CITIES（城市天气编码 JSON）");
+    process.exit(1);
+}
 try {
-    if(citiesJson!=undefined){
-        cities = JSON.parse(citiesJson);
-    }else{
-        cities = [
-        { city_name: "浙江-余杭", city_code: "101210106" },
-        { city_name: "浙江-吴兴", city_code: "101210205" },
-        { city_name: "安徽-宿松", city_code: "101220606" }
-        //{ city_name: "安徽-怀宁", city_code: "101220605" }
-        ];
-    }
+    cities = JSON.parse(citiesJson);
 } catch (error) {
     console.error("环境变量-城市天气编码配置错误:", error);
 }

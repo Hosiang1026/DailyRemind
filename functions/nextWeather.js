@@ -1,6 +1,18 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
+const citiesJson = process.env.CITIES;
+var cities = [];
+if (!citiesJson || String(citiesJson).trim() === "") {
+    console.error("请配置环境变量 CITIES（城市天气编码 JSON）");
+    process.exit(1);
+}
+try {
+    cities = JSON.parse(citiesJson);
+} catch (error) {
+    console.error("环境变量-城市天气编码配置错误:", error);
+}
+
 const syncDataWithRetry = async (url, headers, maxRetries = 3) => {
 	let retryCount = 0;
 	while (retryCount <= maxRetries) {
@@ -67,13 +79,6 @@ const extractFc = (dataStr, cityname) => {
 
 module.exports = handleWeather = () => {
 	return new Promise(async (resolve, reject) => {
-		const cities = [
-			//{ city_name: "安徽-怀宁", city_code: "101220605" },
-			{ city_name: "浙江-余杭", city_code: "101210106" },
-			//{ city_name: "浙江-吴兴", city_code: "101210205" },
-			//{ city_name: "福建-福州", city_code: "101230101" }
-		];
-
 		const baseUrl = "https://d1.weather.com.cn/weather_index/{city_code}.html?_=1722309451962";
 		const headers = {
 			"Referer": "http://www.weather.com.cn/"

@@ -7,8 +7,10 @@ const $ = new Env('安装Node依赖')
 
 !(async () => {
   try {
-    const ran = ensureNodeDeps()
-    $.log('', ran ? '已执行 npm install' : '依赖已齐全', '')
+    const logLine = (s) => $.log('', s, '')
+    logLine('开始检查青龙脚本与 package.json 依赖…')
+    const r = ensureNodeDeps.ensureQinglongDepsVerbose(logLine)
+    logLine(r.installed ? `已执行 npm install，共补全 ${r.missing.length} 个包` : '依赖已齐全，未执行安装')
   } catch (e) {
     $.log('', `❌ ${e.message || e}`, '')
   }

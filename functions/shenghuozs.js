@@ -3,9 +3,17 @@ var calendar = require("../utils/calendar");
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const cities = [
-    { city_name: "浙江余杭", city_code: "101210106" }
-	];
+const citiesJson = process.env.CITIES;
+var cities = [];
+if (!citiesJson || String(citiesJson).trim() === "") {
+    console.error("请配置环境变量 CITIES（城市天气编码 JSON）");
+    process.exit(1);
+}
+try {
+    cities = JSON.parse(citiesJson);
+} catch (error) {
+    console.error("环境变量-城市天气编码配置错误:", error);
+}
 
 const syncDataWithRetry = async (url, headers, maxRetries = 3) => {
     let retryCount = 0;

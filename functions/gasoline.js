@@ -304,6 +304,11 @@ module.exports = handleGasoline = async () => {
             provinces.push(anhuiData);
         }
 
+        if (provinces.length === 0) {
+            console.error("请配置环境变量 GASOLINE_OIL_PROVINCES 或 OIL_PROVINCES（省份油价 JSON）");
+            process.exit(1);
+        }
+
         let curr_price = 0;
         const scrapedByProvince = {};
         for(let province of provinces) {
