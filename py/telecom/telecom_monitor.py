@@ -94,6 +94,38 @@ def _load_bills_and_push(path):
     return push_extra, out
 
 
+def _publish_mqtt(body):
+    host = (os.environ.get("mqtt_host") or "").strip()
+    port_s = (os.environ.get("mqtt_port") or "").strip()
+    if not host or not port_s:
+        return
+    try:
+        port = int(port_s)
+    except ValueError:
+        return
+    user = (os.environ.get("mqtt_username") or "").strip()
+    pwd = (os.environ.get("mqtt_password") or "").strip()
+    topic = (os.environ.get("mqtt_topic_telecom") or "qinglong/telecom").strip() or "qinglong/telecom"
+    ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    payload = json.dumps({"content": body, "timestamp": ts}, ensure_ascii=False)
+    try:
+        import paho.mqtt.publish as mqtt_publish
+
+        auth = {"username": user, "password": pwd} if user else None
+        mqtt_publish.single(
+            topic,
+            payload,
+            hostname=host,
+            port=port,
+            auth=auth,
+            qos=0,
+            retain=True,
+        )
+        print("mqtt:Published", topic)
+    except Exception as ex:
+        print("mqtt:", ex)
+
+
 def send_notify(title, body, push_config_extra=None):
     try:
         import notify
@@ -298,6 +330,7 @@ def main():
             print("流量使用在均匀范围内，跳过通知")
         else:
             send_notify("【电信套餐用量监控】", body, push_extra)
+        _publish_mqtt(body)
     print(f"===============程序结束===============")
 
 

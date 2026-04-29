@@ -1,7 +1,10 @@
 /*
+* 定时任务名称：电信套餐
+* 执行规则：0 20 * * *（每天 20:00）
 cron "0 20 * * *" ql_telecom_task.js, tag=电信套餐
 * 依赖：Python3，pip install -r py/requirements.txt
 * 账号：TELECOM_USER 或 TELECOM_USERS；可选 TELECOM_CONFIG_JSON 为 json 路径，仅话费月账与 push_config，不含密码
+* MQTT：mqtt_host、mqtt_port；可选 mqtt_username、mqtt_password、mqtt_topic_telecom（默认 qinglong/telecom）
 */
 
 require('dotenv').config()
