@@ -31,7 +31,7 @@ const querystring = require('querystring');
 const exec = require('child_process').exec;
 const $ = new Env();
 const timeout = 15000; //超时时间(单位毫秒)
-console.log("加载sendNotify，当前版本: 20230506V2");
+if (process.env.GASOLINE_QUIET !== '1') console.log("加载sendNotify，当前版本: 20230506V2");
 // =======================================go-cqhttp通知设置区域===========================================
 //gobot_url 填写请求地址http://127.0.0.1/send_private_msg
 //gobot_token 填写在go-cqhttp文件设置的访问密钥
@@ -147,6 +147,10 @@ const {
 const fs = require('fs');
 const path = require('path');
 function getDefaultNotifyAuthor() {
+    if (process.env.END_CONTENT != null) {
+        const t = String(process.env.END_CONTENT).trim();
+        if (t) return '\n\n' + t;
+    }
     try {
         const pkg = require(path.join(__dirname, '..', 'package.json'));
         let u = (pkg.repository && pkg.repository.url) || '';
@@ -170,7 +174,7 @@ if (isnewql) {
 let Fileexists = fs.existsSync(strCKFile);
 let TempCK = [];
 if (Fileexists) {
-    console.log("检测到别名缓存文件CKName_cache.json，载入...");
+    if (process.env.GASOLINE_QUIET !== '1') console.log("检测到别名缓存文件CKName_cache.json，载入...");
     TempCK = fs.readFileSync(strCKFile, 'utf-8');
     if (TempCK) {
         TempCK = TempCK.toString();
@@ -181,7 +185,7 @@ if (Fileexists) {
 let UidFileexists = fs.existsSync(strUidFile);
 let TempCKUid = [];
 if (UidFileexists) {
-    console.log("检测到一对一Uid文件WxPusherUid.json，载入...");
+    if (process.env.GASOLINE_QUIET !== '1') console.log("检测到一对一Uid文件WxPusherUid.json，载入...");
     TempCKUid = fs.readFileSync(strUidFile, 'utf-8');
     if (TempCKUid) {
         TempCKUid = TempCKUid.toString();
@@ -199,14 +203,20 @@ let Notify_SkipText = [];
 let isLogin = false;
 if (process.env.NOTIFY_SHOWNAMETYPE) {
     ShowRemarkType = process.env.NOTIFY_SHOWNAMETYPE;
+    if (process.env.GASOLINE_QUIET !== '1') {
     if (ShowRemarkType == "2")
         console.log("检测到显示备注名称，格式为: 京东别名(备注)");
     if (ShowRemarkType == "3")
         console.log("检测到显示备注名称，格式为: 京东账号(备注)");
     if (ShowRemarkType == "4")
         console.log("检测到显示备注名称，格式为: 备注");
+    }
 }
 async function sendNotify(text, desp, params = {}, author = getDefaultNotifyAuthor(), strsummary = "") {
+    const _snSavedLog = console.log
+    const _snQuiet = process.env.GASOLINE_QUIET === '1'
+    if (_snQuiet) console.log = () => {}
+    try {
     console.log(`开始发送通知...`);
 
     if (process.env.NOTIFY_FILTERBYFILE) {
@@ -876,6 +886,9 @@ async function sendNotify(text, desp, params = {}, author = getDefaultNotifyAuth
         bncrNotify(text, desp), //bncr
         wxpusherNotify(text, desp) // wxpusher
     ]);
+    } finally {
+        if (_snQuiet) console.log = _snSavedLog
+    }
 }
 
 function getuuid(strRemark, PtPin) {

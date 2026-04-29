@@ -10,7 +10,7 @@ require("dotenv").config();
 
 const oilDbg = (...a) => {
   const v = (process.env.OIL_DEBUG || '').toLowerCase()
-  if (v === '0' || v === 'false') return
+  if (v !== '1' && v !== 'true') return
   console.log('[油价]', ...a)
 }
 
@@ -193,7 +193,6 @@ function writeGasoline(provinceName, oilPrice92, oilPrice95, oilPrice98, oilPric
                         }
                         data.gasoline[index] = { ...data.gasoline[index], ...updatedGasolineItem };
                         fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
-                        console.log('writeOilPrice success');
                     }
 
                 }
@@ -312,7 +311,7 @@ module.exports = handleGasoline = async () => {
         let curr_price = 0;
         const scrapedByProvince = {};
         for(let province of provinces) {
-            console.log(`正在获取 ${province.province_name} 的今日油价数据...`);
+            oilDbg('正在获取', province.province_name)
             const url = oilUrl.replace("{province_code}", province.province_code);
             const oilPriceArr = await fetchContent(url);
             if(oilPriceArr){
@@ -354,11 +353,10 @@ module.exports = handleGasoline = async () => {
                     oilPrice_0: normOilPrice(oilPrice_0),
                 };
                 const g = scrapedByProvince[province.province_name];
-                console.log('[油价]', province.province_name, `92=${g.oilPrice_92} 95=${g.oilPrice_95} 98=${g.oilPrice_98} 0#=${g.oilPrice_0}`);
-                oilDbg(province.province_name, 'writeGasoline')
+                oilDbg(province.province_name, `92=${g.oilPrice_92} 95=${g.oilPrice_95} 98=${g.oilPrice_98} 0#=${g.oilPrice_0}`, 'writeGasoline')
                 writeGasoline(province.province_name, oilPrice_92, oilPrice_95, oilPrice_98, oilPrice_0);
             } else {
-                console.warn('[油价]', province.province_name, '未解析到油价')
+                oilDbg(province.province_name, '未解析到油价')
             }
         }
         oilDbg('省份循环结束')
@@ -436,8 +434,6 @@ module.exports = handleGasoline = async () => {
         if (ut) content.push('\n' + ut);
 
         await sendMqttMsg(content.join('\n'));
-
-        console.log('[油价] 完成, 行数', content.length)
 
         return content.join('\n');
 

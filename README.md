@@ -3,23 +3,17 @@
 #### 订阅仓库
 
 ```
-ql repo https://github.com/Hosiang1026/DailyRemind.git "js" "app.js|ql_table_task.js" "functions|db|utils|package.json" "master"
+ql repo https://github.com/Hosiang1026/DailyRemind.git "task/" "app.js|ql_table_task.js" "functions/|db/|utils/|sh/|node_modules/" "master"
 ```
 
-#### 配置文件
+#### 安装依赖
 
-```sh
-export SENTENCE='{"open":false}'
-export AT_ALL='false'
-export START='{"open":false,"content":""}'
-export END='{"open":false,"content":"","time":""}'
-export ROBOT_PUSH='{"open":false,"key":""}'
-export LOTTERY='{"open":false,"SD":[],"KL8":[],"QLC":[],"SSQ":[]}'
-export WEATHER='{"open":false,"key":"","base_data":[],"all_data":[],"clothes":[]}'
-export DAILY='{"open":false,"marriage":[],"anniversary":[],"birthday":[],"legal":[],"sFtv":[],"lFtv":[],"term":[],"special":[],"internation":[],"license":[]}'
-export GASOLINE='{"open":false,"province":[],"model":[],"oil_provinces":[]}'
-export CLASS_TABLE='{"open":false,"graduate":"","homework":"","computer":[],"hr":[]}'
 ```
+cd /ql/data/repo/Hosiang1026_DailyRemind_master && npm install
+```
+
+注： 配置文件，参考/sh/exports.sh
+
 
 #### 任务列表
 
