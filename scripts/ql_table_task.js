@@ -1,49 +1,53 @@
 /*
-cron "25 10 * * 0,6" ql_gasoline_task.js, tag=汽油价格
-* 汽油价格任务:脚本更新地址 scripts/qinglong/js/ql_gasoline_task.js
+cron "40 7 * * 1-5" ql_table_task.js, tag=网课提醒
+* 网课提醒任务:脚本更新地址 scripts/ql_table_task.js
   配置参数 input.js
 */
 
-require('../../../functions/qlTaskEnv').assertInputExports('ql_gasoline_task.js')
+require('../functions/qlTaskEnv').assertInputExports('ql_table_task.js')
 const axios = require('axios')
-const qlCheckUpdate = require('../../../utils/qlCheckUpdate')
+const qlCheckUpdate = require('../utils/qlCheckUpdate')
 axios.defaults.timeout = 40 * 1000
 
 const SCRIPT_VERSION = 1.0
 
-const $ = new Env('汽油价格');
+const $ = new Env('网课提醒');
 let notify, allMessage = '';
 
-const handleGasolineContent = () => {
+//处理要发送的天气内容
+const handleWeatherContent = () => {
   return new Promise(async (resolve, reject) => {
     try {
       let content = []
-      const { gasoline } = require('../sh/input')
+      const { classTable} = require('../sh/input')
 
-      if (gasoline.open) {
-        const handleGasoline = require('../../../functions/gasoline')
-        const gasolineContent = await handleGasoline()
-        if (gasolineContent.length > 0) {
-          content.push(`${gasolineContent}`)
+      //课表模块
+      if (classTable.open) {
+        const handleClassTable = require('../functions/classTable')
+        const classTableContent = await handleClassTable()
+        if ('' != classTableContent) {
+          content.push(`${classTableContent}`)
         }
       }
 
-      if (content.length == 0) {
-        content.push('请最少配置一个模块内容,没有内容无法推送')
-      }
-      resolve(content.join(''))
+      resolve(content.join(''))//转字符串
     } catch (error) {
-      console.error('[汽油]', error.message || error)
+      console.log('处理内容失败', error.message || error);
       reject(error.message || error)
     }
   })
 }
 
 !(async() => {
-     qlCheckUpdate(SCRIPT_VERSION, 'ql_gasoline_task.js')
+     qlCheckUpdate(SCRIPT_VERSION, 'ql_table_task.js')
+     //获取配置
      await requireConfig();
-     const content = await handleGasolineContent();
-     await notify.sendNotify(`大家好😻`, `${content}`)
+     //获取天气内容
+     const content = await handleWeatherContent();
+     //发送通知
+    if (content.length > 0) {
+        await notify.sendNotify(`大家好🐇`, `${content}`)
+    }
 })()
 .catch((e) => {
         $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
@@ -55,7 +59,8 @@ const handleGasolineContent = () => {
 
 function requireConfig() {
   return new Promise(resolve => {
-    notify = $.isNode() ? require('../../../utils/sendNotify') : '';
+    console.log('开始获取配置文件\n')
+    notify = $.isNode() ? require('../utils/sendNotify') : '';
     resolve()
   })
 }

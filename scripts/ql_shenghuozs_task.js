@@ -1,124 +1,67 @@
 /*
-cron "11 8 * * *" ql_gold_task.js, tag=金银价格
-* 金银价格: scripts/qinglong/js/ql_gold_task.js
+cron "18 7 * * *" ql_shenghuozs_task.js, tag=生活指数
+* 生活指数:脚本更新地址 scripts/ql_shenghuozs_task.js
+  配置参数 input.js
 */
 
+require('../functions/qlTaskEnv').assertInputExports('ql_shenghuozs_task.js', ['CITIES'])
 const axios = require('axios')
-const cheerio = require('cheerio')
-const iconv = require('iconv-lite')
-const qlCheckUpdate = require('../../../utils/qlCheckUpdate')
-
+const qlCheckUpdate = require('../utils/qlCheckUpdate')
 axios.defaults.timeout = 40 * 1000
 
-const SCRIPT_VERSION = 1.1
+const SCRIPT_VERSION = 1.0
 
-const $ = new Env('金银价格')
-let notify
+const $ = new Env('生活指数');
+let notify;
 
-function getGold() {
-  return new Promise(async (resolve) => {
+//处理要发送的天气内容
+const handleShenghuoZSContent = () => {
+  return new Promise(async (resolve, reject) => {
     try {
-      let _content = '👑今日金价\n\n'
-      let domestic_content = '🏅国内价格\n'
-      let international_content = '🏅国际价格\n'
-      let store_content = '🏅金店价格\n'
-      let conver_content = '⚖金价换算\n'
-      const bdurl = 'http://www.huangjinjiage.cn'
-      const headers = {
-        'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Edg/96.0.1054.62',
+      let content = []
+      const { weather} = require('../sh/input')
+
+      //根据不同的配置，增加不同的内容
+      // 天气生活指数模块
+      if (weather.open) {
+        const handleShenghuoZS = require('../functions/shenghuozs')
+        const shenghuozsContent = await handleShenghuoZS()
+        if ('' != shenghuozsContent) {
+          content.push(`${shenghuozsContent}`)
+        }
       }
-      const r = await axios.get(bdurl, { headers, responseType: 'arraybuffer' })
-      const $h = cheerio.load(iconv.decode(Buffer.from(r.data), 'gb18030'))
 
-      const domestic_silver = $h('tr#jiage5')
-        .find('td')
-        .eq(1)
-        .text()
-        .trim()
-      const domestic_gold = $h('tr.bg#jiage4')
-        .find('td')
-        .eq(1)
-        .text()
-        .trim()
-      domestic_content += '· 白银：' + domestic_silver + '元/克\n'
-      domestic_content += '· 黄金：' + domestic_gold + '元/克\n\n'
-
-      const international_silver = $h('tr.bg#jiage3')
-        .find('td')
-        .eq(1)
-        .text()
-        .trim()
-      const international_gold = $h('tr.bg#jiage1')
-        .find('td')
-        .eq(1)
-        .text()
-        .trim()
-      international_content += '· 白银：' + international_silver + '美元/盎司\n'
-      international_content += '· 黄金：' + international_gold + '美元/盎司\n\n'
-
-      function tabRow(i) {
-        const el = $h('.tabtitle').eq(i)
-        const brand = el.text().replace(/内地/g, '').trim()
-        const gold = el.closest('tr').find('td').eq(1).text().trim()
-        return { brand, gold }
-      }
-      const a11 = tabRow(11)
-      const a21 = tabRow(21)
-      const a12 = tabRow(12)
-      const a19 = tabRow(19)
-      const a13 = tabRow(13)
-      const a18 = tabRow(18)
-      const a20 = tabRow(20)
-      store_content += '· ' + a11.brand + '：' + a11.gold + '元/克\n'
-      store_content += '· ' + a21.brand + '：' + a21.gold + '元/克\n'
-      store_content += '· ' + a12.brand + '：' + a12.gold + '元/克\n'
-      store_content += '· ' + a19.brand + '：' + a19.gold + '元/克\n'
-      store_content += '· ' + a13.brand + '：' + a13.gold + '元/克\n'
-      store_content += '· ' + a18.brand + '：' + a18.gold + '元/克\n'
-      store_content += '· ' + a20.brand + '：' + a20.gold + '元/克\n\n'
-
-      const usdcny_price = 7.1329
-      const conver_gold =
-        (parseFloat(international_gold) / 31.1035) * parseFloat(usdcny_price)
-      const difference_gold = parseFloat(domestic_gold) - conver_gold
-      conver_content += '· 国际换算：' + Math.round(conver_gold * 100) / 100 + '元/克\n'
-      conver_content += '· 1克差价：' + Math.round(difference_gold * 100) / 100 + '元\n'
-      conver_content += '· 50克价格：' + Math.round(parseFloat(domestic_gold) * 50 * 100) / 100 + '元\n'
-      conver_content += '· 金衡盎司：' + '1盎司 = 31.1035克\n'
-
-      _content += domestic_content + international_content + store_content + conver_content
-      resolve(_content)
-    } catch (e) {
-      resolve(e)
+      resolve(content.join(''))//转字符串
+    } catch (error) {
+      console.log('处理内容失败', error.message || error);
+      reject(error.message || error)
     }
   })
 }
 
-!(async () => {
-  qlCheckUpdate(SCRIPT_VERSION, 'ql_gold_task.js')
-  await requireConfig()
-  const newcontent = await getGold()
-  if (typeof newcontent === 'string' && newcontent.trim()) {
-    console.log('获取黄金价格成功！\n' + newcontent)
-    await notify.sendNotify('金银价格', newcontent)
-  } else {
-    console.log(
-      '获取黄金价格失败！',
-      typeof newcontent === 'string' ? '' : (newcontent && newcontent.message) || newcontent
-    )
-  }
+!(async() => {
+     qlCheckUpdate(SCRIPT_VERSION, 'ql_shenghuozs_task.js')
+     //获取配置
+     await requireConfig();
+     //获取天气内容
+     const content = await handleShenghuoZSContent();
+    //发送通知
+    if (content.length > 0) {
+        await notify.sendNotify(`大家好🐇`, `${content}`)
+    }
 })()
-  .catch((e) => {
-    $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
-  })
-  .finally(() => {
-    $.done()
-  })
+.catch((e) => {
+        $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
+    })
+    .finally(() => {
+        $.done();
+    })
+
 
 function requireConfig() {
-  return new Promise((resolve) => {
-    notify = $.isNode() ? require('../../../utils/sendNotify') : ''
+  return new Promise(resolve => {
+    console.log('开始获取配置文件\n')
+    notify = $.isNode() ? require('../utils/sendNotify') : '';
     resolve()
   })
 }

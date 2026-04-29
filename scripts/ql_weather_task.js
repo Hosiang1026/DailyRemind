@@ -1,32 +1,33 @@
 /*
-cron "40 7 * * 1-5" ql_table_task.js, tag=网课提醒
-* 网课提醒任务:脚本更新地址 scripts/qinglong/js/ql_table_task.js
+cron "5 7 * * *" ql_weather_task.js, tag=实况天气
+* 实况天气任务:脚本更新地址 scripts/ql_weather_task.js
   配置参数 input.js
 */
 
-require('../../../functions/qlTaskEnv').assertInputExports('ql_table_task.js')
+require('../functions/qlTaskEnv').assertInputExports('ql_weather_task.js', ['CITIES'])
 const axios = require('axios')
-const qlCheckUpdate = require('../../../utils/qlCheckUpdate')
+const qlCheckUpdate = require('../utils/qlCheckUpdate')
 axios.defaults.timeout = 40 * 1000
 
 const SCRIPT_VERSION = 1.0
 
-const $ = new Env('网课提醒');
-let notify, allMessage = '';
+const $ = new Env('实况天气');
+let notify;
 
 //处理要发送的天气内容
 const handleWeatherContent = () => {
   return new Promise(async (resolve, reject) => {
     try {
       let content = []
-      const { classTable} = require('../sh/input')
+      const { weather} = require('../sh/input')
 
-      //课表模块
-      if (classTable.open) {
-        const handleClassTable = require('../../../functions/classTable')
-        const classTableContent = await handleClassTable()
-        if ('' != classTableContent) {
-          content.push(`${classTableContent}`)
+      //根据不同的配置，增加不同的内容
+      // 天气模块
+      if (weather.open) {
+        const handleWeather = require('../functions/weather')
+        const weatherContent = await handleWeather()
+        if ('' != weatherContent) {
+          content.push(`${weatherContent}`)
         }
       }
 
@@ -39,12 +40,12 @@ const handleWeatherContent = () => {
 }
 
 !(async() => {
-     qlCheckUpdate(SCRIPT_VERSION, 'ql_table_task.js')
+     qlCheckUpdate(SCRIPT_VERSION, 'ql_weather_task.js')
      //获取配置
      await requireConfig();
      //获取天气内容
      const content = await handleWeatherContent();
-     //发送通知
+    //发送通知
     if (content.length > 0) {
         await notify.sendNotify(`大家好🐇`, `${content}`)
     }
@@ -60,7 +61,7 @@ const handleWeatherContent = () => {
 function requireConfig() {
   return new Promise(resolve => {
     console.log('开始获取配置文件\n')
-    notify = $.isNode() ? require('../../../utils/sendNotify') : '';
+    notify = $.isNode() ? require('../utils/sendNotify') : '';
     resolve()
   })
 }

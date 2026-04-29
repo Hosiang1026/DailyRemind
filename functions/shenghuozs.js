@@ -1,4 +1,4 @@
-const { weather } = require('../scripts/qinglong/sh/input')
+const { weather } = require('../sh/input')
 var calendar = require('../utils/calendar')
 const axios = require('axios');
 const cheerio = require('cheerio');

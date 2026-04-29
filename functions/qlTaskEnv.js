@@ -49,7 +49,7 @@ function assertInputExports(taskFile, extraKeys = []) {
     const missing = keys.filter((k) => !isPresent(k));
     if (missing.length === 0) return;
     const msg =
-        `[${taskFile}] 未配置 export: ${missing.join(', ')}，请 source 仓库 scripts/qinglong/sh/exports.sh 或在青龙环境变量中配置`;
+        `[${taskFile}] 未配置 export: ${missing.join(', ')}，请 source 仓库 sh/exports.sh 或在青龙环境变量中配置`;
     console.log(msg);
     process.exit(1);
 }
