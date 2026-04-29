@@ -5,6 +5,7 @@ cron "35 21 * * *" ql_lottery_task.js, tag=福利彩票
 */
 
 require('../../../functions/ensureNodeDeps')()
+require('../../../functions/qlTaskEnv').assertInputExports('ql_lottery_task.js')
 const axios = require('axios')
 const qlCheckUpdate = require('../../../functions/qlCheckUpdate')
 axios.defaults.timeout = 40 * 1000

@@ -5,6 +5,7 @@ cron "25 10 * * 0,6" ql_gasoline_task.js, tag=汽油价格
 */
 
 require('../../../functions/ensureNodeDeps')()
+require('../../../functions/qlTaskEnv').assertInputExports('ql_gasoline_task.js')
 const axios = require('axios')
 const qlCheckUpdate = require('../../../functions/qlCheckUpdate')
 axios.defaults.timeout = 40 * 1000

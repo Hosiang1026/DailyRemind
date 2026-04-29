@@ -5,6 +5,7 @@ cron "40 7 * * 1-5" ql_table_task.js, tag=网课提醒
 */
 
 require('../../../functions/ensureNodeDeps')()
+require('../../../functions/qlTaskEnv').assertInputExports('ql_table_task.js')
 const axios = require('axios')
 const qlCheckUpdate = require('../../../functions/qlCheckUpdate')
 axios.defaults.timeout = 40 * 1000

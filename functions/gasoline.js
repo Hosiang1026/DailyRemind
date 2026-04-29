@@ -25,23 +25,18 @@ const httpGetOpts = {
     },
 };
 
-// 获取省份汽油编码
-const provincesJson = process.env.OIL_PROVINCES;
-
-// 解析 JSON 数据
 let provinces = [];
 try {
-    if(provincesJson!=undefined){
-        provinces = JSON.parse(provincesJson);
-    }else{
-        provinces = [
-            { province_name: "浙江", province_code: "zhejiang" },
-            { province_name: "安徽", province_code: "anhui" },
-            { province_name: "福建", province_code: "fujian" }
-        ];
+    if (Array.isArray(gasoline.oil_provinces) && gasoline.oil_provinces.length > 0) {
+        provinces = gasoline.oil_provinces;
+    } else {
+        const provincesJson = process.env.OIL_PROVINCES;
+        if (provincesJson != undefined && provincesJson !== '') {
+            provinces = JSON.parse(provincesJson);
+        }
     }
 } catch (error) {
-    console.error("环境变量-省份汽油编码配置错误:", error);
+    console.error("省份汽油编码配置错误:", error);
 }
 
 //汽油价格API: https://api.help.bj.cn/apis/youjia/
