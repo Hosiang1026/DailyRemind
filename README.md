@@ -25,14 +25,14 @@ export CLASS_TABLE='{"open":false,"graduate":"","homework":"","computer":[],"hr"
 
 | 脚本名称 | 作用 | 执行规则 | 是否可用 |
 | --- | --- | --- | --- |
-| `scripts/ql_weather_task.js` | 实况天气 | `5 7 * * *` | 是 |
-| `scripts/ql_next_weather_task.js` | 未来预报 | `12 7 * * *` | 是 |
-| `scripts/ql_shenghuozs_task.js` | 生活指数 | `18 7 * * *` | 是 |
-| `scripts/ql_daily_task.js` | 节日提醒 | `0 8 * * *` | 是 |
-| `scripts/ql_gasoline_task.js` | 汽油价格 | `25 10 * * 0,6` | 是 |
-| `scripts/ql_lottery_task.js` | 福利彩票 | `35 21 * * *` | 是 |
-| `scripts/ql_table_task.js` | 网课提醒 | `40 7 * * 1-5` | 是 |
-| `scripts/ql_gold_task.js` | 金银价格 | `11 8 * * *` | 是 |
+| `task/ql_weather_task.js` | 实况天气 | `5 7 * * *` | 是 |
+| `task/ql_next_weather_task.js` | 未来预报 | `12 7 * * *` | 是 |
+| `task/ql_shenghuozs_task.js` | 生活指数 | `18 7 * * *` | 是 |
+| `task/ql_daily_task.js` | 节日提醒 | `0 8 * * *` | 是 |
+| `task/ql_gasoline_task.js` | 汽油价格 | `25 10 * * 0,6` | 是 |
+| `task/ql_lottery_task.js` | 福利彩票 | `35 21 * * *` | 是 |
+| `task/ql_table_task.js` | 网课提醒 | `40 7 * * 1-5` | 是 |
+| `task/ql_gold_task.js` | 金银价格 | `11 8 * * *` | 是 |
 
 
 

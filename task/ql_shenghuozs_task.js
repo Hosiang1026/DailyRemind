@@ -1,40 +1,36 @@
 /*
-cron "35 21 * * *" ql_lottery_task.js, tag=福利彩票
-* 福利彩票任务:脚本更新地址 scripts/ql_lottery_task.js
+cron "18 7 * * *" ql_shenghuozs_task.js, tag=生活指数
+* 生活指数:脚本更新地址 task/ql_shenghuozs_task.js
   配置参数 input.js
 */
 
-require('../functions/qlTaskEnv').assertInputExports('ql_lottery_task.js')
+require('../functions/qlTaskEnv').assertInputExports('ql_shenghuozs_task.js', ['CITIES'])
 const axios = require('axios')
 const qlCheckUpdate = require('../utils/qlCheckUpdate')
 axios.defaults.timeout = 40 * 1000
 
 const SCRIPT_VERSION = 1.0
 
-const $ = new Env('福利彩票');
-let notify, allMessage = '';
+const $ = new Env('生活指数');
+let notify;
 
-//处理要发送的福利彩票内容
-const handleLotteryContent = () => {
+//处理要发送的天气内容
+const handleShenghuoZSContent = () => {
   return new Promise(async (resolve, reject) => {
     try {
       let content = []
-      const { lottery} = require('../sh/input')
+      const { weather} = require('../sh/input')
 
       //根据不同的配置，增加不同的内容
-      //福利彩票模块
-      if (lottery.open) {
-        const handleLottery = require('../functions/lottery')
-        const lotteryContent = await handleLottery()
-        if ('' != lotteryContent) {
-          content.push(`${lotteryContent}`)
+      // 天气生活指数模块
+      if (weather.open) {
+        const handleShenghuoZS = require('../functions/shenghuozs')
+        const shenghuozsContent = await handleShenghuoZS()
+        if ('' != shenghuozsContent) {
+          content.push(`${shenghuozsContent}`)
         }
       }
 
-      //如果啥都没输入的话
-      if (content.length == 0) {
-        content.push('请最少配置一个模块内容,没有内容无法推送')
-      }
       resolve(content.join(''))//转字符串
     } catch (error) {
       console.log('处理内容失败', error.message || error);
@@ -44,13 +40,15 @@ const handleLotteryContent = () => {
 }
 
 !(async() => {
-     qlCheckUpdate(SCRIPT_VERSION, 'ql_lottery_task.js')
+     qlCheckUpdate(SCRIPT_VERSION, 'ql_shenghuozs_task.js')
      //获取配置
      await requireConfig();
      //获取天气内容
-     const content = await handleLotteryContent();
-     //发送通知
-     await notify.sendNotify(`大家好🐇`, `${content}`)
+     const content = await handleShenghuoZSContent();
+    //发送通知
+    if (content.length > 0) {
+        await notify.sendNotify(`大家好🐇`, `${content}`)
+    }
 })()
 .catch((e) => {
         $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
