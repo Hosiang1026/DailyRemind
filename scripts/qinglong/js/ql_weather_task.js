@@ -4,8 +4,12 @@ cron "5 7 * * *" ql_weather_task.js, tag=实况天气
   配置参数 input.js
 */
 
+require('../../../functions/ensureNodeDeps')()
 const axios = require('axios')
+const qlCheckUpdate = require('../../../functions/qlCheckUpdate')
 axios.defaults.timeout = 40 * 1000
+
+const SCRIPT_VERSION = 1.0
 
 const $ = new Env('实况天气');
 let notify;
@@ -36,6 +40,7 @@ const handleWeatherContent = () => {
 }
 
 !(async() => {
+     qlCheckUpdate(SCRIPT_VERSION, 'ql_weather_task.js')
      //获取配置
      await requireConfig();
      //获取天气内容

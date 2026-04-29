@@ -1,13 +1,17 @@
 /*
-cron "25 10 * * 0,6" ql_gasoline_task.js, tag=油价
+cron "25 10 * * 0,6" ql_gasoline_task.js, tag=汽油价格
 * 汽油价格任务:脚本更新地址 scripts/qinglong/js/ql_gasoline_task.js
   配置参数 input.js
 */
 
+require('../../../functions/ensureNodeDeps')()
 const axios = require('axios')
+const qlCheckUpdate = require('../../../functions/qlCheckUpdate')
 axios.defaults.timeout = 40 * 1000
 
-const $ = new Env('油价');
+const SCRIPT_VERSION = 1.0
+
+const $ = new Env('汽油价格');
 let notify, allMessage = '';
 
 const handleGasolineContent = () => {
@@ -36,6 +40,7 @@ const handleGasolineContent = () => {
 }
 
 !(async() => {
+     qlCheckUpdate(SCRIPT_VERSION, 'ql_gasoline_task.js')
      await requireConfig();
      const content = await handleGasolineContent();
      await notify.sendNotify(`大家好😻`, `${content}`)

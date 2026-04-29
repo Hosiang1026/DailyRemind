@@ -16,17 +16,11 @@ let start = {
 
 //福利彩票模块
 let lottery = {
-    open: true, //是否需要推送福利彩票，需要填true，否则填false （不需要加引号，填了false的话下面新闻有关的配置项就不用填了）
+    open: true, //是否需要推送福利彩票，需要填true，否则填false （不需要加引号，填了false的话下面彩票有关的配置项就不用填了）
     SD: [1, 2, 3, 4, 5, 6, 0], //福彩3D  每日21:15开奖
     KL8: [1, 2, 3, 4, 5, 6, 0],//快乐8   每日21:30开奖
     QLC: [1, 3, 5], //七乐彩 每周一、三、五21:15开奖
     SSQ: [2, 4, 0], //双色球 每周二、四、日21:15开奖
-}
-
-//新闻模块
-let news = {
-    open: false, //是否需要推送新闻，需要填true，否则填false （不需要加引号，填了false的话下面新闻有关的配置项就不用填了）
-    size: 8, //想要多少条的新闻
 }
 
 //天气模块
@@ -1349,4 +1343,4 @@ let sentence = {
 }
 
 //下面的内容请勿改动
-module.exports = { robotPush, start, news, lottery, weather, daily, gasoline, end, atAll, classTable, sentence }
+module.exports = { robotPush, start, lottery, weather, daily, gasoline, end, atAll, classTable, sentence }

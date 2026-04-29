@@ -4,8 +4,12 @@ cron "0 8 * * *" ql_daily_task.js, tag=节日提醒
 * 配置参数 input.js
 */
 
+require('../../../functions/ensureNodeDeps')()
 const axios = require('axios')
+const qlCheckUpdate = require('../../../functions/qlCheckUpdate')
 axios.defaults.timeout = 40 * 1000
+
+const SCRIPT_VERSION = 1.0
 
 const $ = new Env('节日提醒');
 let notify;
@@ -41,6 +45,7 @@ const handleDailyContent = () => {
 }
 
 !(async() => {
+     qlCheckUpdate(SCRIPT_VERSION, 'ql_daily_task.js')
      //获取配置
      await requireConfig();
      //获取节日内容

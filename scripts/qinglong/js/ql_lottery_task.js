@@ -1,13 +1,17 @@
 /*
-cron "35 21 * * *" ql_lottery_task.js, tag=福彩
+cron "35 21 * * *" ql_lottery_task.js, tag=福利彩票
 * 福利彩票任务:脚本更新地址 scripts/qinglong/js/ql_lottery_task.js
   配置参数 input.js
 */
 
+require('../../../functions/ensureNodeDeps')()
 const axios = require('axios')
+const qlCheckUpdate = require('../../../functions/qlCheckUpdate')
 axios.defaults.timeout = 40 * 1000
 
-const $ = new Env('福彩');
+const SCRIPT_VERSION = 1.0
+
+const $ = new Env('福利彩票');
 let notify, allMessage = '';
 
 //处理要发送的福利彩票内容
@@ -40,6 +44,7 @@ const handleLotteryContent = () => {
 }
 
 !(async() => {
+     qlCheckUpdate(SCRIPT_VERSION, 'ql_lottery_task.js')
      //获取配置
      await requireConfig();
      //获取天气内容
