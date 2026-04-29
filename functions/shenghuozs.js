@@ -88,6 +88,7 @@ module.exports = handleShenghuoZS = () => {
 
     try {
         let weatherCityContent = []
+        const seenZsBody = new Set()
         let nowDate = new Date();
         let currentYear = nowDate.getFullYear();
         let currentMonth = nowDate.getMonth();
@@ -100,10 +101,13 @@ module.exports = handleShenghuoZS = () => {
             console.log(`正在获取 ${city.city_name} 的数据...`);
             if (dataStr != null) {
                 var dataZS = extractDataZS(dataStr);
-                if (dataZS.length > 0) {
-                    weatherCityContent.push('🎈生活指数 \n');
+                if (dataZS && dataZS.length > 0) {
                     dataZS.sort((a, b) => calendar.getTextLength(a) - calendar.getTextLength(b));
-                    weatherCityContent.push(dataZS.join('\n'));
+                    const zsBody = dataZS.join('\n')
+                    if (seenZsBody.has(zsBody)) continue
+                    seenZsBody.add(zsBody)
+                    weatherCityContent.push('🎈生活指数 \n');
+                    weatherCityContent.push(zsBody);
                 }
                 weatherCityContent.join('\n\n');
             }

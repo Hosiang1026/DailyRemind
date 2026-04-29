@@ -3,6 +3,7 @@ cron "11 8 * * *" ql_gold_task.js, tag=金银价格
 * 金银价格: task/ql_gold_task.js
 */
 
+require('dotenv').config()
 const axios = require('axios')
 const cheerio = require('cheerio')
 const iconv = require('iconv-lite')
@@ -95,6 +96,64 @@ function getGold() {
   })
 }
 
+async function sendMqttMsg(goldContent) {
+  const mqtt_host = process.env.mqtt_host || ''
+  const mqtt_port = process.env.mqtt_port || ''
+  const mqtt_username = process.env.mqtt_username || ''
+  const mqtt_password = process.env.mqtt_password || ''
+  if (!mqtt_host || !mqtt_port) {
+    return
+  }
+  const mqtt = require('mqtt')
+  const clientId = 'mqtt_gold'
+  const connectUrl = `mqtt://${mqtt_host}:${mqtt_port}`
+  const client = mqtt.connect(connectUrl, {
+    clientId,
+    clean: true,
+    connectTimeout: 2000,
+    username: mqtt_username,
+    password: mqtt_password,
+    reconnectPeriod: 1000,
+  })
+  const topic = 'qinglong/gold'
+  const now = new Date()
+  const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`
+  const data = { content: goldContent, timestamp }
+  return new Promise((resolve, reject) => {
+    client.on('connect', async () => {
+      console.log('mqtt:Connected')
+      try {
+        await new Promise((pubResolve, pubReject) => {
+          client.publish(topic, JSON.stringify(data), { qos: 0, retain: true }, (error) => {
+            if (error) pubReject(error)
+            else pubResolve()
+          })
+        })
+        console.log('mqtt:Published')
+        setTimeout(() => {
+          client.end()
+          resolve()
+        }, 500)
+      } catch (error) {
+        console.error('mqtt:Publish error', error)
+        client.end()
+        reject(error)
+      }
+    })
+    client.on('error', (error) => {
+      console.error('mqtt:Connection error', error)
+      client.end()
+      reject(error)
+    })
+    setTimeout(() => {
+      if (client.connected === false) {
+        client.end()
+        reject(new Error('mqtt:Connection timeout'))
+      }
+    }, 2000)
+  })
+}
+
 !(async () => {
   qlCheckUpdate(SCRIPT_VERSION, 'ql_gold_task.js')
   await requireConfig()
@@ -102,6 +161,11 @@ function getGold() {
   if (typeof newcontent === 'string' && newcontent.trim()) {
     console.log('获取黄金价格成功！\n' + newcontent)
     await notify.sendNotify('金银价格', newcontent)
+    try {
+      await sendMqttMsg(newcontent)
+    } catch (e) {
+      console.error('mqtt:', e && e.message ? e.message : e)
+    }
   } else {
     console.log(
       '获取黄金价格失败！',
