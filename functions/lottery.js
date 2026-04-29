@@ -98,8 +98,13 @@ function sleep(ms) {
 function writeLotteryCode(ssqCode, ssqRed, ssqBlue, ssqDate, lotteryContent) {
 	return new Promise(async (resolve, reject) => {
 	try{
-		if (fs.existsSync(dataFilePath)) {
-			const data = JSON.parse(fs.readFileSync(dataFilePath, 'utf8'));
+		if (!fs.existsSync(dataFilePath)) {
+			fs.mkdirSync(path.dirname(dataFilePath), { recursive: true });
+			fs.writeFileSync(dataFilePath, JSON.stringify({ lottery: [], predict: [] }, null, 2));
+		}
+		const data = JSON.parse(fs.readFileSync(dataFilePath, 'utf8'));
+		if (!Array.isArray(data.lottery)) data.lottery = [];
+		if (!Array.isArray(data.predict)) data.predict = [];
 			//实际双色球号码数量大于200, 清空数据
 			if (data.lottery.length > 200){
 				data.lottery = [];
@@ -170,9 +175,6 @@ function writeLotteryCode(ssqCode, ssqRed, ssqBlue, ssqDate, lotteryContent) {
 			}else{
 				console.log('writePredictLotteryCode exist');
 			}
-		} else {
-			console.log('Data file not found', error.message || error);
-		}
 	} catch (error) {
 		console.error('写入彩票号码失败', error.message || error);
 		reject(error.message || error)

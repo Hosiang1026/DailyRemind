@@ -1,15 +1,24 @@
-# DailyRemind 日常提醒库
+# DailyRemind 日常提醒
 
-#### ql repo命令拉取脚本
+#### 订阅仓库
 
 ```
 ql repo https://github.com/Hosiang1026/DailyRemind.git "_task.js" "app.js|sendNotify.js|qlApi.js|/functions/|ql.js" "functions|sendNotify.js|qlApi.js|ql_table_task.js" "master"
 ```
 
-#### 依赖库
+#### 配置文件
 
-```
-https://github.com/Hosiang1026/DailyRemindScripts.git
+```sh
+export SENTENCE='{"open":false}'
+export AT_ALL='false'
+export START='{"open":false,"content":""}'
+export END='{"open":false,"content":"","time":""}'
+export ROBOT_PUSH='{"open":false,"key":""}'
+export LOTTERY='{"open":false,"SD":[],"KL8":[],"QLC":[],"SSQ":[]}'
+export WEATHER='{"open":false,"key":"","base_data":[],"all_data":[],"clothes":[]}'
+export DAILY='{"open":false,"marriage":[],"anniversary":[],"birthday":[],"legal":[],"sFtv":[],"lFtv":[],"term":[],"special":[],"internation":[],"license":[]}'
+export GASOLINE='{"open":false,"province":[],"model":[],"oil_provinces":[]}'
+export CLASS_TABLE='{"open":false,"graduate":"","homework":"","computer":[],"hr":[]}'
 ```
 
 #### 任务列表
