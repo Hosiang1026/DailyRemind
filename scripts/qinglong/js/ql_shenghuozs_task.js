@@ -7,7 +7,7 @@ cron "18 7 * * *" ql_shenghuozs_task.js, tag=生活指数
 require('../../../functions/ensureNodeDeps')()
 require('../../../functions/qlTaskEnv').assertInputExports('ql_shenghuozs_task.js')
 const axios = require('axios')
-const qlCheckUpdate = require('../../../utils/qlCheckUpdate')
+const qlCheckUpdate = require('./qlCheckUpdate')
 axios.defaults.timeout = 40 * 1000
 
 const SCRIPT_VERSION = 1.0
