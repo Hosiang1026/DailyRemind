@@ -146,11 +146,30 @@ const {
 } = require('./ql');
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
+
+function parseEnvBoolTrue(name) {
+    const v = process.env[name];
+    if (v === undefined || v === null) return false;
+    const t = String(v).trim().toLowerCase();
+    return t === 'true' || t === '1';
+}
+
+async function appendSentenceIfOpen(desp) {
+    if (!parseEnvBoolTrue('SENTENCE_OPEN')) return desp;
+    try {
+        const res = await axios.get('https://api.shadiao.pro/chp', { timeout: 15000 });
+        const text =
+            res.data && res.data.data && res.data.data.text != null
+                ? String(res.data.data.text)
+                : '';
+        if (text) return desp + '\n\n💘' + text;
+    } catch (e) {}
+    return desp;
+}
+
 function getDefaultNotifyAuthor() {
-    if (process.env.END_CONTENT != null) {
-        const t = String(process.env.END_CONTENT).trim();
-        if (t) return '\n\n' + t;
-    }
+    if (parseEnvBoolTrue('END_OPEN')) return '';
     try {
         const pkg = require(path.join(__dirname, '..', 'package.json'));
         let u = (pkg.repository && pkg.repository.url) || '';
@@ -848,7 +867,7 @@ async function sendNotify(text, desp, params = {}, author = getDefaultNotifyAuth
         })
     }
 
-    //提供6种通知
+    desp = await appendSentenceIfOpen(desp);
     desp = buildLastDesp(desp, author);
     await serverNotify(text, desp); //微信server酱
 
@@ -1074,6 +1093,7 @@ async function sendNotifybyWxPucher(text, desp, PtPin, author = '\n\n本通知 B
                     }
 					
                     console.log("处理完成，开始发送通知...");
+                    desp = await appendSentenceIfOpen(desp);
                     desp = buildLastDesp(desp, author);
                     if (strAllNotify) {
                         desp = strAllNotify + "\n" + desp;
@@ -1573,6 +1593,14 @@ function qywxBotNotify(text, desp) {
 }
 
 function buildLastDesp(desp, author = '') {
+    if (parseEnvBoolTrue('END_OPEN')) {
+        const c = process.env.END_CONTENT != null ? String(process.env.END_CONTENT).trim() : '';
+        const tp = process.env.END_TIME != null ? String(process.env.END_TIME) : '通知时间: ';
+        let tail = '';
+        if (c) tail += '\n\n' + c;
+        tail += '\n' + tp + GetDateTime(new Date());
+        return desp.trim() + tail;
+    }
     author = process.env.NOTIFY_AUTHOR || author;
     if (process.env.NOTIFY_AUTHOR_BLANK || !author) {
         return desp.trim();
