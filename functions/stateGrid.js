@@ -8,7 +8,7 @@ function parseAccounts() {
     try {
       const j = JSON.parse(raw)
       if (Array.isArray(j) && j.length) {
-        const rows = j
+        return j
           .map((x) => ({
             username: String(x.username || x.user || x.account || '').trim(),
             password: String(x.password || x.pass || '').trim(),
@@ -16,7 +16,6 @@ function parseAccounts() {
             bizrt: x.bizrt,
           }))
           .filter((x) => x.username && (x.password || x.bizrt || qr))
-        if (rows.length) return rows
       }
     } catch (_) {}
   }
@@ -38,8 +37,12 @@ function parseAccounts() {
 async function runAll() {
   const accounts = parseAccounts()
   if (!accounts.length) {
+    const qr = String(process.env.WSGW_LOGIN_MODE || '').toLowerCase() === 'qr'
+    const u = String(process.env.WSGW_USERNAME || '').trim()
     console.error(
-      '[state-grid] 需配置账号密码、或 WSGW_LOGIN_MODE=qr、或 WSGW_ACCOUNTS 含 bizrt'
+      qr && !u
+        ? '[state-grid] WSGW_LOGIN_MODE=qr 时 WSGW_USERNAME 不能为空（缓存分区用）'
+        : '[state-grid] 需配置账号密码、或 WSGW_LOGIN_MODE=qr+WSGW_USERNAME、或 WSGW_BIZRT/WSGW_ACCOUNTS.bizrt'
     )
     process.exit(1)
   }
