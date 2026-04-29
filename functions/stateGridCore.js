@@ -256,6 +256,15 @@ const notify = (e = '', o = '', r = '', s = {}) => {
         body: JSON.stringify({ yuheng: e }),
       },
         r = await Encrypt(o);
+      {
+        const ck = isNode() ? String(process.env.WSGW_COOKIE || '').trim() : '';
+        if (ck && r && typeof r === 'object') {
+          r.headers = { ...(r.headers || {}) };
+          const ex = r.headers.Cookie || r.headers.cookie || '';
+          r.headers.Cookie = ex ? `${ex}; ${ck}` : ck;
+          if (r.headers.cookie !== undefined) delete r.headers.cookie;
+        }
+      }
       switch (e.url) {
         case '/api/oauth2/oauth/authorize':
           Object.assign(r, { body: r.body.replace(/^\"|\"$/g, '') });
@@ -1145,6 +1154,17 @@ const notify = (e = '', o = '', r = '', s = {}) => {
             ? self
             : {};
 Global.bizrt = jsonParse(store.get('95598_bizrt')) || {};
+if (isNode() && process.env.WSGW_BIZRT) {
+  try {
+    const b = JSON.parse(process.env.WSGW_BIZRT);
+    if (b?.token && b?.userInfo) {
+      Global.bizrt = b;
+      store.set('95598_bizrt', jsonStr(b));
+    }
+  } catch (_) {}
+}
+const IS_QR_LOGIN =
+  isNode() && String(process.env.WSGW_LOGIN_MODE || '').toLowerCase() === 'qr';
 const log = new Logger(
   SCRIPTNAME,
   isTrue(isNode() ? process.env.WSGW_LOG_DEBUG : store.get('95598_log_debug'))
@@ -1494,6 +1514,93 @@ async function getMonthElecQuantity(e) {
     console.log('🔚 获取月用电量结束');
   }
 }
+async function doLoginQr() {
+  console.log('⏳ 获取登录二维码...');
+  let r;
+  try {
+    r = await request({
+      url: `/api${$api.getQCodeNew}`,
+      method: 'post',
+      headers: { ...requestKey },
+      data: {
+        params: {
+          uscInfo: {
+            devciceIp: '',
+            tenant: 'state_grid',
+            member: '0902',
+            devciceId: '',
+          },
+          quInfo: {
+            optSys: 'android',
+            pushId: '000000',
+            addressProvince: '110100',
+            addressRegion: '110101',
+            addressCity: '330100',
+          },
+        },
+        Channels: 'web',
+      },
+    });
+  } catch (e) {
+    return Promise.reject(`获取二维码失败: ${e}`);
+  }
+  const loginKey =
+    r.loginKey ||
+    r.ticket ||
+    r.uuid ||
+    r.qrcodeId ||
+    r.qrCodeId ||
+    r.data?.loginKey;
+  const h5 =
+    r.qrCodeUrl || r.qrUrl || r.url || r.h5QrUrl || r.shortUrl;
+  if (h5) console.log(`\n网上国网 App 扫码：\n${h5}\n`);
+  if (!loginKey) {
+    log.error(jsonStr(r, null, 2));
+    return Promise.reject('二维码凭证字段未识别');
+  }
+  for (let i = 0; i < 120; i++) {
+    if (i) await new Promise(res => setTimeout(res, 2000));
+    let chk;
+    try {
+      chk = await request({
+        url: `/api${$api.checkQCode}`,
+        method: 'post',
+        headers: { ...requestKey },
+        data: {
+          loginKey,
+          params: {
+            uscInfo: {
+              devciceIp: '',
+              tenant: 'state_grid',
+              member: '0902',
+              devciceId: '',
+            },
+            quInfo: {
+              optSys: 'android',
+              pushId: '000000',
+              addressProvince: '110100',
+              addressRegion: '110101',
+              addressCity: '330100',
+            },
+          },
+          Channels: 'web',
+        },
+      });
+    } catch (e) {
+      if (i % 15 === 0) log.info(`等待扫码… (${i * 2}s)`);
+      continue;
+    }
+    const b = chk.bizrt || chk;
+    if (b?.userInfo?.length > 0 && b?.token) {
+      store.set('95598_bizrt', jsonStr(b)), (Global.bizrt = b);
+      log.info('✅ 扫码登录成功');
+      return;
+    }
+    if (chk.code && String(chk.message || '').includes('失效'))
+      return Promise.reject(String(chk.message));
+  }
+  return Promise.reject('扫码超时');
+}
 async function doLogin() {
   const { code: e, ticket: o } = await getVerifyCode();
   await login(o, e);
@@ -1599,12 +1706,22 @@ async function sendMsg(e, eleBill, dayList, monthElecQuantity) {
 //     : notify(e, o, r, s);
 // }
 module.exports = (async () => {
-  if ((await showNotice(), !USERNAME || !PASSWORD)) {
-    console.error('[state-grid] 请先配置 WSGW_USERNAME / WSGW_PASSWORD');
+  if (
+    (await showNotice(),
+    !(
+      (USERNAME && PASSWORD) ||
+      (bizrt?.token && bizrt?.userInfo) ||
+      (IS_QR_LOGIN && USERNAME)
+    ))
+  ) {
+    console.error(
+      '[state-grid] 请配置 WSGW_USERNAME/WSGW_PASSWORD，或 WSGW_BIZRT/缓存，或 WSGW_LOGIN_MODE=qr'
+    );
     return;
   }
   await getKeyCode(),
-    (bizrt?.token && bizrt?.userInfo) || (await doLogin()),
+    (bizrt?.token && bizrt?.userInfo) ||
+      (IS_QR_LOGIN ? await doLoginQr() : await doLogin()),
     await getAuthcode(),
     await getAccessToken(),
     await getBindInfo();
