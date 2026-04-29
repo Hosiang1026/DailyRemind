@@ -27,6 +27,7 @@ cd /ql/data/repo/Hosiang1026_DailyRemind_master && npm install&&pip install -r p
 | `task/ql_lottery_task.js` | 福利彩票 | `35 21 * * *` | 是 |
 | `task/ql_table_task.js` | 网课提醒 | `40 7 * * 1-5` | 是 |
 | `task/ql_gold_task.js` | 金银价格 | `11 8 * * *` | 是 |
+| `task/ql_telecom_task.js` | 电信套餐 | `0 20 * * *` | 是 |
 
 
 

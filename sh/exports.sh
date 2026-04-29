@@ -40,6 +40,15 @@ export TELECOM_FLUX_PACKAGE='true'
 export TELECOM_ONLY_WARN='true'
 export TELECOM_CONFIG_JSON='db/telecom_bills.json'
 
+## 网上国网
+export WSGW_USERNAME=''
+export WSGW_PASSWORD=''
+# 多登录账号 JSON，设置后优先于上两项循环执行
+# export WSGW_ACCOUNTS='[{"username":"账号1","password":"密码1"},{"username":"账号2","password":"密码2"}]'
+export WSGW_RECENT_ELC_FEE='false'
+export WSGW_NOTIFY_ALL='false'
+# export WSGW_LOG_DEBUG='true'
+
 ## 彩票（星期 0=周日）
 # 彩票提醒总开关
 export LOTTERY_OPEN='true'
