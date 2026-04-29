@@ -108,7 +108,10 @@ def _publish_mqtt(body):
     pwd = (os.environ.get("mqtt_password") or "").strip()
     topic = (os.environ.get("mqtt_topic_telecom") or "qinglong/telecom").strip() or "qinglong/telecom"
     ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    payload = json.dumps({"content": body, "timestamp": ts}, ensure_ascii=False)
+    payload = json.dumps(
+        {"content": "📱电信套餐\n\n" + body, "timestamp": ts},
+        ensure_ascii=False,
+    )
     try:
         import paho.mqtt.publish as mqtt_publish
 

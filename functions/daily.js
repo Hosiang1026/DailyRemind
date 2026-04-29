@@ -38,9 +38,14 @@ async function sendMqttMsg(content, licenseContent) {
 	const minutes = String(now.getMinutes()).padStart(2, '0');
 	const seconds = String(now.getSeconds()).padStart(2, '0');
 	const timestamp = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+	const licenseBody = (licenseContent || '')
+		.replace(/^\s*\n*💳证件有效期\s*\n*/u, '')
+		.trim()
+	const mqttLicense =
+		licenseBody.length > 0 ? '💳证件有效期\n\n' + licenseBody : ''
 	const data = {
-		content: `\n${content}`,
-		license: licenseContent || '',
+		content: '📅节日提醒\n\n' + content,
+		license: mqttLicense,
 		timestamp: timestamp
 	};
 

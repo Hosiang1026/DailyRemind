@@ -6,6 +6,8 @@ const rainDbPath = path.join(__dirname, '..', 'db', 'weather_rain_by_month.json'
 function normalizeRainDb(db) {
     if (!db.records) db.records = {};
     if (!db.marks) db.marks = {};
+    if (!db.sunnyRecords) db.sunnyRecords = {};
+    if (!db.sunnyMarks) db.sunnyMarks = {};
     for (const city of Object.keys(db.records)) {
         for (const month of Object.keys(db.records[city])) {
             const v = db.records[city][month];
@@ -21,7 +23,7 @@ function loadRainDb() {
     try {
         if (fs.existsSync(rainDbPath)) return normalizeRainDb(JSON.parse(fs.readFileSync(rainDbPath, 'utf8')));
     } catch (e) { }
-    return { records: {}, marks: {} };
+    return { records: {}, marks: {}, sunnyRecords: {}, sunnyMarks: {} };
 }
 function saveRainDb(db) {
     const dir = path.dirname(rainDbPath);
@@ -56,6 +58,65 @@ function mutateRainRecord(db, cityName, dataStr, refDate) {
     db.marks[markKey] = 1;
     const cur = db.records[cityName][monthKey];
     db.records[cityName][monthKey] = (typeof cur === 'number' ? cur : 0) + 1;
+}
+function mutateSunnyRecord(db, cityName, dataStr, refDate) {
+    const regex = /var dataSK\s*=\s*({[\s\S]*})/;
+    const match = dataStr.match(regex);
+    if (!match || !match[1]) return;
+    let data;
+    try { data = JSON.parse(match[1]); } catch (e) { return; }
+    const w = data.weather || '';
+    if (w.indexOf('雨') !== -1) return;
+    if (w.indexOf('晴') === -1) return;
+    const dateStr = (data.date || '').replace(/\(星期[一二三四五六日]\)/, '');
+    let y = refDate.getFullYear(), mo, d;
+    const m = dateStr.match(/(\d+)月(\d+)日/);
+    if (m) {
+        mo = parseInt(m[1], 10);
+        d = parseInt(m[2], 10);
+    } else {
+        mo = refDate.getMonth() + 1;
+        d = refDate.getDate();
+    }
+    const pad = (n) => String(n).padStart(2, '0');
+    const dayKey = `${y}-${pad(mo)}-${pad(d)}`;
+    const monthKey = `${y}-${pad(mo)}`;
+    const markKey = cityName + '\t' + dayKey;
+    if (!db.sunnyMarks) db.sunnyMarks = {};
+    if (!db.sunnyRecords[cityName]) db.sunnyRecords[cityName] = {};
+    if (db.sunnyMarks[markKey]) return;
+    db.sunnyMarks[markKey] = 1;
+    const cur = db.sunnyRecords[cityName][monthKey];
+    db.sunnyRecords[cityName][monthKey] = (typeof cur === 'number' ? cur : 0) + 1;
+}
+function formatRainSunMonthlyStats(db, cityList, refDate) {
+    const y = refDate.getFullYear();
+    const padM = (n) => String(n).padStart(2, '0');
+    const maxMonthKey = `${y}-${padM(refDate.getMonth() + 1)}`;
+    const prefix = `${y}-`;
+    const names = [];
+    for (const c of cityList) {
+        if (!names.includes(c.city_name)) names.push(c.city_name);
+    }
+    const lines = [`\n📊各月雨天/晴天（${y}年1月起）`];
+    for (const cityName of names) {
+        const rM = db.records[cityName] || {};
+        const sM = db.sunnyRecords[cityName] || {};
+        const months = new Set([...Object.keys(rM), ...Object.keys(sM)]);
+        const sorted = [...months]
+            .filter((mk) => mk.startsWith(prefix) && mk >= `${y}-01` && mk <= maxMonthKey)
+            .sort();
+        if (sorted.length === 0) {
+            lines.push(`${cityName}: （暂无）`);
+            continue;
+        }
+        for (const mk of sorted) {
+            const r = typeof rM[mk] === 'number' ? rM[mk] : 0;
+            const s = typeof sM[mk] === 'number' ? sM[mk] : 0;
+            lines.push(`${cityName} ${mk}: 雨${r}天 晴${s}天`);
+        }
+    }
+    return lines.join('\n');
 }
 
 //台风列表 https://d1.weather.com.cn/typhoon/typhoon_list/list_2024.json?callback=getData&_=1722388563506
@@ -384,7 +445,10 @@ module.exports = handleWeather = (opts = {}) => {
             const dataStr = await syncDataWithRetry(url, headers);
             if (dataStr != null) {
                 dataList.push(dataStr);
-                if (rainDb) mutateRainRecord(rainDb, city.city_name, dataStr, now);
+                if (rainDb) {
+                    mutateRainRecord(rainDb, city.city_name, dataStr, now);
+                    mutateSunnyRecord(rainDb, city.city_name, dataStr, now);
+                }
             var dataSK = extractDataSK(dataStr);
             if (dataSK != null) {
                 mergedAllContent.push('\n🚩'+ city.city_name);
@@ -435,7 +499,9 @@ module.exports = handleWeather = (opts = {}) => {
         mergedAllContent.join('\n\n');
         console.log('获取天气预报成功数据：', mergedAllContent);
         if (rainDb) saveRainDb(rainDb);
-        resolve(mergedAllContent.join('\n'))
+        let body = mergedAllContent.join('\n');
+        if (opts.recordMonthlyRain && rainDb) body += formatRainSunMonthlyStats(rainDb, cities, now);
+        resolve(body)
 
     } catch (error) {
         console.log('处理天气预报数据失败', error.message || error);

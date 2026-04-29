@@ -26,7 +26,7 @@ const handleWeatherContent = () => {
       // 天气模块
       if (weather.open) {
         const handleWeather = require('./functions/weather')
-        const weatherContent = await handleWeather()
+        const weatherContent = await handleWeather({ recordMonthlyRain: true })
         if ('' != weatherContent) {
           content.push(`\n\n${weatherContent}`)
         }
