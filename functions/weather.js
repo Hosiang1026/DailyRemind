@@ -8,6 +8,10 @@ function normalizeRainDb(db) {
     if (!db.marks) db.marks = {};
     if (!db.sunnyRecords) db.sunnyRecords = {};
     if (!db.sunnyMarks) db.sunnyMarks = {};
+    if (!db.hotRecords) db.hotRecords = {};
+    if (!db.hotMarks) db.hotMarks = {};
+    if (!db.coldRecords) db.coldRecords = {};
+    if (!db.coldMarks) db.coldMarks = {};
     for (const city of Object.keys(db.records)) {
         for (const month of Object.keys(db.records[city])) {
             const v = db.records[city][month];
@@ -23,7 +27,30 @@ function loadRainDb() {
     try {
         if (fs.existsSync(rainDbPath)) return normalizeRainDb(JSON.parse(fs.readFileSync(rainDbPath, 'utf8')));
     } catch (e) { }
-    return { records: {}, marks: {}, sunnyRecords: {}, sunnyMarks: {} };
+    return { records: {}, marks: {}, sunnyRecords: {}, sunnyMarks: {}, hotRecords: {}, hotMarks: {}, coldRecords: {}, coldMarks: {} };
+}
+function parseSkDayContext(dataStr, refDate) {
+    const regex = /var dataSK\s*=\s*({[\s\S]*})/;
+    const match = dataStr.match(regex);
+    if (!match || !match[1]) return null;
+    let data;
+    try { data = JSON.parse(match[1]); } catch (e) { return null; }
+    const dateStr = (data.date || '').replace(/\(星期[一二三四五六日]\)/, '');
+    let y = refDate.getFullYear(), mo, d;
+    const m = dateStr.match(/(\d+)月(\d+)日/);
+    if (m) {
+        mo = parseInt(m[1], 10);
+        d = parseInt(m[2], 10);
+    } else {
+        mo = refDate.getMonth() + 1;
+        d = refDate.getDate();
+    }
+    const pad = (n) => String(n).padStart(2, '0');
+    const dayKey = `${y}-${pad(mo)}-${pad(d)}`;
+    const monthKey = `${y}-${pad(mo)}`;
+    const tempRaw = data.temp;
+    const temp = tempRaw === undefined || tempRaw === null || tempRaw === '' ? NaN : parseFloat(String(tempRaw).replace(/[^\d.-]/g, ''));
+    return { data, dayKey, monthKey, temp };
 }
 function saveRainDb(db) {
     const dir = path.dirname(rainDbPath);
@@ -31,63 +58,53 @@ function saveRainDb(db) {
     fs.writeFileSync(rainDbPath, JSON.stringify(db, null, 2), 'utf8');
 }
 function mutateRainRecord(db, cityName, dataStr, refDate) {
-    const regex = /var dataSK\s*=\s*({[\s\S]*})/;
-    const match = dataStr.match(regex);
-    if (!match || !match[1]) return;
-    let data;
-    try { data = JSON.parse(match[1]); } catch (e) { return; }
-    const w = data.weather || '';
+    const ctx = parseSkDayContext(dataStr, refDate);
+    if (!ctx) return;
+    const w = ctx.data.weather || '';
     if (w.indexOf('雨') === -1) return;
-    const dateStr = (data.date || '').replace(/\(星期[一二三四五六日]\)/, '');
-    let y = refDate.getFullYear(), mo, d;
-    const m = dateStr.match(/(\d+)月(\d+)日/);
-    if (m) {
-        mo = parseInt(m[1], 10);
-        d = parseInt(m[2], 10);
-    } else {
-        mo = refDate.getMonth() + 1;
-        d = refDate.getDate();
-    }
-    const pad = (n) => String(n).padStart(2, '0');
-    const dayKey = `${y}-${pad(mo)}-${pad(d)}`;
-    const monthKey = `${y}-${pad(mo)}`;
-    const markKey = cityName + '\t' + dayKey;
+    const markKey = cityName + '\t' + ctx.dayKey;
     if (!db.marks) db.marks = {};
     if (!db.records[cityName]) db.records[cityName] = {};
     if (db.marks[markKey]) return;
     db.marks[markKey] = 1;
-    const cur = db.records[cityName][monthKey];
-    db.records[cityName][monthKey] = (typeof cur === 'number' ? cur : 0) + 1;
+    const cur = db.records[cityName][ctx.monthKey];
+    db.records[cityName][ctx.monthKey] = (typeof cur === 'number' ? cur : 0) + 1;
 }
 function mutateSunnyRecord(db, cityName, dataStr, refDate) {
-    const regex = /var dataSK\s*=\s*({[\s\S]*})/;
-    const match = dataStr.match(regex);
-    if (!match || !match[1]) return;
-    let data;
-    try { data = JSON.parse(match[1]); } catch (e) { return; }
-    const w = data.weather || '';
+    const ctx = parseSkDayContext(dataStr, refDate);
+    if (!ctx) return;
+    const w = ctx.data.weather || '';
     if (w.indexOf('雨') !== -1) return;
     if (w.indexOf('晴') === -1) return;
-    const dateStr = (data.date || '').replace(/\(星期[一二三四五六日]\)/, '');
-    let y = refDate.getFullYear(), mo, d;
-    const m = dateStr.match(/(\d+)月(\d+)日/);
-    if (m) {
-        mo = parseInt(m[1], 10);
-        d = parseInt(m[2], 10);
-    } else {
-        mo = refDate.getMonth() + 1;
-        d = refDate.getDate();
-    }
-    const pad = (n) => String(n).padStart(2, '0');
-    const dayKey = `${y}-${pad(mo)}-${pad(d)}`;
-    const monthKey = `${y}-${pad(mo)}`;
-    const markKey = cityName + '\t' + dayKey;
+    const markKey = cityName + '\t' + ctx.dayKey;
     if (!db.sunnyMarks) db.sunnyMarks = {};
     if (!db.sunnyRecords[cityName]) db.sunnyRecords[cityName] = {};
     if (db.sunnyMarks[markKey]) return;
     db.sunnyMarks[markKey] = 1;
-    const cur = db.sunnyRecords[cityName][monthKey];
-    db.sunnyRecords[cityName][monthKey] = (typeof cur === 'number' ? cur : 0) + 1;
+    const cur = db.sunnyRecords[cityName][ctx.monthKey];
+    db.sunnyRecords[cityName][ctx.monthKey] = (typeof cur === 'number' ? cur : 0) + 1;
+}
+function mutateHotRecord(db, cityName, dataStr, refDate) {
+    const ctx = parseSkDayContext(dataStr, refDate);
+    if (!ctx || Number.isNaN(ctx.temp) || ctx.temp <= 30) return;
+    const markKey = cityName + '\t' + ctx.dayKey;
+    if (!db.hotMarks) db.hotMarks = {};
+    if (!db.hotRecords[cityName]) db.hotRecords[cityName] = {};
+    if (db.hotMarks[markKey]) return;
+    db.hotMarks[markKey] = 1;
+    const cur = db.hotRecords[cityName][ctx.monthKey];
+    db.hotRecords[cityName][ctx.monthKey] = (typeof cur === 'number' ? cur : 0) + 1;
+}
+function mutateColdRecord(db, cityName, dataStr, refDate) {
+    const ctx = parseSkDayContext(dataStr, refDate);
+    if (!ctx || Number.isNaN(ctx.temp) || ctx.temp >= 10) return;
+    const markKey = cityName + '\t' + ctx.dayKey;
+    if (!db.coldMarks) db.coldMarks = {};
+    if (!db.coldRecords[cityName]) db.coldRecords[cityName] = {};
+    if (db.coldMarks[markKey]) return;
+    db.coldMarks[markKey] = 1;
+    const cur = db.coldRecords[cityName][ctx.monthKey];
+    db.coldRecords[cityName][ctx.monthKey] = (typeof cur === 'number' ? cur : 0) + 1;
 }
 function formatRainSunMonthlyStats(db, cityList, refDate) {
     const y = refDate.getFullYear();
@@ -98,22 +115,29 @@ function formatRainSunMonthlyStats(db, cityList, refDate) {
     for (const c of cityList) {
         if (!names.includes(c.city_name)) names.push(c.city_name);
     }
-    const lines = [`\n📊各月雨天/晴天（${y}年1月起）`];
-    for (const cityName of names) {
+    const lines = [`\n\n📊天气统计信息`, ''];
+    for (let i = 0; i < names.length; i++) {
+        const cityName = names[i];
         const rM = db.records[cityName] || {};
         const sM = db.sunnyRecords[cityName] || {};
-        const months = new Set([...Object.keys(rM), ...Object.keys(sM)]);
+        const hM = db.hotRecords[cityName] || {};
+        const cM = db.coldRecords[cityName] || {};
+        const months = new Set([...Object.keys(rM), ...Object.keys(sM), ...Object.keys(hM), ...Object.keys(cM)]);
         const sorted = [...months]
             .filter((mk) => mk.startsWith(prefix) && mk >= `${y}-01` && mk <= maxMonthKey)
             .sort();
+        if (i > 0) lines.push('');
         if (sorted.length === 0) {
-            lines.push(`${cityName}: （暂无）`);
+            lines.push(`🚩${cityName}: （暂无）`);
             continue;
         }
+        lines.push(`🚩${cityName} `);
         for (const mk of sorted) {
             const r = typeof rM[mk] === 'number' ? rM[mk] : 0;
             const s = typeof sM[mk] === 'number' ? sM[mk] : 0;
-            lines.push(`${cityName} ${mk}: 雨${r}天 晴${s}天`);
+            const h = typeof hM[mk] === 'number' ? hM[mk] : 0;
+            const c = typeof cM[mk] === 'number' ? cM[mk] : 0;
+            lines.push(`${mk}: 雨${r}天 晴${s}天 高温${h}天 低温${c}天`);
         }
     }
     return lines.join('\n');
@@ -448,6 +472,8 @@ module.exports = handleWeather = (opts = {}) => {
                 if (rainDb) {
                     mutateRainRecord(rainDb, city.city_name, dataStr, now);
                     mutateSunnyRecord(rainDb, city.city_name, dataStr, now);
+                    mutateHotRecord(rainDb, city.city_name, dataStr, now);
+                    mutateColdRecord(rainDb, city.city_name, dataStr, now);
                 }
             var dataSK = extractDataSK(dataStr);
             if (dataSK != null) {
