@@ -1,4 +1,3 @@
-require('./functions/ensureNodeDeps')()
 const axios = require('axios')
 axios.defaults.timeout = 40 * 1000
 
