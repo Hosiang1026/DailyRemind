@@ -1,8 +1,6 @@
 require('dotenv').config({ path: require('path').join(__dirname, '../.env') })
-const path = require('path')
 
 function parseAccounts() {
-  const qr = String(process.env.WSGW_LOGIN_MODE || '').toLowerCase() === 'qr'
   const raw = process.env.WSGW_ACCOUNTS
   if (raw && String(raw).trim()) {
     try {
@@ -15,14 +13,14 @@ function parseAccounts() {
             cookie: String(x.cookie || x.ck || '').trim(),
             bizrt: x.bizrt,
           }))
-          .filter((x) => x.username && (x.password || x.bizrt || qr))
+          .filter((x) => x.username && (x.password || x.bizrt))
       }
     } catch (_) {}
   }
   const u = String(process.env.WSGW_USERNAME || '').trim()
   const p = String(process.env.WSGW_PASSWORD || '').trim()
   const envBiz = String(process.env.WSGW_BIZRT || '').trim()
-  if (u && (p || envBiz || qr))
+  if (u && (p || envBiz))
     return [
       {
         username: u,
@@ -37,12 +35,8 @@ function parseAccounts() {
 async function runAll() {
   const accounts = parseAccounts()
   if (!accounts.length) {
-    const qr = String(process.env.WSGW_LOGIN_MODE || '').toLowerCase() === 'qr'
-    const u = String(process.env.WSGW_USERNAME || '').trim()
     console.error(
-      qr && !u
-        ? '[state-grid] WSGW_LOGIN_MODE=qr 时 WSGW_USERNAME 不能为空（缓存分区用）'
-        : '[state-grid] 需配置账号密码、或 WSGW_LOGIN_MODE=qr+WSGW_USERNAME、或 WSGW_BIZRT/WSGW_ACCOUNTS.bizrt'
+      '[state-grid] 需配置 WSGW_USERNAME+WSGW_PASSWORD，或 WSGW_BIZRT/WSGW_ACCOUNTS 含 bizrt'
     )
     process.exit(1)
   }
