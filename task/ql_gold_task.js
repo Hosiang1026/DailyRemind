@@ -77,11 +77,6 @@ function getGold() {
       domestic_content += '· 白银：' + domestic_silver + '元/克\n'
       domestic_content += '· 黄金：' + domestic_gold + '元/克\n'
       const lowGold = writeGoldDomesticLow(domestic_gold)
-      if (lowGold) {
-        domestic_content += '\n🎯最低国内金价\n'
-        domestic_content += '· ' + lowGold.low + '元/克\n'
-        domestic_content += '· 更新时间: ' + lowGold.date + '\n'
-      }
       domestic_content += '\n'
 
       const international_silver = $h('tr.bg#jiage3')
@@ -127,7 +122,13 @@ function getGold() {
       conver_content += '· 50克价格：' + Math.round(parseFloat(domestic_gold) * 50 * 100) / 100 + '元\n'
       conver_content += '· 金衡盎司：' + '1盎司 = 31.1035克\n'
 
-      _content += domestic_content + international_content + store_content + conver_content
+      let low_content = ''
+      if (lowGold) {
+        low_content += '\n🎯最低国内价格\n'
+        low_content += '· 黄金：' + lowGold.low + '元/克\n'
+        low_content += '· 更新时间: ' + lowGold.date + '\n'
+      }
+      _content += domestic_content + international_content + store_content + low_content + conver_content
       resolve(_content)
     } catch (e) {
       resolve(e)

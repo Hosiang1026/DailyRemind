@@ -7,6 +7,7 @@ import sys
 import json
 import calendar
 import datetime
+import urllib.request
 
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if _SCRIPT_DIR not in sys.path:
@@ -126,6 +127,67 @@ def _publish_mqtt(body):
         print("mqtt:", ex)
 
 
+def _env_bool_true(name):
+    v = os.environ.get(name)
+    if v is None:
+        return False
+    return str(v).strip().lower() in ("true", "1")
+
+
+def _default_notify_author():
+    try:
+        pkg_path = os.path.join(_ROOT, "package.json")
+        with open(pkg_path, "r", encoding="utf-8") as f:
+            pkg = json.load(f)
+        repo = pkg.get("repository") or {}
+        u = str(repo.get("url") or "")
+        u = re.sub(r"^git\+", "", u)
+        u = re.sub(r"\.git\s*$", "", u, flags=re.I).strip()
+        if u:
+            return "\n\n本通知 By " + u
+    except Exception:
+        pass
+    return "\n\n本通知 By DailyRemind"
+
+
+def _append_task_notify_footer(body):
+    text = (body or "").strip()
+    if _env_bool_true("SENTENCE_OPEN"):
+        try:
+            req = urllib.request.Request(
+                "https://api.shadiao.pro/chp",
+                headers={"User-Agent": "Mozilla/5.0"},
+            )
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                j = json.loads(resp.read().decode("utf-8"))
+            chp = (j.get("data") or {}).get("text")
+            if chp:
+                text = text + "\n\n💘" + str(chp)
+        except Exception:
+            pass
+    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    if _env_bool_true("END_OPEN"):
+        c = (os.environ.get("END_CONTENT") or "").strip()
+        tp = str(os.environ.get("END_TIME") or "通知时间: ")
+        tail = ""
+        if c:
+            tail += "\n\n" + c
+        tail += "\n" + tp + now
+        return text + tail
+    if os.environ.get("NOTIFY_AUTHOR_BLANK"):
+        return text
+    author = os.environ.get("NOTIFY_AUTHOR")
+    if author is None or not str(author).strip():
+        author = _default_notify_author()
+    else:
+        author = str(author).strip()
+        if "本通知 By" not in author:
+            author = "\n\n本通知 By " + author
+    if not author:
+        return text
+    return text + author + "\n通知时间: " + now
+
+
 def send_notify(title, body, push_config_extra=None):
     try:
         import notify
@@ -133,7 +195,7 @@ def send_notify(title, body, push_config_extra=None):
         if push_config_extra:
             notify.push_config.update(push_config_extra)
             notify.push_config["CONSOLE"] = notify.push_config.get("CONSOLE", True)
-        notify.send(title, body)
+        notify.send(title, _append_task_notify_footer(body))
     except Exception:
         print("发送通知消息失败！")
 
