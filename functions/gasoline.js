@@ -386,10 +386,7 @@ module.exports = handleGasoline = async () => {
                     if (result.province_name == province.province_name) {
                         const sc = scrapedByProvince[result.province_name] || {};
                         content.push(`\n🚘${result.province_name}\n`);
-                        content.push(`· 92号汽油: ${mix(result.oilPrice_92, sc.oilPrice_92)}`);
                         content.push(`· 95号汽油: ${mix(result.oilPrice_95, sc.oilPrice_95)}`);
-                        content.push(`· 98号汽油: ${mix(result.oilPrice_98, sc.oilPrice_98)}`);
-                        content.push(`· 0号柴油: ${mix(result.oilPrice_0, sc.oilPrice_0)}`);
                         content.push(`· 更新时间: ${result.update_date}`);
                     }
                 });

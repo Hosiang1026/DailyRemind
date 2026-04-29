@@ -7,11 +7,43 @@ require('dotenv').config()
 const axios = require('axios')
 const cheerio = require('cheerio')
 const iconv = require('iconv-lite')
+const fs = require('fs')
+const path = require('path')
 const qlCheckUpdate = require('../utils/qlCheckUpdate')
 
 axios.defaults.timeout = 40 * 1000
 
-const SCRIPT_VERSION = 1.1
+const SCRIPT_VERSION = 1.2
+const goldDataPath = path.join(__dirname, '..', 'db', 'gold.json')
+
+function writeGoldDomesticLow(domesticGoldStr) {
+  const num = parseFloat(String(domesticGoldStr ?? '').replace(/[^\d.-]/g, '').trim())
+  if (!Number.isFinite(num) || num <= 0) return null
+  const now = new Date()
+  const updateDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+  let storedLow = NaN
+  let storedDate = ''
+  if (fs.existsSync(goldDataPath)) {
+    try {
+      const j = JSON.parse(fs.readFileSync(goldDataPath, 'utf8'))
+      storedLow = Number(j.domestic_gold_low)
+      storedDate = String(j.update_date || '')
+    } catch (_) {}
+  } else {
+    fs.mkdirSync(path.dirname(goldDataPath), { recursive: true })
+  }
+  let low = Number.isFinite(storedLow) && storedLow > 0 ? storedLow : num
+  let date = Number.isFinite(storedLow) && storedLow > 0 ? storedDate : updateDate
+  if (!Number.isFinite(storedLow) || storedLow <= 0 || num < storedLow) {
+    low = num
+    date = updateDate
+    fs.writeFileSync(
+      goldDataPath,
+      JSON.stringify({ domestic_gold_low: low, update_date: date }, null, 2)
+    )
+  }
+  return { low, date }
+}
 
 const $ = new Env('金银价格')
 let notify
@@ -43,7 +75,14 @@ function getGold() {
         .text()
         .trim()
       domestic_content += '· 白银：' + domestic_silver + '元/克\n'
-      domestic_content += '· 黄金：' + domestic_gold + '元/克\n\n'
+      domestic_content += '· 黄金：' + domestic_gold + '元/克\n'
+      const lowGold = writeGoldDomesticLow(domestic_gold)
+      if (lowGold) {
+        domestic_content += '\n🎯最低国内金价\n'
+        domestic_content += '· ' + lowGold.low + '元/克\n'
+        domestic_content += '· 更新时间: ' + lowGold.date + '\n'
+      }
+      domestic_content += '\n'
 
       const international_silver = $h('tr.bg#jiage3')
         .find('td')

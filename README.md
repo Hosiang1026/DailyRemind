@@ -9,7 +9,7 @@ ql repo https://github.com/Hosiang1026/DailyRemind.git "task/" "app.js|ql_table_
 #### 安装依赖
 
 ```
-cd /ql/data/repo/Hosiang1026_DailyRemind_master && npm install
+cd /ql/data/repo/Hosiang1026_DailyRemind_master && npm install&&pip install -r py/requirements.txt
 ```
 
 注： 配置文件，参考/sh/exports.sh
