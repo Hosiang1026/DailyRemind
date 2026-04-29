@@ -7,7 +7,7 @@ cron "35 21 * * *" ql_lottery_task.js, tag=福利彩票
 require('../../../functions/ensureNodeDeps')()
 require('../../../functions/qlTaskEnv').assertInputExports('ql_lottery_task.js')
 const axios = require('axios')
-const qlCheckUpdate = require('../utils/qlCheckUpdate')
+const qlCheckUpdate = require('../../../utils/qlCheckUpdate')
 axios.defaults.timeout = 40 * 1000
 
 const SCRIPT_VERSION = 1.0
@@ -64,7 +64,7 @@ const handleLotteryContent = () => {
 function requireConfig() {
   return new Promise(resolve => {
     console.log('开始获取配置文件\n')
-    notify = $.isNode() ? require('../../../sendNotify') : '';
+    notify = $.isNode() ? require('../../../utils/sendNotify') : '';
     resolve()
   })
 }

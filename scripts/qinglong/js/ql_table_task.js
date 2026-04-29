@@ -7,7 +7,7 @@ cron "40 7 * * 1-5" ql_table_task.js, tag=网课提醒
 require('../../../functions/ensureNodeDeps')()
 require('../../../functions/qlTaskEnv').assertInputExports('ql_table_task.js')
 const axios = require('axios')
-const qlCheckUpdate = require('../utils/qlCheckUpdate')
+const qlCheckUpdate = require('../../../utils/qlCheckUpdate')
 axios.defaults.timeout = 40 * 1000
 
 const SCRIPT_VERSION = 1.0
@@ -61,7 +61,7 @@ const handleWeatherContent = () => {
 function requireConfig() {
   return new Promise(resolve => {
     console.log('开始获取配置文件\n')
-    notify = $.isNode() ? require('../../../sendNotify') : '';
+    notify = $.isNode() ? require('../../../utils/sendNotify') : '';
     resolve()
   })
 }

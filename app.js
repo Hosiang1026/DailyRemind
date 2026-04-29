@@ -188,7 +188,7 @@ const scheduleCronstyle = ()=>{
 module.exports = weatherPush = async (ctx) => {
   try {
     const content = await handleWeatherContent()
-    const handleRobotPush = require('./scripts/qinglong/utils/robotPush')
+    const handleRobotPush = require('./utils/robotPush')
     const res = await handleRobotPush(content)
     return JSON.stringify({ success: true, data: res });
   } catch (error) {
@@ -206,7 +206,7 @@ schedule.scheduleJob('0 10 7 ? * MON-FRI',  async () => {
 module.exports = newsPush = async (ctx) => {
   try {
     const content = await handleNewsContent()
-    const handleRobotPush = require('./scripts/qinglong/utils/robotPush')
+    const handleRobotPush = require('./utils/robotPush')
     const res = await handleRobotPush(content)
     return JSON.stringify({ success: true, data: res });
   } catch (error) {
@@ -224,7 +224,7 @@ schedule.scheduleJob('0 20 10 ? * SAT,SUN',  async () => {
 module.exports = gasolinePush = async (ctx) => {
   try {
     const content = await handleGasolineContent()
-    const robot = require('./scripts/qinglong/utils/robotPush')
+    const robot = require('./utils/robotPush')
     const res = await robot(content)
     return JSON.stringify({ success: true, data: res });
   } catch (error) {

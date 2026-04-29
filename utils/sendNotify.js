@@ -148,7 +148,7 @@ const fs = require('fs');
 const path = require('path');
 function getDefaultNotifyAuthor() {
     try {
-        const pkg = require(path.join(__dirname, 'package.json'));
+        const pkg = require(path.join(__dirname, '..', 'package.json'));
         let u = (pkg.repository && pkg.repository.url) || '';
         u = String(u).replace(/^git\+/, '').replace(/\.git\s*$/i, '').trim();
         if (u) return '\n\n本通知 By ' + u;

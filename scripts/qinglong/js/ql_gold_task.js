@@ -7,7 +7,7 @@ require('../../../functions/ensureNodeDeps')()
 const axios = require('axios')
 const cheerio = require('cheerio')
 const iconv = require('iconv-lite')
-const qlCheckUpdate = require('../utils/qlCheckUpdate')
+const qlCheckUpdate = require('../../../utils/qlCheckUpdate')
 
 axios.defaults.timeout = 40 * 1000
 
@@ -119,7 +119,7 @@ function getGold() {
 
 function requireConfig() {
   return new Promise((resolve) => {
-    notify = $.isNode() ? require('../../../sendNotify') : ''
+    notify = $.isNode() ? require('../../../utils/sendNotify') : ''
     resolve()
   })
 }
