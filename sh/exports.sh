@@ -33,6 +33,13 @@ export ROBOT_PUSH='false'
 # 企业微信机器人 Webhook Key
 export ROBOT_KEY='07f4c380'
 
+## 电信套餐
+export TELECOM_USER='13800138000你的密码'
+# export TELECOM_USERS='13800138000pwd1;13900139000pwd2'
+export TELECOM_FLUX_PACKAGE='true'
+export TELECOM_ONLY_WARN='true'
+export TELECOM_CONFIG_JSON='db/telecom_bills.json'
+
 ## 彩票（星期 0=周日）
 # 彩票提醒总开关
 export LOTTERY_OPEN='true'
