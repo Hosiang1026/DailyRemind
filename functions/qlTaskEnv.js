@@ -17,7 +17,6 @@ const INPUT_EXPORT_KEYS = [
     'WEATHER_BASE_DATA',
     'WEATHER_ALL_DATA',
     'WEATHER_CLOTHES',
-    'CITIES',
     'DAILY_OPEN',
     'DAILY_MARRIAGE',
     'DAILY_ANNIVERSARY',
@@ -45,8 +44,9 @@ function isPresent(name) {
     return v !== undefined && v !== null;
 }
 
-function assertInputExports(taskFile) {
-    const missing = INPUT_EXPORT_KEYS.filter((k) => !isPresent(k));
+function assertInputExports(taskFile, extraKeys = []) {
+    const keys = INPUT_EXPORT_KEYS.concat(extraKeys);
+    const missing = keys.filter((k) => !isPresent(k));
     if (missing.length === 0) return;
     const msg =
         `[${taskFile}] 未配置 export: ${missing.join(', ')}，请 source 仓库 scripts/qinglong/sh/exports.sh 或在青龙环境变量中配置`;

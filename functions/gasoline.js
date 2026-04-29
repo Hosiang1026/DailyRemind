@@ -1,10 +1,10 @@
 const { gasoline } = require('../scripts/qinglong/sh/input')
 const axios = require('axios');
 const cheerio = require('cheerio');
-var calendar = require("../utils/calendar");
+var calendar = require('../scripts/qinglong/utils/calendar')
 const fs = require('fs');
 const path = require('path');
-const dataFilePath = path.join(__dirname, '..', 'db', 'gasoline.json');
+const dataFilePath = path.join(__dirname, '..', 'scripts', 'qinglong', 'db', 'gasoline.json');
 
 require("dotenv").config();
 

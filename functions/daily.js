@@ -1,7 +1,7 @@
 const { daily } = require('../scripts/qinglong/sh/input')
-var calendar = require("../utils/calendar");
+var calendar = require('../scripts/qinglong/utils/calendar')
 //const axios = require('axios')
-//var calendarplus = require("../utils/calendarplus");
+//var calendarplus = require("../scripts/qinglong/utils/calendarplus");
 
 require("dotenv").config();
 

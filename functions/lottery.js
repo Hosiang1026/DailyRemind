@@ -2,7 +2,7 @@ const { lottery } = require('../scripts/qinglong/sh/input')
 const axios = require("axios");
 const fs = require('fs');
 const path = require('path');
-const dataFilePath = path.join(__dirname, '..', 'db', 'lottery.json');
+const dataFilePath = path.join(__dirname, '..', 'scripts', 'qinglong', 'db', 'lottery.json');
 
 require("dotenv").config();
 

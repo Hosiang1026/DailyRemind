@@ -5,9 +5,9 @@ cron "5 7 * * *" ql_weather_task.js, tag=实况天气
 */
 
 require('../../../functions/ensureNodeDeps')()
-require('../../../functions/qlTaskEnv').assertInputExports('ql_weather_task.js')
+require('../../../functions/qlTaskEnv').assertInputExports('ql_weather_task.js', ['CITIES'])
 const axios = require('axios')
-const qlCheckUpdate = require('../../../utils/qlCheckUpdate')
+const qlCheckUpdate = require('../utils/qlCheckUpdate')
 axios.defaults.timeout = 40 * 1000
 
 const SCRIPT_VERSION = 1.0
