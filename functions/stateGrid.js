@@ -8,7 +8,7 @@ function parseAccounts() {
     try {
       const j = JSON.parse(raw)
       if (Array.isArray(j) && j.length) {
-        return j
+        const rows = j
           .map((x) => ({
             username: String(x.username || x.user || x.account || '').trim(),
             password: String(x.password || x.pass || '').trim(),
@@ -16,6 +16,7 @@ function parseAccounts() {
             bizrt: x.bizrt,
           }))
           .filter((x) => x.username && (x.password || x.bizrt || qr))
+        if (rows.length) return rows
       }
     } catch (_) {}
   }
