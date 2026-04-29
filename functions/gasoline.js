@@ -1,4 +1,4 @@
-const { gasoline } = require('./input')
+const { gasoline } = require('../scripts/qinglong/sh/input')
 const axios = require('axios');
 const cheerio = require('cheerio');
 var calendar = require("./calendar");

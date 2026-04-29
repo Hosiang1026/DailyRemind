@@ -20,7 +20,7 @@ const handleWeatherContent = () => {
   return new Promise(async (resolve, reject) => {
     try {
       let content = []
-      const { weather} = require('../../../functions/input')
+      const { weather} = require('../sh/input')
 
       //根据不同的配置，增加不同的内容
       // 天气模块

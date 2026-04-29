@@ -19,7 +19,7 @@ const handleGasolineContent = () => {
   return new Promise(async (resolve, reject) => {
     try {
       let content = []
-      const { gasoline } = require('../../../functions/input')
+      const { gasoline } = require('../sh/input')
 
       if (gasoline.open) {
         const handleGasoline = require('../../../functions/gasoline')

@@ -20,7 +20,7 @@ const handleWeatherContent = () => {
   return new Promise(async (resolve, reject) => {
     try {
       let content = []
-      const { classTable} = require('../../../functions/input')
+      const { classTable} = require('../sh/input')
 
       //课表模块
       if (classTable.open) {

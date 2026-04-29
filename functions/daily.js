@@ -1,4 +1,4 @@
-const { daily } = require('./input')
+const { daily } = require('../scripts/qinglong/sh/input')
 var calendar = require("./calendar");
 //const axios = require('axios')
 //var calendarplus = require("./calendarplus");

@@ -20,7 +20,7 @@ const handleLotteryContent = () => {
   return new Promise(async (resolve, reject) => {
     try {
       let content = []
-      const { lottery} = require('../../../functions/input')
+      const { lottery} = require('../sh/input')
 
       //根据不同的配置，增加不同的内容
       //福利彩票模块

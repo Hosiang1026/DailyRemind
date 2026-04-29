@@ -20,7 +20,7 @@ const handleDailyContent = () => {
   return new Promise(async (resolve, reject) => {
     try {
       let content = []
-      const {sentence, daily} = require('../../../functions/input')
+      const {sentence, daily} = require('../sh/input')
 
       //根据不同的配置，增加不同的内容
 

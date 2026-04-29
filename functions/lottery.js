@@ -1,4 +1,4 @@
-const { lottery } = require('./input')
+const { lottery } = require('../scripts/qinglong/sh/input')
 const axios = require("axios");
 const fs = require('fs');
 const path = require('path');

@@ -7,7 +7,7 @@ const handleWeatherContent = () => {
   return new Promise(async (resolve, reject) => {
     try {
       let content = []
-      const { start, weather, classTable, lottery, end} = require('./functions/input')
+      const { start, weather, classTable, lottery, end} = require('./scripts/qinglong/sh/input')
 
       //根据不同的配置，增加不同的内容
       //开头语模块
@@ -76,7 +76,7 @@ const handleNewsContent = () => {
   return new Promise(async (resolve, reject) => {
     try {
       let content = []
-      const { start, news, sentence, daily, end} = require('./functions/input')
+      const { start, news, sentence, daily, end} = require('./scripts/qinglong/sh/input')
 
       //根据不同的配置，增加不同的内容
       //开头语模块
@@ -132,7 +132,7 @@ const handleGasolineContent = () => {
   return new Promise(async (resolve, reject) => {
     try {
       let content = []
-      const { start, gasoline, end } = require('./functions/input')
+      const { start, gasoline, end } = require('./scripts/qinglong/sh/input')
 
       //根据不同的配置，增加不同的内容
       //开头语模块
