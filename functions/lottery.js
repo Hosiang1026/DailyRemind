@@ -133,14 +133,14 @@ function writeLotteryCode(ssqCode, ssqRed, ssqBlue, ssqDate, lotteryContent, now
 			if(showSsqPredict && data.lottery.length > 0 && data.predict.length > 0){
 				const lastPrediction = data.predict[data.predict.length - 1];
 				const winnings = calculateWinnings(data.lottery, data.predict);
-				lotteryContent.push(`\n🎯本期预测双色球开奖\n`);
+				lotteryContent.push(`\n🎯本期预测开奖\n`);
 				winnings.forEach(result => {
+					lotteryContent.push(`· 匹配红球数: ${result.matchedRedBalls}`);
+					lotteryContent.push(`· 是否匹配蓝球: ${result.matchedBlueBall ? '是' : '否'}`);
 					lotteryContent.push(`· 中奖情况: ${result.matchedPrize}`);
 					lotteryContent.push(`· 中奖金额: ${result.matchedAmount}`);
-					lotteryContent.push(`· 匹配红球数: ${result.matchedRedBalls}`);
-					lotteryContent.push(`· 是否匹配蓝球: ${result.matchedBlueBall}`);
-					lotteryContent.push(`· 预测红球号码: ` + lastPrediction.ssq_red);
 					lotteryContent.push(`· 预测蓝球号码: ` + lastPrediction.ssq_blue);
+					lotteryContent.push(`· 预测红球号码: ` + lastPrediction.ssq_red);
 				});
 			}
 
@@ -155,10 +155,10 @@ function writeLotteryCode(ssqCode, ssqRed, ssqBlue, ssqDate, lotteryContent, now
 			const newPredictId = data.predict.length ? Math.max(...data.predict.map(item => item.id)) + 1 : 1;
 			const prediction = predictNextSSQ(data);
 			if (showSsqPredict) {
-				lotteryContent.push(`\n💹预测下期双色球号码\n`);
+				lotteryContent.push(`\n💹下期预测号码\n`);
 				lotteryContent.push(`· 彩票期数: ` + data.lottery.length);
-				lotteryContent.push(`· 红球号码: ` + prediction.redBalls);
 				lotteryContent.push(`· 蓝球号码: ` + prediction.blueBall);
+				lotteryContent.push(`· 红球号码: ` + prediction.redBalls);
 			}
 			console.log("Predicted Red Balls:", prediction.redBalls);
 			console.log("Predicted Blue Ball:", prediction.blueBall);
@@ -583,8 +583,8 @@ module.exports = handleLottery = () => {
 				if (SSQ.poolmoney != ''&&SSQ.poolmoney != '_'&&SSQ.poolmoney != '0'){
 					lotteryContent.push(`· 奖池金额: ` + SSQ.poolmoney + '元');
 				}
-				lotteryContent.push(`· 红球号码: ` + SSQ.red);
 				lotteryContent.push(`· 蓝球号码: ` + SSQ.blue);
+				lotteryContent.push(`· 红球号码: ` + SSQ.red);
 				if (SSQ.content != ''&&SSQ.content != '_'){
 					lotteryContent.push(`· 中奖情况: ` + SSQ.content);
 				}
