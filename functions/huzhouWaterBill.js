@@ -162,6 +162,15 @@ async function fetchWaterBill() {
   return { data, hh };
 }
 
+function recentJe(data) {
+  const items = data && data.items;
+  if (!Array.isArray(items) || !items.length) return NaN;
+  const v = items[0].je;
+  if (v === null || v === undefined || v === '') return NaN;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : NaN;
+}
+
 async function run() {
   const { data, hh } = await fetchWaterBill();
   if (isAuthExpired(data)) {
@@ -170,7 +179,9 @@ async function run() {
   }
   const text = formatBillBody(data, hh);
   await sendMqttMsg(text);
-  return { skipNotify: false, text };
+  const je = recentJe(data);
+  const pushWechat = Number.isFinite(je) && je > 0;
+  return { skipNotify: false, text, pushWechat };
 }
 
 module.exports = { run, fetchWaterBill, formatBillBody, sendMqttMsg };
