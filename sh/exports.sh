@@ -1031,6 +1031,10 @@ export GASOLINE_OIL_PROVINCES='[
   }
 ]'
 
+## 水费
+export HUZHOU_WATER_HH='70119012'
+export HUZHOU_WATER_ACCESS_TOKEN='JkOL'
+
 ## 课表
 # 课表提醒总开关
 export CLASS_TABLE_OPEN='false'
