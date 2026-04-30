@@ -534,14 +534,11 @@ def run_one_account(telecom, phonenum, password, slice_data, push_config_extra, 
     else:
         voice_line = f"📞 通话：已用 {vu} 分钟"
 
-    ct = (summary.get("createTime") or "").strip()
-    time_note = f"（统计时间 {ct}）" if ct else ""
-
     notify_str = f"""
 📱 手机：{summary['phonenum']}
 💰 余额：{round(summary['balance']/100,2)} 元
 {voice_line}
-🌐 总流量{time_note}
+🌐 总流量
 {common_block}{special_block}"""
 
     notify_str += _flow_items_block(telecom, summary.get("flowItems") or [])

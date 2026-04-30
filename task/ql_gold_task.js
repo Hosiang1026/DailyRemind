@@ -13,7 +13,7 @@ const qlCheckUpdate = require('../utils/qlCheckUpdate')
 
 axios.defaults.timeout = 40 * 1000
 
-const SCRIPT_VERSION = 1.3
+const SCRIPT_VERSION = 1.31
 const goldDataPath = path.join(__dirname, '..', 'db', 'gold.json')
 
 function readGoldJson() {
@@ -41,7 +41,16 @@ function writeGoldDomesticLow(domesticGoldStr) {
   if (!Number.isFinite(num) || num <= 0) return null
   const now = new Date()
   const updateDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
-  const obj = readGoldJson()
+  let obj = {}
+  if (fs.existsSync(goldDataPath)) {
+    try {
+      const p = JSON.parse(fs.readFileSync(goldDataPath, 'utf8'))
+      if (!p || typeof p !== 'object' || Array.isArray(p)) return null
+      obj = p
+    } catch (_) {
+      return null
+    }
+  }
   const storedLow = Number(obj.domestic_gold_low)
   const storedDate = String(obj.update_date || '')
   let low = Number.isFinite(storedLow) && storedLow > 0 ? storedLow : num
@@ -204,19 +213,20 @@ async function sendMqttMsg(goldContent) {
 !(async () => {
   qlCheckUpdate(SCRIPT_VERSION, 'ql_gold_task.js')
   await requireConfig()
+  const prevDomesticSnapshot = readGoldJson().last_domestic_gold
   const goldRes = await getGold()
   if (goldRes && typeof goldRes.content === 'string' && goldRes.content.trim()) {
     const newcontent = goldRes.content
     console.log('获取黄金价格成功！\n' + newcontent)
-    const j = readGoldJson()
     const cur = parseDomesticGoldNum(goldRes.domesticGoldStr)
-    const prev = j.last_domestic_gold
+    const prev = prevDomesticSnapshot
+    const round2 = (n) => Math.round(Number(n) * 100) / 100
     const same =
       Number.isFinite(cur) &&
       prev !== undefined &&
       prev !== null &&
       Number.isFinite(Number(prev)) &&
-      cur === Number(prev)
+      round2(cur) === round2(prev)
     if (!same) {
       await notify.sendNotify('', newcontent)
     }
