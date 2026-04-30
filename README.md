@@ -3,7 +3,7 @@
 #### 订阅仓库
 
 ```
-ql repo https://github.com/Hosiang1026/DailyRemind.git "task/" "app.js|ql_table_task.js" "functions/|db/|utils/|sh/|node_modules/" "master"
+ql repo https://github.com/Hosiang1026/DailyRemind.git "task/" "app.js|ql_table_task.js|ql_huzhou_water_task.js" "functions/|db/|utils/|sh/|node_modules/" "master"
 ```
 
 #### 安装依赖
