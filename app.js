@@ -223,8 +223,8 @@ module.exports = newsPush = async (ctx) => {
   }
 };
 
-//油价定时任务: 周末执行的任务上午10:20触发
-schedule.scheduleJob('0 20 10 ? * SAT,SUN',  async () => {
+//油价定时任务: 每天 6:25
+schedule.scheduleJob('25 6 * * *',  async () => {
   const pushRes = await gasolinePush()
   res.send(pushRes)
   console.log('gasolineScheduleJob Success:' + new Date())

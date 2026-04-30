@@ -24,9 +24,9 @@ cd /ql/data/repo/Hosiang1026_DailyRemind_master && npm install&&pip install -r p
 | `task/ql_shenghuozs_task.js` | 生活指数 | `18 7 * * *` | 是 |
 | `task/ql_daily_task.js` | 节日提醒 | `0 8 * * *` | 是 |
 | `task/ql_state_grid_task.js` | 国家电网 | `30 8 * * *` | 是 |
-| `task/ql_gasoline_task.js` | 汽油价格 | `25 10 * * 0,6` | 是 |
+| `task/ql_gasoline_task.js` | 汽油价格 | `25 6 * * *` | 是 |
 | `task/ql_lottery_task.js` | 福利彩票 | `35 21 * * *` | 是 |
 | `task/ql_table_task.js` | 网课提醒 | `40 7 * * 1-5` | 是 |
-| `task/ql_gold_task.js` | 金银价格 | `11 8 * * *` | 是 |
+| `task/ql_gold_task.js` | 金银价格 | `11 10 * * *` | 是 |
 | `task/ql_telecom_task.js` | 电信套餐 | `0 20 * * *` | 是 |
 

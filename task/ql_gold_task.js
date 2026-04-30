@@ -1,5 +1,5 @@
 /*
-cron "11 8 * * *" ql_gold_task.js, tag=金银价格
+cron "11 10 * * *" ql_gold_task.js, tag=金银价格
 * 金银价格: task/ql_gold_task.js
 */
 

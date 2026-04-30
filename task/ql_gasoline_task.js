@@ -1,5 +1,5 @@
 /*
-cron "25 10 * * 0,6" ql_gasoline_task.js, tag=汽油价格
+cron "25 6 * * *" ql_gasoline_task.js, tag=汽油价格
 * 汽油价格任务:脚本更新地址 task/ql_gasoline_task.js
   配置参数 input.js
 */
