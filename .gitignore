@@ -1,5 +1,3 @@
 /node_modules
 .xml
-/db/telecom_state.json
-/db/telecom_accounts.json
-/db/state-grid/
+/db

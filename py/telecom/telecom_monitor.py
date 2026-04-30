@@ -191,14 +191,77 @@ def _append_task_notify_footer(body):
     return text + author + "\n通知时间: " + now
 
 
-def send_notify(title, body, push_config_extra=None):
+def _telecom_strip_non_wechat(pc):
+    pc.update(
+        {
+            "BARK_PUSH": "",
+            "FSKEY": "",
+            "GOBOT_URL": "",
+            "GOBOT_QQ": "",
+            "GOBOT_TOKEN": "",
+            "GOTIFY_URL": "",
+            "GOTIFY_TOKEN": "",
+            "IGOT_PUSH_KEY": "",
+            "DEER_KEY": "",
+            "DEER_URL": "",
+            "CHAT_URL": "",
+            "CHAT_TOKEN": "",
+            "QMSG_KEY": "",
+            "QMSG_TYPE": "",
+            "TG_BOT_TOKEN": "",
+            "TG_USER_ID": "",
+            "TG_API_HOST": "",
+            "TG_PROXY_AUTH": "",
+            "TG_PROXY_HOST": "",
+            "TG_PROXY_PORT": "",
+            "AIBOTK_KEY": "",
+            "AIBOTK_TYPE": "",
+            "AIBOTK_NAME": "",
+            "SMTP_SERVER": "",
+            "SMTP_SSL": "false",
+            "SMTP_EMAIL": "",
+            "SMTP_PASSWORD": "",
+            "SMTP_NAME": "",
+            "SMTP_EMAIL_TO": "",
+            "SMTP_NAME_TO": "",
+            "PUSHME_KEY": "",
+            "PUSHME_URL": "",
+            "CHRONOCAT_QQ": "",
+            "CHRONOCAT_TOKEN": "",
+            "CHRONOCAT_URL": "",
+            "DODO_BOTTOKEN": "",
+            "DODO_BOTID": "",
+            "DODO_LANDSOURCEID": "",
+            "DODO_SOURCEID": "",
+            "WEBHOOK_URL": "",
+            "WEBHOOK_BODY": "",
+            "WEBHOOK_HEADERS": "",
+            "WEBHOOK_METHOD": "",
+            "WEBHOOK_CONTENT_TYPE": "",
+            "NTFY_URL": "",
+            "NTFY_TOPIC": "",
+            "NTFY_PRIORITY": "3",
+        }
+    )
+
+
+def send_notify(title, body, push_config_extra=None, only_wechat=False):
     try:
         import notify
 
-        if push_config_extra:
-            notify.push_config.update(push_config_extra)
-            notify.push_config["CONSOLE"] = notify.push_config.get("CONSOLE", True)
-        notify.send(title, _append_task_notify_footer(body))
+        saved = dict(notify.push_config)
+        try:
+            if push_config_extra:
+                notify.push_config.update(push_config_extra)
+                notify.push_config["CONSOLE"] = notify.push_config.get("CONSOLE", True)
+            notify.push_config["DD_BOT_TOKEN"] = ""
+            notify.push_config["DD_BOT_SECRET"] = ""
+            if only_wechat:
+                _telecom_strip_non_wechat(notify.push_config)
+            notify.send(title, _append_task_notify_footer(body))
+        finally:
+            notify.push_config.clear()
+            notify.push_config.update(saved)
     except Exception:
         print("发送通知消息失败！")
 
@@ -394,7 +457,12 @@ def main():
         if TELECOM_ONLY_WARN and worst_icon == "🟢":
             print("流量使用在均匀范围内，跳过通知")
         else:
-            send_notify("【电信套餐用量监控】", body, push_extra)
+            send_notify(
+                "【电信套餐用量监控】",
+                body,
+                push_extra,
+                only_wechat=bool(TELECOM_ONLY_WARN),
+            )
         _publish_mqtt(body)
     print(f"===============程序结束===============")
 

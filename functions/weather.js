@@ -115,7 +115,7 @@ function formatRainSunMonthlyStats(db, cityList, refDate) {
     for (const c of cityList) {
         if (!names.includes(c.city_name)) names.push(c.city_name);
     }
-    const lines = [`\n\n📊天气统计信息`, ''];
+    const lines = [`\n\n📊天气信息统计`, ''];
     for (let i = 0; i < names.length; i++) {
         const cityName = names[i];
         const rM = db.records[cityName] || {};

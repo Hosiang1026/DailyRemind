@@ -1148,7 +1148,7 @@ module.exports = handleTimeList = () => {
 
             console.log('获取重要节日成功\n', contentStr);
             await sendMqttMsg(contentForMqtt, licenseContent);
-            resolve(contentStr)
+            resolve(contentForMqtt)
         } catch (error) {
             reject(error.message || error)
         }

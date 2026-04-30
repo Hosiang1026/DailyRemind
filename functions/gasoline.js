@@ -5,8 +5,27 @@ var calendar = require('../utils/calendar')
 const fs = require('fs');
 const path = require('path');
 const dataFilePath = path.join(__dirname, '..', 'db', 'gasoline.json');
+const lastZj95Path = path.join(__dirname, '..', 'db', 'gasoline_last_zj95.json');
 
 require("dotenv").config();
+
+function readLastZj95() {
+    try {
+        if (!fs.existsSync(lastZj95Path)) return null;
+        const j = JSON.parse(fs.readFileSync(lastZj95Path, 'utf8'));
+        const n = normOilPrice(j.price);
+        return n > 0 ? n : null;
+    } catch (_) {
+        return null;
+    }
+}
+
+function writeLastZj95(n) {
+    const v = normOilPrice(n);
+    if (!(v > 0)) return;
+    fs.mkdirSync(path.dirname(lastZj95Path), { recursive: true });
+    fs.writeFileSync(lastZj95Path, JSON.stringify({ price: v }, null, 2));
+}
 
 const oilDbg = (...a) => {
   const v = (process.env.OIL_DEBUG || '').toLowerCase()
@@ -362,6 +381,7 @@ module.exports = handleGasoline = async () => {
         oilDbg('省份循环结束')
 
         content.push(`\n🎯最低油价`);
+        content.push('');
         oilDbg('db', fs.existsSync(dataFilePath) ? '有' : '无')
         let low_price = 0;
         if (fs.existsSync(dataFilePath)) {
@@ -381,16 +401,18 @@ module.exports = handleGasoline = async () => {
                 if (alt > 0) return String(alt);
                 return String(dbVal ?? 0).replace(/\s*\(元\)\s*/g, '').trim();
             };
+            let maxUpdateDate = '';
             for (let province of provinces) {
                 list.forEach((result) => {
                     if (result.province_name == province.province_name) {
                         const sc = scrapedByProvince[result.province_name] || {};
-                        content.push(`\n🚘${result.province_name}\n`);
-                        content.push(`· 95号汽油: ${mix(result.oilPrice_95, sc.oilPrice_95)}`);
-                        content.push(`· 更新时间: ${result.update_date}`);
+                        content.push(`· ${result.province_name}95号汽油: ${mix(result.oilPrice_95, sc.oilPrice_95)}`);
+                        const ud = String(result.update_date || '').trim();
+                        if (ud && (!maxUpdateDate || ud > maxUpdateDate)) maxUpdateDate = ud;
                     }
                 });
             }
+            if (maxUpdateDate) content.push(`· 更新时间: ${maxUpdateDate}`);
         }
         if (!curr_price && low_price) curr_price = low_price;
         var updateText = await fetchUpdateText(textUrl);
@@ -422,17 +444,21 @@ module.exports = handleGasoline = async () => {
         const diff_cost_50 = curr_cost_50 - low_cost_50;
 
         content.push(`\n🚖浙江95号汽油换算\n`);
-        content.push(`· 油箱容积: 60升`);
-        content.push(`· 30L油费: ${curr_cost_30.toFixed(2)}元`);
-        content.push(`· 30L差价: ${diff_cost_30.toFixed(2)}元`);
-        content.push(`· 50L油费: ${curr_cost_50.toFixed(2)}元`);
-        content.push(`· 50L差价: ${diff_cost_50.toFixed(2)}元`);
+        content.push(`· SKODA油箱容积: 60升`);
+        content.push(`· 30L油费: ${curr_cost_30.toFixed(2)}元|差价: ${diff_cost_30.toFixed(2)}元`);
+        content.push(`· 50L油费: ${curr_cost_50.toFixed(2)}元|差价: ${diff_cost_50.toFixed(2)}元`);
         const ut = (updateText || '').trim();
         if (ut) content.push('\n' + ut);
 
-        await sendMqttMsg(content.join('\n'));
+        const text = content.join('\n');
+        const zj95Now = scrapedByProvince['浙江']?.oilPrice_95 ?? 0;
+        const prevZj95 = readLastZj95();
+        const skipNotify = prevZj95 != null && zj95Now > 0 && Math.abs(prevZj95 - zj95Now) < 0.0001;
+        if (zj95Now > 0 && !skipNotify) writeLastZj95(zj95Now);
 
-        return content.join('\n');
+        await sendMqttMsg(text);
+
+        return { content: text, skipNotify };
 
     } catch (error) {
         console.error('[油价] 失败', error.message || error);

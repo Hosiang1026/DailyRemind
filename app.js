@@ -139,11 +139,17 @@ const handleGasolineContent = () => {
         content.push(`${start.content}`)
       }
       //汽油价格模块
+      let gasolineSkippedPush = false
       if (gasoline.open) {
         const handleGasoline = require('./functions/gasoline')
-        const gasolineContent = await handleGasoline()
-        if (gasolineContent.length > 0) {
-          content.push(`\n\n${gasolineContent}`)
+        const pack = await handleGasoline()
+        const g = pack && typeof pack === 'object' && 'content' in pack ? pack : { content: String(pack || ''), skipNotify: false }
+        if (g.content.length > 0) {
+          if (!g.skipNotify) {
+            content.push(`\n\n${g.content}`)
+          } else {
+            gasolineSkippedPush = true
+          }
         }
       }
       //结束模块
@@ -155,9 +161,13 @@ const handleGasolineContent = () => {
       }
       //如果啥都没输入的话
       if (content.length == 0) {
+        if (gasoline.open && gasolineSkippedPush) {
+          resolve({ body: '', skipRobot: true })
+          return
+        }
         content.push('请最少配置一个模块内容,没有内容无法推送')
       }
-      resolve(content.join(''))//转字符串
+      resolve({ body: content.join(''), skipRobot: false })
     } catch (error) {
       console.log('处理内容失败', error.message || error);
       reject(error.message || error)
@@ -222,9 +232,12 @@ schedule.scheduleJob('0 20 10 ? * SAT,SUN',  async () => {
 
 module.exports = gasolinePush = async (ctx) => {
   try {
-    const content = await handleGasolineContent()
+    const { body, skipRobot } = await handleGasolineContent()
+    if (skipRobot) {
+      return JSON.stringify({ success: true, data: null });
+    }
     const robot = require('./utils/robotPush')
-    const res = await robot(content)
+    const res = await robot(body)
     return JSON.stringify({ success: true, data: res });
   } catch (error) {
     return JSON.stringify({ success: false, errMsg: error.message || error });

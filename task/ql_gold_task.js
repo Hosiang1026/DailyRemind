@@ -52,8 +52,7 @@ function getGold() {
   return new Promise(async (resolve) => {
     try {
       let _content = '👑今日金价\n\n'
-      let domestic_content = '🏅国内价格\n'
-      let international_content = '🏅国际价格\n'
+      let metal_content = '🏅金银价格\n'
       let store_content = '🏅金店价格\n'
       let conver_content = '⚖金价换算\n'
       const bdurl = 'http://www.huangjinjiage.cn'
@@ -74,10 +73,9 @@ function getGold() {
         .eq(1)
         .text()
         .trim()
-      domestic_content += '· 白银：' + domestic_silver + '元/克\n'
-      domestic_content += '· 黄金：' + domestic_gold + '元/克\n'
+      metal_content += '· 国内白银：' + domestic_silver + '元/克\n'
+      metal_content += '· 国内黄金：' + domestic_gold + '元/克\n'
       const lowGold = writeGoldDomesticLow(domestic_gold)
-      domestic_content += '\n'
 
       const international_silver = $h('tr.bg#jiage3')
         .find('td')
@@ -89,8 +87,8 @@ function getGold() {
         .eq(1)
         .text()
         .trim()
-      international_content += '· 白银：' + international_silver + '美元/盎司\n'
-      international_content += '· 黄金：' + international_gold + '美元/盎司\n\n'
+      metal_content += '· 国际白银：' + international_silver + '美元/盎司\n'
+      metal_content += '· 国际黄金：' + international_gold + '美元/盎司\n\n'
 
       function tabRow(i) {
         const el = $h('.tabtitle').eq(i)
@@ -117,18 +115,18 @@ function getGold() {
       const conver_gold =
         (parseFloat(international_gold) / 31.1035) * parseFloat(usdcny_price)
       const difference_gold = parseFloat(domestic_gold) - conver_gold
-      conver_content += '· 国际换算：' + Math.round(conver_gold * 100) / 100 + '元/克\n'
       conver_content += '· 1克差价：' + Math.round(difference_gold * 100) / 100 + '元\n'
       conver_content += '· 50克价格：' + Math.round(parseFloat(domestic_gold) * 50 * 100) / 100 + '元\n'
+      conver_content += '· 国际换算：' + Math.round(conver_gold * 100) / 100 + '元/克\n'
       conver_content += '· 金衡盎司：' + '1盎司 = 31.1035克\n'
 
       let low_content = ''
       if (lowGold) {
-        low_content += '\n🎯最低国内价格\n'
-        low_content += '· 黄金：' + lowGold.low + '元/克\n'
-        low_content += '· 更新时间: ' + lowGold.date + '\n'
+        low_content += '🎯最低价格\n'
+        low_content += '· 国内黄金：' + lowGold.low + '元/克\n'
+        low_content += '· 更新时间: ' + lowGold.date + '\n\n'
       }
-      _content += domestic_content + international_content + store_content + low_content + conver_content
+      _content += metal_content + store_content + low_content + conver_content
       resolve(_content)
     } catch (e) {
       resolve(e)
@@ -200,7 +198,7 @@ async function sendMqttMsg(goldContent) {
   const newcontent = await getGold()
   if (typeof newcontent === 'string' && newcontent.trim()) {
     console.log('获取黄金价格成功！\n' + newcontent)
-    await notify.sendNotify('金银价格', newcontent)
+    await notify.sendNotify('', newcontent)
     try {
       await sendMqttMsg(newcontent)
     } catch (e) {

@@ -21,18 +21,21 @@ const handleGasolineContent = () => {
       let content = []
       const { gasoline } = require('../sh/input')
 
+      let skipNotify = false
       if (gasoline.open) {
         const handleGasoline = require('../functions/gasoline')
-        const gasolineContent = await handleGasoline()
-        if (gasolineContent.length > 0) {
-          content.push(`${gasolineContent}`)
+        const pack = await handleGasoline()
+        const g = pack && typeof pack === 'object' && 'content' in pack ? pack : { content: String(pack || ''), skipNotify: false }
+        skipNotify = !!g.skipNotify
+        if (g.content.length > 0) {
+          content.push(`${g.content}`)
         }
       }
 
       if (content.length == 0) {
         content.push('请最少配置一个模块内容,没有内容无法推送')
       }
-      resolve(content.join(''))
+      resolve({ msg: content.join(''), skipNotify })
     } catch (error) {
       console.error('[汽油]', error.message || error)
       reject(error.message || error)
@@ -43,10 +46,10 @@ const handleGasolineContent = () => {
 !(async() => {
      qlCheckUpdate(SCRIPT_VERSION, 'ql_gasoline_task.js')
      await requireConfig();
-     const content = await handleGasolineContent();
+     const { msg, skipNotify } = await handleGasolineContent();
      const title = `大家好😻`
-     await notify.sendNotify(title, `${content}`)
-     console.log(`${title}\n${content}`)
+     if (!skipNotify) await notify.sendNotify(title, `${msg}`)
+     console.log(`${title}\n${msg}`)
 })()
 .catch((e) => {
         $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
