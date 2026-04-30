@@ -84,20 +84,31 @@ async function fetchContent(url) {
     }
 }
 
+function parseTishiContentFromHtml(html) {
+    const raw = String(html || '');
+    const m = raw.match(/tishiContent\s*=\s*"((?:\\.|[^"\\])*)"/);
+    if (!m) return '';
+    let s = m[1].replace(/\\'/g, "'").replace(/<br\s*\/?>/gi, '\n');
+    s = s.split(/\r?\n/).map((line) => line.replace(/\s+/g, ' ').trim()).filter(Boolean).join('\n');
+    s = s.replace(/当前微信公众号油价已更新。?/g, '').replace(/，\s*$/gm, '').trim();
+    return s;
+}
+
 //抓取汽油调价情况
 async function fetchUpdateText(url) {
     try {
         oilDbg('调价页', url)
         const { data } = await axios.get(url, httpGetOpts);
         oilDbg('调价页字节', typeof data === 'string' ? data.length : 0)
-        const $ = cheerio.load(data);
+        const html = String(data || '');
+        let fromScript = parseTishiContentFromHtml(html);
+        if (fromScript) return fromScript;
 
-        // Extract specific text about oil price changes
+        const $ = cheerio.load(data);
         var priceUpdateText = $('#rightTop').text().trim().split('\n').filter(line => line.includes('相互转告')).join(' ');
-		//console.log('priceUpdateText:' ,  priceUpdateText);
-        if(priceUpdateText == ''){
-		   priceUpdateText = $('#rightTop').text().trim().split('\n').filter(line => line.includes('调整')).join(' ');
-		}
+        if (priceUpdateText == '') {
+            priceUpdateText = $('#rightTop').text().trim().split('\n').filter(line => line.includes('调整')).join(' ');
+        }
 
         const $tishi = $('.tishi').first().clone();
         $tishi.find('script, style').remove();
