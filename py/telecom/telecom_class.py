@@ -135,7 +135,7 @@ PMpq0/XKBO8lYhN/gwIDAQAB
                 "attach": "test",
             },
             "headerInfos": {
-                "code": "userFluxPackage",
+                "code": "qryImportantData",
                 "clientType": self.client_type,
                 "timestamp": ts,
                 "shopId": "20002",

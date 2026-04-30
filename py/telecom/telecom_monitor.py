@@ -282,13 +282,112 @@ def usage_status_icon(used, total):
     return "🟢"
 
 
-def _append_bills_lines(notify_str, phonenum, bills_by_phone):
-    months = bills_by_phone.get(phonenum) or {}
-    if not months:
+def _short_flux_title(title):
+    if not title or "-" not in title:
+        return title or ""
+    a, b = title.split("-", 1)
+    if b.startswith(a):
+        rest = b[len(a) :].lstrip("-")
+        return f"{a}·{rest}" if rest else a
+    return title
+
+
+def _flux_usage_suffix(telecom, product):
+    if product.get("infiniteTitle"):
+        return ""
+    raw = f"{product.get('leftTitle') or ''}{product.get('leftHighlight') or ''}{product.get('rightCommon') or ''}"
+    mu = re.search(r"已用\s*(\d+(?:\.\d+)?)\s*([KMGT]B)", raw, re.I)
+    mt = re.search(r"共\s*(\d+(?:\.\d+)?)\s*([KMGT]B)", raw, re.I)
+    if not mu or not mt:
+        return ""
+    u_s = f"{float(mu.group(1)):.10g}{mu.group(2).upper()}"
+    t_s = f"{float(mt.group(1)):.10g}{mt.group(2).upper()}"
+    try:
+        used_kb = int(telecom.convert_flow(u_s, "KB", 0))
+        tot_kb = int(telecom.convert_flow(t_s, "KB", 0))
+    except (TypeError, ValueError, ZeroDivisionError):
+        return ""
+    if tot_kb <= 0:
+        return ""
+    rem_kb = max(0, tot_kb - used_kb)
+    rem_gb = telecom.convert_flow(rem_kb, "GB", 2)
+    pct = (used_kb / tot_kb) * 100.0
+    return f"  └ 剩余 {rem_gb} GB · 用量占比 {pct:.1f}%"
+
+
+def _flow_items_block(telecom, flow_items):
+    if not flow_items:
+        return ""
+    lines = []
+    for it in flow_items:
+        tot = int(it.get("total") or 0)
+        use = int(it.get("use") or 0)
+        bal = int(it.get("balance") or 0)
+        use_g = telecom.convert_flow(use, "GB", 2)
+        tot_g = telecom.convert_flow(tot, "GB", 2)
+        bal_g = telecom.convert_flow(bal, "GB", 2)
+        pct = (100.0 * use / tot) if tot > 0 else 0.0
+        lines.append(
+            f"  · 已用 {use_g} / 共 {tot_g} GB，剩余 {bal_g} GB（占套内 {pct:.1f}%）"
+        )
+    return "\n\n【国内通用流量】\n" + "\n".join(lines)
+
+
+def _fee_lines_from_important_balance(data):
+    if not isinstance(data, dict):
+        return []
+    bi = data.get("balanceInfo") or {}
+    out = []
+    pbr = bi.get("phoneBillRegion")
+    if isinstance(pbr, dict):
+        title = (pbr.get("title") or "").strip()
+        sub = (pbr.get("subTitle") or "").strip()
+        hh = (pbr.get("subTitleHh") or "").strip()
+        row = " ".join(x for x in (sub, hh) if x) or " ".join(x for x in (title, sub, hh) if x)
+        if row.strip():
+            out.append(f"  {row.strip()}")
+    for bar in bi.get("phoneBillBars") or []:
+        if not isinstance(bar, dict):
+            continue
+        t = (bar.get("title") or "").strip()
+        st = (bar.get("subTilte") or bar.get("subTitle") or "").strip()
+        br = (bar.get("barRightSubTitle") or "").strip()
+        row = " ".join(x for x in (t, st, br) if x)
+        if row:
+            out.append(f"  {row}")
+    return out
+
+
+def _bill_month_label(ym):
+    s = str(ym).strip()
+    if len(s) == 6 and s.isdigit():
+        return f"{int(s[:4])}年{int(s[4:6]):02d}月"
+    m = re.match(r"^(\d{4})-(\d{1,2})$", s)
+    if m:
+        return f"{int(m.group(1))}年{int(m.group(2)):02d}月"
+    return s
+
+
+def _bill_amount_with_unit(amt):
+    a = str(amt).strip()
+    if not a:
+        return a
+    if a.endswith("元"):
+        return a
+    return a + "元"
+
+
+def _append_fee_records(notify_str, important_data, phonenum, bills_by_phone):
+    api_lines = _fee_lines_from_important_balance(important_data)
+    months = (bills_by_phone or {}).get(phonenum) or {}
+    json_lines = [
+        f"  {_bill_month_label(ym)}  {_bill_amount_with_unit(amt)}"
+        for ym, amt in sorted(months.items(), key=lambda x: x[0], reverse=True)
+    ]
+    lines = api_lines + json_lines
+    if not lines:
         return notify_str
-    lines = sorted(months.items(), key=lambda x: x[0], reverse=True)
-    notify_str += "\n\n【话费记录】" + "".join(f"\n  {ym}  {amt}" for ym, amt in lines)
-    return notify_str
+    return notify_str + "\n\n【话费记录】\n" + "\n".join(lines)
 
 
 def run_one_account(telecom, phonenum, password, slice_data, push_config_extra, bills_by_phone):
@@ -379,43 +478,70 @@ def run_one_account(telecom, phonenum, password, slice_data, push_config_extra, 
             print("获取流量包明细：成功")
             packages = user_flux_package["responseData"]["data"]["productOFFRatable"]["ratableResourcePackages"]
             for package in packages:
-                package_icon = (
-                    "🇨🇳"
-                    if "国内" in package["title"]
-                    else "📺" if "专用" in package["title"] else "🌎"
-                )
-                flux_package_str += f"\n{package_icon}{package['title']}\n"
                 for product in package["productInfos"]:
+                    ptitle = _short_flux_title(product.get("title") or "")
                     if product.get("infiniteTitle"):
-                        flux_package_str += f"""🔹[{product['title']}]{product['infiniteTitle']}{product['infiniteValue']}{product['infiniteUnit']}/无限\n"""
+                        flux_package_str += f"""🔹[{ptitle}]{product['infiniteTitle']}{product['infiniteValue']}{product['infiniteUnit']}/无限\n"""
                     else:
-                        flux_package_str += f"""🔹[{product['title']}]{product['leftTitle']}{product['leftHighlight']}{product['rightCommon']}\n"""
+                        flux_package_str += f"""🔹[{ptitle}]{product['leftTitle']}{product['leftHighlight']}{product['rightCommon']}\n"""
+                        suf = _flux_usage_suffix(telecom, product)
+                        if suf:
+                            flux_package_str += suf + "\n"
 
-    common_str = (
-        f"{telecom.convert_flow(summary['commonUse'],'GB',2)} / {telecom.convert_flow(summary['commonTotal'],'GB',2)} GB"
-        if summary["flowOver"] == 0
-        else f"-{telecom.convert_flow(summary['flowOver'],'GB',2)} / {telecom.convert_flow(summary['commonTotal'],'GB',2)} GB"
-    )
     status_icon = usage_status_icon(summary["commonUse"], summary["commonTotal"])
-    common_str = f"{common_str} {status_icon}"
-    special_str = (
-        f"{telecom.convert_flow(summary['specialUse'], 'GB', 2)} / {telecom.convert_flow(summary['specialTotal'], 'GB', 2)} GB"
-        if summary["specialTotal"] > 0
-        else ""
-    )
+    if summary["flowOver"] == 0 and summary["commonTotal"] > 0:
+        use_g = telecom.convert_flow(summary["commonUse"], "GB", 2)
+        tot_g = telecom.convert_flow(summary["commonTotal"], "GB", 2)
+        rem_g = telecom.convert_flow(summary["commonTotal"] - summary["commonUse"], "GB", 2)
+        pct_common = 100.0 * summary["commonUse"] / summary["commonTotal"]
+        common_block = (
+            f"  - 通用：\n"
+            f"    已用 {use_g} / 总量 {tot_g} GB\n"
+            f"    剩余 {rem_g} GB · 已用占总量 {pct_common:.1f}% {status_icon}"
+        )
+    else:
+        common_line = (
+            f"{telecom.convert_flow(summary['commonUse'],'GB',2)} / {telecom.convert_flow(summary['commonTotal'],'GB',2)} GB"
+            if summary["flowOver"] == 0
+            else f"-{telecom.convert_flow(summary['flowOver'],'GB',2)} / {telecom.convert_flow(summary['commonTotal'],'GB',2)} GB"
+        )
+        common_block = f"  - 通用：{common_line} {status_icon}"
+
+    special_block = ""
+    if summary["specialTotal"] > 0:
+        su, st = summary["specialUse"], summary["specialTotal"]
+        su_g = telecom.convert_flow(su, "GB", 2)
+        st_g = telecom.convert_flow(st, "GB", 2)
+        sr_g = telecom.convert_flow(st - su, "GB", 2)
+        pct_sp = 100.0 * su / st if st > 0 else 0.0
+        special_block = (
+            f"\n  - 专用：\n"
+            f"    已用 {su_g} / 总量 {st_g} GB\n"
+            f"    剩余 {sr_g} GB · 已用占总量 {pct_sp:.1f}%"
+        )
+
+    vt, vb, vu = summary["voiceTotal"], int(summary.get("voiceBalance") or 0), summary["voiceUsage"]
+    if vt > 0:
+        voice_line = f"📞 通话：已用 {vu} 分钟，剩余 {vb} 分钟，套餐含 {vt} 分钟"
+    else:
+        voice_line = f"📞 通话：已用 {vu} 分钟"
+
+    ct = (summary.get("createTime") or "").strip()
+    time_note = f"（统计时间 {ct}）" if ct else ""
 
     notify_str = f"""
 📱 手机：{summary['phonenum']}
-💰 余额：{round(summary['balance']/100,2)}
-📞 通话：{summary['voiceUsage']}{f" / {summary['voiceTotal']}" if summary['voiceTotal']>0 else ''} min
-🌐 总流量
-  - 通用：{common_str}{f'{chr(10)}  - 专用：{special_str}' if special_str else ''}"""
+💰 余额：{round(summary['balance']/100,2)} 元
+{voice_line}
+🌐 总流量{time_note}
+{common_block}{special_block}"""
+
+    notify_str += _flow_items_block(telecom, summary.get("flowItems") or [])
 
     if TELECOM_FLUX_PACKAGE and flux_package_str.strip():
-        notify_str += f"\n\n【流量包明细】\n\n{flux_package_str.strip()}"
+        notify_str += f"\n\n【国内通用流量明细】\n{flux_package_str.strip()}"
 
-    notify_str += f"\n\n查询时间：{summary['createTime']}"
-    notify_str = _append_bills_lines(notify_str, phonenum, bills_by_phone)
+    notify_str = _append_fee_records(notify_str, rd.get("data"), phonenum, bills_by_phone)
     add_notify(notify_str.strip())
     slice_data["login_info"] = CONFIG_DATA.get("login_info", slice_data.get("login_info", {}))
     slice_data["loginFailTime"] = CONFIG_DATA.get("loginFailTime", 0)

@@ -13,34 +13,45 @@ const qlCheckUpdate = require('../utils/qlCheckUpdate')
 
 axios.defaults.timeout = 40 * 1000
 
-const SCRIPT_VERSION = 1.2
+const SCRIPT_VERSION = 1.3
 const goldDataPath = path.join(__dirname, '..', 'db', 'gold.json')
 
-function writeGoldDomesticLow(domesticGoldStr) {
+function readGoldJson() {
+  if (!fs.existsSync(goldDataPath)) return {}
+  try {
+    return JSON.parse(fs.readFileSync(goldDataPath, 'utf8'))
+  } catch (_) {
+    return {}
+  }
+}
+
+function writeGoldJson(obj) {
+  fs.mkdirSync(path.dirname(goldDataPath), { recursive: true })
+  fs.writeFileSync(goldDataPath, JSON.stringify(obj, null, 2))
+}
+
+function parseDomesticGoldNum(domesticGoldStr) {
   const num = parseFloat(String(domesticGoldStr ?? '').replace(/[^\d.-]/g, '').trim())
+  if (!Number.isFinite(num) || num <= 0) return NaN
+  return num
+}
+
+function writeGoldDomesticLow(domesticGoldStr) {
+  const num = parseDomesticGoldNum(domesticGoldStr)
   if (!Number.isFinite(num) || num <= 0) return null
   const now = new Date()
   const updateDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
-  let storedLow = NaN
-  let storedDate = ''
-  if (fs.existsSync(goldDataPath)) {
-    try {
-      const j = JSON.parse(fs.readFileSync(goldDataPath, 'utf8'))
-      storedLow = Number(j.domestic_gold_low)
-      storedDate = String(j.update_date || '')
-    } catch (_) {}
-  } else {
-    fs.mkdirSync(path.dirname(goldDataPath), { recursive: true })
-  }
+  const obj = readGoldJson()
+  const storedLow = Number(obj.domestic_gold_low)
+  const storedDate = String(obj.update_date || '')
   let low = Number.isFinite(storedLow) && storedLow > 0 ? storedLow : num
   let date = Number.isFinite(storedLow) && storedLow > 0 ? storedDate : updateDate
   if (!Number.isFinite(storedLow) || storedLow <= 0 || num < storedLow) {
     low = num
     date = updateDate
-    fs.writeFileSync(
-      goldDataPath,
-      JSON.stringify({ domestic_gold_low: low, update_date: date }, null, 2)
-    )
+    obj.domestic_gold_low = low
+    obj.update_date = date
+    writeGoldJson(obj)
   }
   return { low, date }
 }
@@ -115,10 +126,8 @@ function getGold() {
       const conver_gold =
         (parseFloat(international_gold) / 31.1035) * parseFloat(usdcny_price)
       const difference_gold = parseFloat(domestic_gold) - conver_gold
-      conver_content += '· 1克差价：' + Math.round(difference_gold * 100) / 100 + '元\n'
-      conver_content += '· 50克价格：' + Math.round(parseFloat(domestic_gold) * 50 * 100) / 100 + '元\n'
       conver_content += '· 国际换算：' + Math.round(conver_gold * 100) / 100 + '元/克\n'
-      conver_content += '· 金衡盎司：' + '1盎司 = 31.1035克\n'
+      conver_content += '· 50克价格：' + Math.round(parseFloat(domestic_gold) * 50 * 100) / 100 + '元|差价' + Math.round(difference_gold * 50 * 100) / 100 + '元\n'
 
       let low_content = ''
       if (lowGold) {
@@ -127,7 +136,7 @@ function getGold() {
         low_content += '· 更新时间: ' + lowGold.date + '\n\n'
       }
       _content += metal_content + store_content + low_content + conver_content
-      resolve(_content)
+      resolve({ content: _content, domesticGoldStr: domestic_gold })
     } catch (e) {
       resolve(e)
     }
@@ -195,19 +204,40 @@ async function sendMqttMsg(goldContent) {
 !(async () => {
   qlCheckUpdate(SCRIPT_VERSION, 'ql_gold_task.js')
   await requireConfig()
-  const newcontent = await getGold()
-  if (typeof newcontent === 'string' && newcontent.trim()) {
+  const goldRes = await getGold()
+  if (goldRes && typeof goldRes.content === 'string' && goldRes.content.trim()) {
+    const newcontent = goldRes.content
     console.log('获取黄金价格成功！\n' + newcontent)
-    await notify.sendNotify('', newcontent)
+    const j = readGoldJson()
+    const cur = parseDomesticGoldNum(goldRes.domesticGoldStr)
+    const prev = j.last_domestic_gold
+    const same =
+      Number.isFinite(cur) &&
+      prev !== undefined &&
+      prev !== null &&
+      Number.isFinite(Number(prev)) &&
+      cur === Number(prev)
+    if (!same) {
+      await notify.sendNotify('', newcontent)
+    }
     try {
       await sendMqttMsg(newcontent)
     } catch (e) {
       console.error('mqtt:', e && e.message ? e.message : e)
     }
+    if (Number.isFinite(cur)) {
+      const j2 = readGoldJson()
+      j2.last_domestic_gold = cur
+      writeGoldJson(j2)
+    }
   } else {
     console.log(
       '获取黄金价格失败！',
-      typeof newcontent === 'string' ? '' : (newcontent && newcontent.message) || newcontent
+      goldRes && typeof goldRes === 'object' && goldRes.message
+        ? goldRes.message
+        : goldRes && typeof goldRes === 'string'
+          ? goldRes
+          : goldRes
     )
   }
 })()
