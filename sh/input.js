@@ -76,7 +76,6 @@ const daily = {
 
 const gasoline = {
     open: parseBoolEnv('GASOLINE_OPEN'),
-    province: parseEnvJson('GASOLINE_PROVINCE'),
     model: parseEnvJson('GASOLINE_MODEL'),
     oil_provinces: parseEnvJson('GASOLINE_OIL_PROVINCES'),
 };

@@ -1005,12 +1005,6 @@ export DAILY_BIRTHDAY='[
 ## 油价
 # 油价提醒总开关
 export GASOLINE_OPEN='true'
-# 关注省份名称
-export GASOLINE_PROVINCE='[
-  "浙江",
-  "福建",
-  "安徽"
-]'
 # 关注油品
 export GASOLINE_MODEL='[
   "0号柴油",
@@ -1018,19 +1012,22 @@ export GASOLINE_MODEL='[
   "95号汽油",
   "98号汽油"
 ]'
-# 省份与接口 province_code
+# 省份与接口 province_code；date 为 MM-DD 数组则仅当日抓取，[] 或不写则每次都抓
 export GASOLINE_OIL_PROVINCES='[
   {
     "province_name": "浙江",
-    "province_code": "zhejiang"
+    "province_code": "zhejiang",
+    "date": []
   },
   {
     "province_name": "安徽",
-    "province_code": "anhui"
+    "province_code": "anhui",
+    "date": ["02-15","02-16","02-17","02-18","02-19","02-20","02-21","02-22","02-23"]
   },
   {
     "province_name": "福建",
-    "province_code": "fujian"
+    "province_code": "fujian",
+    "date": ["10-01","10-02","10-03","10-04","10-05"]
   }
 ]'
 

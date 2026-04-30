@@ -58,6 +58,19 @@ try {
     console.error("省份汽油编码配置错误:", error);
 }
 
+function oilMmdd(d) {
+    const m = d.getMonth() + 1;
+    const day = d.getDate();
+    return `${String(m).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
+function oilProvinceActiveToday(p, d = new Date()) {
+    const dates = p.date;
+    if (!Array.isArray(dates) || dates.length === 0) return true;
+    const today = oilMmdd(d);
+    return dates.some((x) => String(x).trim() === today);
+}
+
 //汽油价格API: https://api.help.bj.cn/apis/youjia/
 //抓取各个城市的汽油价格
 async function fetchContent(url) {
@@ -313,34 +326,25 @@ module.exports = handleGasoline = async () => {
     const restricUrl = 'https://m.hz.bendibao.com/news/ztfeizheAhaopaixiaokechexianxing/?area=';
 
     try {
-        oilDbg('开始, 省份数', provinces.length)
+        const now = new Date();
+        const activeProvinces = provinces.filter((p) => oilProvinceActiveToday(p, now));
+        oilDbg('开始, 本日生效省份数', activeProvinces.length)
         //内容数组
         let content = [];
         content.push('⛽今日油价');
-
-        const now = new Date();
-        const startDate = new Date(now.getFullYear(), 4, 1); // 5月1日 00:00:00
-        const endDate = new Date(now.getFullYear(), 4, 7, 23, 59, 59); // 5月7日 23:59:59
-        if(now >= startDate && now <= endDate){
-            const fujianData = { province_name: "福建", province_code: "fujian" }
-            provinces.push(fujianData);
-        }
-
-        const newYearStartDate = new Date(now.getFullYear(), 1, 1); // 1月15日 00:00:00
-        const newYearEndDate = new Date(now.getFullYear(), 1, 30, 23, 59, 59); // 2月25日 23:59:59
-        if(now >= newYearStartDate && now <= newYearEndDate){
-            const anhuiData = { province_name: "安徽", province_code: "anhui" }
-            provinces.push(anhuiData);
-        }
 
         if (provinces.length === 0) {
             console.error("请配置环境变量 GASOLINE_OIL_PROVINCES 或 OIL_PROVINCES（省份油价 JSON）");
             process.exit(1);
         }
+        if (activeProvinces.length === 0) {
+            console.error("今日无生效省份：请检查 GASOLINE_OIL_PROVINCES 中各条目的 date（MM-DD）是否包含今天");
+            process.exit(1);
+        }
 
         let curr_price = 0;
         const scrapedByProvince = {};
-        for(let province of provinces) {
+        for(let province of activeProvinces) {
             oilDbg('正在获取', province.province_name)
             const url = oilUrl.replace("{province_code}", province.province_code);
             const oilPriceArr = await fetchContent(url);
@@ -413,7 +417,7 @@ module.exports = handleGasoline = async () => {
                 return String(dbVal ?? 0).replace(/\s*\(元\)\s*/g, '').trim();
             };
             let maxUpdateDate = '';
-            for (let province of provinces) {
+            for (let province of activeProvinces) {
                 list.forEach((result) => {
                     if (result.province_name == province.province_name) {
                         const sc = scrapedByProvince[result.province_name] || {};
