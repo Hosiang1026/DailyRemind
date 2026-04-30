@@ -345,7 +345,8 @@ def _fee_lines_from_important_balance(data):
         hh = (pbr.get("subTitleHh") or "").strip()
         row = " ".join(x for x in (sub, hh) if x) or " ".join(x for x in (title, sub, hh) if x)
         if row.strip():
-            out.append(f"  {row.strip()}")
+            out.append(f"  统计：{row.strip()}")
+    bar_rows = []
     for bar in bi.get("phoneBillBars") or []:
         if not isinstance(bar, dict):
             continue
@@ -354,7 +355,10 @@ def _fee_lines_from_important_balance(data):
         br = (bar.get("barRightSubTitle") or "").strip()
         row = " ".join(x for x in (t, st, br) if x)
         if row:
-            out.append(f"  {row}")
+            bar_rows.append(f"    · {row}")
+    if bar_rows:
+        out.append("  明细：")
+        out.extend(bar_rows)
     return out
 
 
@@ -380,10 +384,14 @@ def _bill_amount_with_unit(amt):
 def _append_fee_records(notify_str, important_data, phonenum, bills_by_phone):
     api_lines = _fee_lines_from_important_balance(important_data)
     months = (bills_by_phone or {}).get(phonenum) or {}
-    json_lines = [
-        f"  {_bill_month_label(ym)}  {_bill_amount_with_unit(amt)}"
-        for ym, amt in sorted(months.items(), key=lambda x: x[0], reverse=True)
-    ]
+    json_pairs = sorted(months.items(), key=lambda x: x[0], reverse=True)
+    json_lines = []
+    if json_pairs:
+        json_lines.append("  各月记录：")
+        for ym, amt in json_pairs:
+            json_lines.append(
+                f"    · {_bill_month_label(ym)}  {_bill_amount_with_unit(amt)}"
+            )
     lines = api_lines + json_lines
     if not lines:
         return notify_str
