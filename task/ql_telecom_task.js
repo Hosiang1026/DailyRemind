@@ -2,7 +2,7 @@
 cron "0 20 * * *" ql_telecom_task.js, tag=电信套餐
 * name:电信套餐
 * 电信套餐任务:脚本更新地址 task/ql_telecom_task.js
-* Python3 pip py/requirements.txt；TELECOM_USER/TELECOM_USERS；可选 TELECOM_CONFIG_JSON；MQTT mqtt_host 等；主题 mqtt_topic_telecom/手机号
+* Python3 pip py/requirements.txt；TELECOM_USER/TELECOM_USERS；可选 TELECOM_CONFIG_JSON；MQTT mqtt_host 等
 */
 
 require('dotenv').config()

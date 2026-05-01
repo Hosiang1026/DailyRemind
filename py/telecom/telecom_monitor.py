@@ -5,6 +5,7 @@ import os
 import re
 import sys
 import json
+from collections import defaultdict
 import calendar
 import datetime
 import urllib.request
@@ -95,22 +96,7 @@ def _load_bills_and_push(path):
     return push_extra, out
 
 
-def _publish_mqtt_single(host, port, auth, topic, payload):
-    import paho.mqtt.publish as mqtt_publish
-
-    mqtt_publish.single(
-        topic,
-        payload,
-        hostname=host,
-        port=port,
-        auth=auth,
-        qos=0,
-        retain=True,
-    )
-    print("mqtt:Published", topic)
-
-
-def _publish_mqtt(phonenum, body):
+def _publish_mqtt(body, by_phone=None):
     host = (os.environ.get("mqtt_host") or "").strip()
     port_s = (os.environ.get("mqtt_port") or "").strip()
     if not host or not port_s:
@@ -121,20 +107,31 @@ def _publish_mqtt(phonenum, body):
         return
     user = (os.environ.get("mqtt_username") or "").strip()
     pwd = (os.environ.get("mqtt_password") or "").strip()
-    base = (os.environ.get("mqtt_topic_telecom") or "qinglong/telecom").strip() or "qinglong/telecom"
-    topic = f"{base.rstrip('/')}/{phonenum}"
+    topic = (os.environ.get("mqtt_topic_telecom") or "qinglong/telecom").strip() or "qinglong/telecom"
     ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    auth = {"username": user, "password": pwd} if user else None
-    payload = json.dumps(
-        {
-            "phone": phonenum,
-            "content": "📱电信套餐\n\n" + (body or "").strip(),
-            "timestamp": ts,
-        },
-        ensure_ascii=False,
-    )
+    full = "📱电信套餐\n\n" + body
+    if isinstance(by_phone, dict) and len(by_phone) > 1:
+        msg = {"timestamp": ts}
+        for p, t in by_phone.items():
+            if isinstance(p, str) and len(p) == 11 and p.isdigit() and t:
+                msg[p] = str(t).strip()
+    else:
+        msg = {"timestamp": ts, "content": full}
+    payload = json.dumps(msg, ensure_ascii=False)
     try:
-        _publish_mqtt_single(host, port, auth, topic, payload)
+        import paho.mqtt.publish as mqtt_publish
+
+        auth = {"username": user, "password": pwd} if user else None
+        mqtt_publish.single(
+            topic,
+            payload,
+            hostname=host,
+            port=port,
+            auth=auth,
+            qos=0,
+            retain=True,
+        )
+        print("mqtt:Published", topic)
     except Exception as ex:
         print("mqtt:", ex)
 
@@ -463,7 +460,7 @@ def run_one_account(telecom, phonenum, password, slice_data, push_config_extra, 
         telecom.set_login_info(login_info)
     else:
         if not auto_login():
-            return notifys, "🟢", None
+            return notifys, "🟢"
 
     important_data = telecom.qry_important_data()
     if important_data.get("responseData"):
@@ -476,13 +473,13 @@ def run_one_account(telecom, phonenum, password, slice_data, push_config_extra, 
     rd = (important_data or {}).get("responseData") or {}
     if not rd.get("data"):
         add_notify(f"获取主要信息失败: {phonenum} {json.dumps(important_data, ensure_ascii=False)[:500]}")
-        return notifys, "🟢", None
+        return notifys, "🟢"
 
     try:
         summary = telecom.to_summary(rd["data"])
     except Exception as e:
         add_notify(f"简化主要信息出错: {e}")
-        return notifys, "🟢", None
+        return notifys, "🟢"
 
     if summary:
         print(f"简化主要信息：{summary}")
@@ -559,7 +556,7 @@ def run_one_account(telecom, phonenum, password, slice_data, push_config_extra, 
     add_notify(notify_str.strip())
     slice_data["login_info"] = CONFIG_DATA.get("login_info", slice_data.get("login_info", {}))
     slice_data["loginFailTime"] = CONFIG_DATA.get("loginFailTime", 0)
-    return notifys, status_icon, notify_str.strip()
+    return notifys, status_icon
 
 
 def main():
@@ -575,31 +572,49 @@ def main():
     push_extra, bills_by_phone = _load_bills_and_push(json_path)
 
     all_blocks = []
+    mqtt_by_phone = defaultdict(list)
     worst_icon = "🟢"
     for phonenum, password in accounts:
         telecom = Telecom()
         slice_data = state.setdefault(phonenum, {})
         try:
-            part, icon, mqtt_body = run_one_account(
-                telecom, phonenum, password, slice_data, push_extra, bills_by_phone
-            )
+            part, icon = run_one_account(telecom, phonenum, password, slice_data, push_extra, bills_by_phone)
             all_blocks.extend(part)
+            for blk in part:
+                if (blk or "").strip():
+                    mqtt_by_phone[phonenum].append(blk.strip())
             if icon in ("🔴", "🟠"):
                 worst_icon = icon
             elif icon == "🟡" and worst_icon == "🟢":
                 worst_icon = icon
-            if mqtt_body is not None:
-                _publish_mqtt(phonenum, mqtt_body)
         except Exception as ex:
             print(phonenum, ex)
-            all_blocks.append(f"📱 {phonenum} 查询异常: {ex}")
+            err = f"📱 {phonenum} 查询异常: {ex}"
+            all_blocks.append(err)
+            mqtt_by_phone[phonenum].append(err)
         _save_state(state)
 
     if all_blocks:
         print(f"===============推送通知===============")
         body = "\n\n────────────\n\n".join(all_blocks)
+        by_phone = {p: "\n\n".join(v) for p, v in mqtt_by_phone.items() if v}
         if TELECOM_ONLY_WARN and worst_icon == "🟢":
             print("流量使用在均匀范围内，跳过通知")
+        elif len(by_phone) > 1:
+            seen = set()
+            for phonenum, _pwd in accounts:
+                if phonenum in seen:
+                    continue
+                seen.add(phonenum)
+                t = (by_phone.get(phonenum) or "").strip()
+                if not t:
+                    continue
+                send_notify(
+                    "【电信套餐用量监控】",
+                    t,
+                    push_extra,
+                    only_wechat=bool(TELECOM_ONLY_WARN),
+                )
         else:
             send_notify(
                 "【电信套餐用量监控】",
@@ -607,6 +622,7 @@ def main():
                 push_extra,
                 only_wechat=bool(TELECOM_ONLY_WARN),
             )
+        _publish_mqtt(body, by_phone)
     print(f"===============程序结束===============")
 
 
