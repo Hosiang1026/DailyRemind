@@ -109,12 +109,19 @@ def _publish_mqtt(body, by_phone=None):
     pwd = (os.environ.get("mqtt_password") or "").strip()
     topic = (os.environ.get("mqtt_topic_telecom") or "qinglong/telecom").strip() or "qinglong/telecom"
     ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    full = "📱电信套餐\n\n" + body
+
+    def _mqtt_val(t):
+        s = str(t).strip()
+        if not s:
+            return ""
+        return "电信套餐\n\n" + s
+
+    full = _mqtt_val(body)
     if isinstance(by_phone, dict) and len(by_phone) > 1:
         msg = {"timestamp": ts}
         for p, t in by_phone.items():
             if isinstance(p, str) and len(p) == 11 and p.isdigit() and t:
-                msg[p] = str(t).strip()
+                msg[p] = _mqtt_val(t)
     else:
         msg = {"timestamp": ts, "content": full}
     payload = json.dumps(msg, ensure_ascii=False)
@@ -610,14 +617,14 @@ def main():
                 if not t:
                     continue
                 send_notify(
-                    "【电信套餐用量监控】",
+                    "【电信套餐】",
                     t,
                     push_extra,
                     only_wechat=bool(TELECOM_ONLY_WARN),
                 )
         else:
             send_notify(
-                "【电信套餐用量监控】",
+                "【电信套餐】",
                 body,
                 push_extra,
                 only_wechat=bool(TELECOM_ONLY_WARN),
