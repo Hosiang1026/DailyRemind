@@ -109,19 +109,13 @@ def _publish_mqtt(body, by_phone=None):
     pwd = (os.environ.get("mqtt_password") or "").strip()
     topic = (os.environ.get("mqtt_topic_telecom") or "qinglong/telecom").strip() or "qinglong/telecom"
     ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    def _mqtt_val(t):
-        s = str(t).strip()
-        if not s:
-            return ""
-        return "电信套餐\n\n" + s
-
-    full = _mqtt_val(body)
-    if isinstance(by_phone, dict) and len(by_phone) > 1:
+    by_phone = by_phone if isinstance(by_phone, dict) else {}
+    full = (body or "").strip()
+    if len(by_phone) > 1:
         msg = {"timestamp": ts}
         for p, t in by_phone.items():
-            if isinstance(p, str) and len(p) == 11 and p.isdigit() and t:
-                msg[p] = _mqtt_val(t)
+            if isinstance(p, str) and len(p) == 11 and p.isdigit() and (t or "").strip():
+                msg[p] = str(t).strip()
     else:
         msg = {"timestamp": ts, "content": full}
     payload = json.dumps(msg, ensure_ascii=False)
@@ -258,7 +252,7 @@ def _telecom_strip_non_wechat(pc):
     )
 
 
-def send_notify(title, body, push_config_extra=None, only_wechat=False):
+def send_notify(title, body, push_config_extra=None, only_wechat=False, skip_footer=False):
     try:
         import notify
 
@@ -271,7 +265,8 @@ def send_notify(title, body, push_config_extra=None, only_wechat=False):
             notify.push_config["DD_BOT_SECRET"] = ""
             if only_wechat:
                 _telecom_strip_non_wechat(notify.push_config)
-            notify.send(title, _append_task_notify_footer(body))
+            out = body if skip_footer else _append_task_notify_footer(body)
+            notify.send(title, out)
         finally:
             notify.push_config.clear()
             notify.push_config.update(saved)
@@ -605,6 +600,8 @@ def main():
         print(f"===============推送通知===============")
         body = "\n\n────────────\n\n".join(all_blocks)
         by_phone = {p: "\n\n".join(v) for p, v in mqtt_by_phone.items() if v}
+        by_phone_fmt = {p: _append_task_notify_footer(s) for p, s in by_phone.items()}
+        body_fmt = _append_task_notify_footer(body) if len(by_phone) <= 1 else ""
         if TELECOM_ONLY_WARN and worst_icon == "🟢":
             print("流量使用在均匀范围内，跳过通知")
         elif len(by_phone) > 1:
@@ -613,21 +610,23 @@ def main():
                 if phonenum in seen:
                     continue
                 seen.add(phonenum)
-                t = (by_phone.get(phonenum) or "").strip()
-                if not t:
+                t_fmt = (by_phone_fmt.get(phonenum) or "").strip()
+                if not t_fmt:
                     continue
                 send_notify(
                     "【电信套餐】",
-                    t,
+                    t_fmt,
                     push_extra,
                     only_wechat=bool(TELECOM_ONLY_WARN),
+                    skip_footer=True,
                 )
         else:
             send_notify(
                 "【电信套餐】",
-                body,
+                body_fmt,
                 push_extra,
                 only_wechat=bool(TELECOM_ONLY_WARN),
+                skip_footer=True,
             )
         _publish_mqtt(body, by_phone)
     print(f"===============程序结束===============")
