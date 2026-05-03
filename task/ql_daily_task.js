@@ -1,5 +1,5 @@
 /*
-cron "0 8 * * *" ql_daily_task.js, tag=节日提醒
+cron "0 0 * * *" ql_daily_task.js, tag=节日提醒
 * 节日提醒任务:脚本更新地址 task/ql_daily_task.js
 * 配置参数 input.js
 */
