@@ -510,7 +510,7 @@ module.exports = handleLottery = () => {
 
 		lotteryContent.push(`📈福利彩票`);
 
-		let nowDate = new Date("2025-02-13");
+		let nowDate = new Date();
 		let nowDay = nowDate.getDay();
 
 		let SDArr = lottery.SD;
