@@ -55,8 +55,6 @@ const lottery = {
 const weather = {
     open: parseBoolEnv('WEATHER_OPEN'),
     key: process.env.WEATHER_KEY != null ? String(process.env.WEATHER_KEY) : '',
-    base_data: parseEnvJson('WEATHER_BASE_DATA'),
-    all_data: parseEnvJson('WEATHER_ALL_DATA'),
     clothes: parseEnvJson('WEATHER_CLOTHES'),
 };
 

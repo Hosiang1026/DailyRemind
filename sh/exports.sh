@@ -71,37 +71,6 @@ export CITIES='[
   {"city_name":"浙江-吴兴","city_code":"101210205"},
   {"city_name":"安徽-怀宁","city_code":"101220605"}
 ]'
-# 常用城市：city_code、time(AM/PM)、day(0–6)
-export WEATHER_BASE_DATA='[
-  {
-    "city_code": 330110,
-    "time": ["AM"],
-    "day": [1,2,3,4,5,6,0]
-  },
-  {
-    "city_code": 330502,
-    "time": ["AM"],
-    "day": [1,2,3,4,5, 6,0]
-  },
-  {
-    "city_code": 340722,
-    "time": ["AM"],
-    "day": [1,2,3,4,5,6, 0]
-  }
-]'
-# 扩展城市：同上
-export WEATHER_ALL_DATA='[
-  {
-    "city_code": 330502,
-    "time": ["PM"],
-    "day": [1,5]
-  },
-  {
-    "city_code": 340822,
-    "time": ["PM"],
-    "day": [3]
-  }
-]'
 # 穿衣建议：name/night/remark/date/mm-dd/num
 export WEATHER_CLOTHES='[
   {
