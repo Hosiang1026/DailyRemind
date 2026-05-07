@@ -323,24 +323,6 @@ def _flux_usage_suffix(telecom, product):
     return f"  └ 剩余 {rem_gb} GB · 用量占比 {pct:.1f}%"
 
 
-def _flow_items_block(telecom, flow_items):
-    if not flow_items:
-        return ""
-    lines = []
-    for it in flow_items:
-        tot = int(it.get("total") or 0)
-        use = int(it.get("use") or 0)
-        bal = int(it.get("balance") or 0)
-        use_g = telecom.convert_flow(use, "GB", 2)
-        tot_g = telecom.convert_flow(tot, "GB", 2)
-        bal_g = telecom.convert_flow(bal, "GB", 2)
-        pct = (100.0 * use / tot) if tot > 0 else 0.0
-        lines.append(
-            f"  · 已用 {use_g} / 共 {tot_g} GB，剩余 {bal_g} GB（占套内 {pct:.1f}%）"
-        )
-    return "\n\n【国内通用流量】\n" + "\n".join(lines)
-
-
 def _fee_lines_from_important_balance(data):
     if not isinstance(data, dict):
         return []
@@ -549,10 +531,8 @@ def run_one_account(telecom, phonenum, password, slice_data, push_config_extra, 
 🌐 总流量
 {common_block}{special_block}"""
 
-    notify_str += _flow_items_block(telecom, summary.get("flowItems") or [])
-
     if TELECOM_FLUX_PACKAGE and flux_package_str.strip():
-        notify_str += f"\n\n【国内通用流量明细】\n{flux_package_str.strip()}"
+        notify_str += f"\n\n【流量明细】\n{flux_package_str.strip()}"
 
     notify_str = _append_fee_records(notify_str, rd.get("data"), phonenum, bills_by_phone)
     add_notify(notify_str.strip())
