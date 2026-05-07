@@ -290,6 +290,13 @@ PMpq0/XKBO8lYhN/gwIDAQAB
                     "total": item_total,
                 }
             )
+        agg_special_total = sum(
+            int(it.get("total") or 0)
+            for it in flowItems
+            if "专用" in (it.get("name") or "")
+        )
+        if agg_special_total > 0:
+            special_total = max(special_total, agg_special_total)
         summary = {
             "phonenum": phonenum,
             "balance": balance,
