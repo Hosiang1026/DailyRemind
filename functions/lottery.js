@@ -76,6 +76,14 @@ async function sendMqttMsg(lotteryContent) {
 	});
 }
 
+function getLotteryWeekday(d) {
+	const w = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Shanghai', weekday: 'short' }).format(d);
+	const m = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+	const v = m[w];
+	if (v === undefined) throw new Error('lottery weekday: ' + w);
+	return v;
+}
+
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.57";
 const options = { headers: { "User-Agent": UA }, rejectUnauthorized: false };
 const lotteryURLs = [
@@ -510,8 +518,7 @@ module.exports = handleLottery = () => {
 
 		lotteryContent.push(`📈福利彩票`);
 
-		let nowDate = new Date();
-		let nowDay = nowDate.getDay();
+		let nowDay = getLotteryWeekday(new Date());
 
 		let SDArr = lottery.SD;
 		for (let i = 0; i < SDArr.length; i++) {

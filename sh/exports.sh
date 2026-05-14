@@ -52,12 +52,12 @@ export WSGW_NOTIFY_ALL='false'
 ## 彩票（星期 0=周日）
 # 彩票提醒总开关
 export LOTTERY_OPEN='true'
-# 福彩 3D 推送星期 0–6
-export LOTTERY_SD='[1,2,3,4,5,6,0]'
-# 快乐8 推送星期
-export LOTTERY_KL8='[1,2,3,4,5,6,0]'
+# 福彩3D 推送星期 0–6
+export LOTTERY_SD='[1,3,5,6]'
 # 七乐彩 推送星期
-export LOTTERY_QLC='[1,3,5]'
+export LOTTERY_QLC='[1,3,5,6]'
+# 快乐8 推送星期
+export LOTTERY_KL8='[1,3,5,6]'
 # 双色球 推送星期
 export LOTTERY_SSQ='[2,4,0]'
 
